@@ -122,7 +122,8 @@ onload = () => {
                 states: {}, 
             }, 
             holding: new Map<number, MovableEntity>(),  
-            handJointId: PLAYER_GRAPHIC_JOINT_ID_LEFT_ARM,
+            //handJointId: PLAYER_GRAPHIC_JOINT_ID_RIGHT_HAND,
+            handJointId: PLAYER_GRAPHIC_JOINT_ID_TAPE_DECK,
         };
         for( let i=0; i<1; i++ ) {
             const robot: Robot = {

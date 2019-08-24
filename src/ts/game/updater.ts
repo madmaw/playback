@@ -451,7 +451,7 @@ const updateAndRenderRoom = (c: CanvasRenderingContext2D, room: Room, delta: num
     // render
     let result: [Entity[], Entity[], Entity[], Entity[]] = [[], [], [], []];
     room.allEntities.forEach(entity => {
-        const movableEntity = entity as MovableEntity;
+        const movableEntity = entity as ActiveMovableEntity;
         const graphicalEntity = entity as ActiveGraphicalEntity;
         const grabbingEntity = entity as GrabbingEntity;
         if (movableEntity.lastCollisions && movableEntity.lastCollisions[EDGE_BOTTOM] + AUTOMATIC_ANIMATION_DELAY < worldAge) {
@@ -492,66 +492,81 @@ const updateAndRenderRoom = (c: CanvasRenderingContext2D, room: Room, delta: num
             if (orientableEntity.orientation != null) {
                 const turnProgress = Math.min(1, (worldAge - orientableEntity.orientationStartTime)/TURN_DURATION) * 2 - 1;
                 c.scale(orientableEntity.orientation?turnProgress:-turnProgress, 1);
-            }
-            const graphicalEntity = entity as ActiveGraphicalEntity;
-            if (graphicalEntity.graphic) {
-                if (graphicalEntity.currentAnimationId != graphicalEntity.targetAnimationId) {
-                    const currentAnimation = graphicalEntity.graphic.animations && graphicalEntity.graphic.animations[graphicalEntity.currentAnimationId];
-                    graphicalEntity.previousAnimationPoseDuration = currentAnimation && currentAnimation.poseDuration || 0;
-                    graphicalEntity.currentAnimationId = graphicalEntity.targetAnimationId;
-                    graphicalEntity.currentAnimationStartTime = worldAge;    
-                }
-        
-                c.scale(w/graphicalEntity.graphic.width, h/graphicalEntity.graphic.height);
-                let currentPoseId: number | undefined;
-                let progress: number | undefined;
-                if (graphicalEntity.currentAnimationId != null) {
-                    const currentAnimation = graphicalEntity.graphic.animations && graphicalEntity.graphic.animations[graphicalEntity.currentAnimationId];
-                    if (currentAnimation) {
-                        
-                        let duration = worldAge - graphicalEntity.currentAnimationStartTime;
-                        let previousAnimationPoseDuration = graphicalEntity.previousAnimationPoseDuration;
-                        if (previousAnimationPoseDuration < currentAnimation.poseDuration) {
-                            duration -= previousAnimationPoseDuration;
-                        }
-                        if (duration >= 0) {
-                            let poseDuration: number;                        
-                            let poseIndex = Math.floor(duration / currentAnimation.poseDuration);
-                            if (currentAnimation.repeat) {
-                                let repeats = Math.floor(poseIndex / currentAnimation.poseIds.length);
-                                const maxPoseDuration = currentAnimation.poseIds.length * currentAnimation.poseDuration;
-                                if (repeats >= currentAnimation.repeat) {
-                                    poseIndex = currentAnimation.poseIds.length - 1;
-                                }   
-                                poseDuration = Math.min(duration - poseIndex * currentAnimation.poseDuration, maxPoseDuration);
-                            } else {
-                                poseDuration = duration - poseIndex * currentAnimation.poseDuration;
-                                poseIndex = poseIndex % currentAnimation.poseIds.length;
-                            }
-                            progress = poseDuration / currentAnimation.poseDuration;
-                            currentPoseId = currentAnimation.poseIds[poseIndex];        
-                        } else {
-                            progress = 1 - duration/previousAnimationPoseDuration;
-                            currentPoseId = currentAnimation.poseIds[currentAnimation.poseIds.length - 1];
-                        }
-                    }
-                }
-                if (graphicalEntity.currentPoseId != currentPoseId) {
-                    graphicalEntity.previousPoseId = graphicalEntity.currentPoseId;
-                    graphicalEntity.currentPoseId = currentPoseId;
-                }
-                drawGraphic(c, graphicalEntity.graphic, currentPoseId, graphicalEntity.previousPoseId, progress);                
-            } else {
-                if (movableEntity.carrier) {
-                    c.fillStyle = 'blue';
-                } else {
-                    c.fillStyle = 'black';
-                }
-                c.fillRect(-w/2, 0, w, h);        
-            }
+            }        
+            drawEntity(c, entity, worldAge);
             c.restore();
         }
     });
     return result;
 };
+
+const drawEntity = (c: CanvasRenderingContext2D, entity: Entity, worldAge: number, xscale = 1, yscale = 1) => {
+    const [x, y, w, h] = entity.bounds;
+    const movableEntity = entity as ActiveMovableEntity;
+    const graphicalEntity = entity as ActiveGraphicalEntity;
+    if (graphicalEntity.graphic) {
+        if (graphicalEntity.currentAnimationId != graphicalEntity.targetAnimationId) {
+            const currentAnimation = graphicalEntity.graphic.animations && graphicalEntity.graphic.animations[graphicalEntity.currentAnimationId];
+            graphicalEntity.previousAnimationPoseDuration = currentAnimation && currentAnimation.poseDuration || 0;
+            graphicalEntity.currentAnimationId = graphicalEntity.targetAnimationId;
+            graphicalEntity.currentAnimationStartTime = worldAge;    
+        }
+        const newXScale = w/(graphicalEntity.graphic.width * xscale);
+        const newYScale = h/(graphicalEntity.graphic.height * yscale)
+        c.save();
+        c.scale(newXScale, newYScale);
+        let currentPoseId: number | undefined;
+        let progress: number | undefined;
+        if (graphicalEntity.currentAnimationId != null) {
+            const currentAnimation = graphicalEntity.graphic.animations && graphicalEntity.graphic.animations[graphicalEntity.currentAnimationId];
+            if (currentAnimation) {
+                
+                let duration = worldAge - graphicalEntity.currentAnimationStartTime;
+                let previousAnimationPoseDuration = graphicalEntity.previousAnimationPoseDuration;
+                if (previousAnimationPoseDuration < currentAnimation.poseDuration) {
+                    duration -= previousAnimationPoseDuration;
+                }
+                if (duration >= 0) {
+                    let poseDuration: number;                        
+                    let poseIndex = Math.floor(duration / currentAnimation.poseDuration);
+                    if (currentAnimation.repeat) {
+                        let repeats = Math.floor(poseIndex / currentAnimation.poseIds.length);
+                        const maxPoseDuration = currentAnimation.poseIds.length * currentAnimation.poseDuration;
+                        if (repeats >= currentAnimation.repeat) {
+                            poseIndex = currentAnimation.poseIds.length - 1;
+                        }   
+                        poseDuration = Math.min(duration - poseIndex * currentAnimation.poseDuration, maxPoseDuration);
+                    } else {
+                        poseDuration = duration - poseIndex * currentAnimation.poseDuration;
+                        poseIndex = poseIndex % currentAnimation.poseIds.length;
+                    }
+                    progress = poseDuration / currentAnimation.poseDuration;
+                    currentPoseId = currentAnimation.poseIds[poseIndex];        
+                } else {
+                    progress = 1 - duration/previousAnimationPoseDuration;
+                    currentPoseId = currentAnimation.poseIds[currentAnimation.poseIds.length - 1];
+                }
+            }
+        }
+        if (graphicalEntity.currentPoseId != currentPoseId) {
+            graphicalEntity.previousPoseId = graphicalEntity.currentPoseId;
+            graphicalEntity.currentPoseId = currentPoseId;
+        }
+        const callback: PostJointRenderCallback = (c, j) => {
+            const held = movableEntity.holding && movableEntity.holding.get(j.id);
+            if (held) {
+                drawEntity(c, held as Entity, worldAge, newXScale, newYScale);
+            }
+        };
+        drawGraphic(c, graphicalEntity.graphic, callback, currentPoseId, graphicalEntity.previousPoseId, progress);        
+        c.restore();        
+    } else {
+        if (movableEntity.carrier) {
+            c.fillStyle = 'blue';
+        } else {
+            c.fillStyle = 'black';
+        }
+        c.fillRect(-w/2, 0, w, h);        
+    }
+}
 

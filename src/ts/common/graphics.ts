@@ -55,13 +55,17 @@ type Transform = {
     opacity: number;
 };
 
-let drawGraphic = (c: CanvasRenderingContext2D, g: Graphic, toPoseId?: number, fromPoseId?: number, progress: number = 1) => {
+interface PostJointRenderCallback {
+    (c: CanvasRenderingContext2D, joint: Joint): void;
+}
+
+let drawGraphic = (c: CanvasRenderingContext2D, g: Graphic, callback: PostJointRenderCallback, toPoseId?: number, fromPoseId?: number, progress: number = 1) => {
     let toPose = g.poses && g.poses[toPoseId];
     let fromPose = g.poses && g.poses[fromPoseId];
-    drawGraphicJoints(c, g, g.joints, toPose, fromPose, progress)
+    drawGraphicJoints(c, g, g.joints, callback, toPose, fromPose, progress)
 };
 
-let drawGraphicJoints = (c: CanvasRenderingContext2D, g: Graphic, joints: Joint[], toPose: Pose, fromPose: Pose | undefined, progress: number) => {
+let drawGraphicJoints = (c: CanvasRenderingContext2D, g: Graphic, joints: Joint[], callback: PostJointRenderCallback, toPose: Pose, fromPose: Pose | undefined, progress: number) => {
     if (joints) {
         joints.forEach(j => {
             c.save();
@@ -72,7 +76,7 @@ let drawGraphicJoints = (c: CanvasRenderingContext2D, g: Graphic, joints: Joint[
             if (fromPose && progress < 1) {
                 applyGraphicTransformations(c, fromPose[j.id], 1-progress);
             }
-            drawGraphicJoints(c, g, j.renderBefore, toPose, fromPose, progress);
+            drawGraphicJoints(c, g, j.renderBefore, callback, toPose, fromPose, progress);
             if (j.imageIndex != null) {
                 g.images[j.imageIndex].forEach(image => {                
                     const [ix, iy, iw, ih, paletteIndex] = image;
@@ -81,7 +85,8 @@ let drawGraphicJoints = (c: CanvasRenderingContext2D, g: Graphic, joints: Joint[
                     c.fillRect(ix, iy, iw, ih);
                 });    
             }
-            drawGraphicJoints(c, g, j.renderAfter, toPose, fromPose, progress);
+            drawGraphicJoints(c, g, j.renderAfter, callback, toPose, fromPose, progress);
+            callback(c, j);
             c.restore();        
         });    
     }

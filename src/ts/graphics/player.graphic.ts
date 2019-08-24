@@ -21,7 +21,9 @@ const PLAYER_GRAPHIC_JOINT_ID_LEFT_ARM = 6;
 const PLAYER_GRAPHIC_JOINT_ID_TORSO = 7;
 const PLAYER_GRAPHIC_JOINT_ID_LEFT_EYE = 8;
 const PLAYER_GRAPHIC_JOINT_ID_RIGHT_EYE = 9;
-const PLAYER_GRAPHIC_JOINT_ID_HANDLE = 11;
+const PLAYER_GRAPHIC_JOINT_ID_HANDLE = 10;
+const PLAYER_GRAPHIC_JOINT_ID_RIGHT_HAND = 11;
+const PLAYER_GRAPHIC_JOINT_ID_TAPE_DECK = 12;
 
 const PLAYER_GRAPHIC_POSE_ID_STEP_LEFT = 0;
 const PLAYER_GRAPHIC_POSE_ID_STEP_RIGHT = 1;
@@ -135,6 +137,13 @@ const playerGraphic: Graphic = {
                         dx: 14, 
                         dy: 10, 
                     }],
+                }, {
+                    id: PLAYER_GRAPHIC_JOINT_ID_TAPE_DECK, 
+                    transformations: [{
+                        transformType: TRANSFORM_TYPE_TRANSLATE, 
+                        dx: 10.5, 
+                        dy: 6,                         
+                    }]
                 }], 
             }, {
                 id: PLAYER_GRAPHIC_JOINT_ID_SIDE_PANEL, // side panel
@@ -146,7 +155,15 @@ const playerGraphic: Graphic = {
                         transformType: TRANSFORM_TYPE_TRANSLATE, 
                         dx: -5, 
                         dy: 8, 
-                    }], 
+                    }],
+                    renderAfter: [{
+                        id: PLAYER_GRAPHIC_JOINT_ID_RIGHT_HAND, 
+                        transformations: [{
+                            transformType: TRANSFORM_TYPE_TRANSLATE, 
+                            dx: 0, 
+                            dy: 6,                                 
+                        }]
+                    }] 
                 }], 
             }], 
         }], 
