@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "module": "amd",
+        "target": "ES2015",
+        "outFile": "build/out.js",
+        "rootDir": ".",
+        "noImplicitAny": false,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true, 
+        "strictNullChecks": false 
+    },
+    "include": [
+        "src/ts/**/*",
+        "src/d.ts/**/*"
+    ],
+    "exclude": [
+    ]
+}
