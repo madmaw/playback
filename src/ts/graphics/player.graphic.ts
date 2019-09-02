@@ -31,17 +31,24 @@ const PLAYER_GRAPHIC_POSE_ID_JUMP = 2;
 const PLAYER_GRAPHIC_POSE_ID_REST_UP = 3;
 const PLAYER_GRAPHIC_POSE_ID_REST_DOWN = 4;
 const PLAYER_GRAPHIC_POSE_ID_GRAB = 5;
+const PLAYER_GRAPHIC_POSE_ID_INSERT = 6;
+const PLAYER_GRAPHIC_POSE_ID_PICK_UP = 7;
+const PLAYER_GRAPHIC_POSE_ID_THROW_WIND_UP = 8;
+const PLAYER_GRAPHIC_POSE_ID_THROW_PITCH = 9;
+const PLAYER_GRAPHIC_POSE_ID_DROP = 10;
+const PLAYER_GRAPHIC_POSE_ID_PUSH_BUTTON = 11;
+
+const playerPalette: HSL[] = [
+    [40, 5, 60], // font body colour
+    [40, 5, 40], // side body colour
+    [120, 40, 30], // face plate colour
+    [40, 5, 10], // legs/arms/buttons
+    [0, 100, 40], // red
+];
 
 const playerGraphic: Graphic = {
     width: 22, 
     height: 30, 
-    palette: [
-        [40, 5, 60], // font body colour
-        [40, 5, 40], // side body colour
-        [120, 40, 30], // face plate colour
-        [40, 5, 10], // legs/arms/buttons
-        [0, 100, 40], // red
-    ], 
     images: [
         // front panel
         [
@@ -193,6 +200,9 @@ const playerGraphic: Graphic = {
                 transformType: TRANSFORM_TYPE_TRANSLATE, 
                 dx: 0, 
                 dy: -6, 
+            }, {
+                transformType: TRANSFORM_TYPE_ROTATE, 
+                rotation: Math.PI/5, 
             }], 
             [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{ // right arm
                 transformType: TRANSFORM_TYPE_ROTATE, 
@@ -202,7 +212,7 @@ const playerGraphic: Graphic = {
                 transformType: TRANSFORM_TYPE_ROTATE, 
                 rotation: Math.PI/3, 
             }], 
-            [PLAYER_GRAPHIC_IMAGE_INDEX_HANDLE]: [{ // handle
+            [PLAYER_GRAPHIC_JOINT_ID_HANDLE]: [{ // handle
                 transformType: TRANSFORM_TYPE_SCALE, 
                 scaleX: .8, 
                 scaleY: 1, 
@@ -241,6 +251,9 @@ const playerGraphic: Graphic = {
                 transformType: TRANSFORM_TYPE_TRANSLATE, 
                 dx: -4, 
                 dy: -6, 
+            }, {
+                transformType: TRANSFORM_TYPE_ROTATE, 
+                rotation: Math.PI/5, 
             }], 
             [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{ // right arm
                 transformType: TRANSFORM_TYPE_ROTATE, 
@@ -252,7 +265,7 @@ const playerGraphic: Graphic = {
             }],
             [PLAYER_GRAPHIC_JOINT_ID_HANDLE]: [{ // handle
                 transformType: TRANSFORM_TYPE_SCALE, 
-                scaleX: .8, 
+                scaleX: .7, 
                 scaleY: 1, 
             }] 
         },
@@ -309,11 +322,108 @@ const playerGraphic: Graphic = {
                 transformType: TRANSFORM_TYPE_ROTATE, 
                 rotation: -Math.PI/3
             }]
+        },
+        // insert
+        {
+            [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{
+                transformType: TRANSFORM_TYPE_ROTATE, 
+                rotation: -Math.PI/2
+            }], 
+            [PLAYER_GRAPHIC_JOINT_ID_RIGHT_HAND]: [{
+                transformType: TRANSFORM_TYPE_ROTATE, 
+                rotation: Math.PI/2
+            }], 
+        },
+        // pick up
+        {
+            [PLAYER_GRAPHIC_JOINT_ID_TORSO]: [, {
+                transformType: TRANSFORM_TYPE_SCALE, 
+                scaleX: 1.1, 
+                scaleY: 0.8, 
+            }, {
+                transformType: TRANSFORM_TYPE_TRANSLATE, 
+                dx: 0, 
+                dy: 10, 
+            }], 
+            [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{
+                transformType: TRANSFORM_TYPE_ROTATE, 
+                rotation: -Math.PI/4, 
+            }],
+        }, 
+        // throw wind up
+        {
+            [PLAYER_GRAPHIC_JOINT_ID_BODY]: [, {
+                transformType: TRANSFORM_TYPE_ROTATE, 
+                rotation: -Math.PI/4, 
+                aroundX: 3, 
+                aroundY: 26, 
+            }], 
+            [PLAYER_GRAPHIC_JOINT_ID_TORSO]: [{
+                transformType: TRANSFORM_TYPE_SCALE, 
+                scaleX: 1.2, 
+                scaleY: 0.8, 
+            }, {
+                transformType: TRANSFORM_TYPE_TRANSLATE, 
+                dx: 0, 
+                dy: 10, 
+            }],            
+            [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{
+                transformType: TRANSFORM_TYPE_ROTATE, 
+                rotation: Math.PI*3/4, 
+            }],
+            [PLAYER_GRAPHIC_JOINT_ID_RIGHT_LEG]: [{
+                transformType: TRANSFORM_TYPE_ROTATE, 
+                rotation: Math.PI/4, 
+            }],
+        }, 
+        // throw pitch
+        {
+            [PLAYER_GRAPHIC_JOINT_ID_BODY]: [{
+                transformType: TRANSFORM_TYPE_ROTATE, 
+                rotation: Math.PI/4, 
+                aroundX: 10, 
+                aroundY: 26, 
+            }], 
+            [PLAYER_GRAPHIC_JOINT_ID_TORSO]: [{
+                transformType: TRANSFORM_TYPE_SCALE, 
+                scaleX: .9, 
+                scaleY: 1.2, 
+            }, {
+                transformType: TRANSFORM_TYPE_TRANSLATE, 
+                dx: 0, 
+                dy: -4, 
+            }],            
+            [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{
+                transformType: TRANSFORM_TYPE_ROTATE, 
+                rotation: 3*Math.PI/2, 
+            }],
+            [PLAYER_GRAPHIC_JOINT_ID_RIGHT_LEG]: [{
+                transformType: TRANSFORM_TYPE_ROTATE, 
+                rotation: -Math.PI/4, 
+            }],
+        }, 
+        // drop 
+        {            
+            [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{
+                transformType: TRANSFORM_TYPE_ROTATE, 
+                rotation: -Math.PI/3, 
+            }],    
+        }, 
+        // push a button 
+        {
+            [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{
+                transformType: TRANSFORM_TYPE_ROTATE, 
+                rotation: -Math.PI*3/4, 
+            }, {
+                transformType: TRANSFORM_TYPE_TRANSLATE, 
+                dx: 0, 
+                dy: 4, 
+            }],    
         }
     ],
     animations: {
         [ANIMATION_ID_WALKING]: { // walk (0)
-            poseDuration: 350, 
+            poseDuration: 300, 
             poseIds: [PLAYER_GRAPHIC_POSE_ID_STEP_LEFT, PLAYER_GRAPHIC_POSE_ID_STEP_RIGHT], // step left, step right
         }, 
         [ANIMATION_ID_JUMPING]: { // jump (1)
@@ -329,6 +439,31 @@ const playerGraphic: Graphic = {
             poseDuration: 100, 
             poseIds: [PLAYER_GRAPHIC_POSE_ID_GRAB], 
             repeat: 1, 
+        }, 
+        [ANIMATION_ID_INSERTING]: {
+            poseDuration: 300, 
+            poseIds: [PLAYER_GRAPHIC_POSE_ID_INSERT], 
+        }, 
+        [ANIMATION_ID_PICKING_UP]: {
+            poseDuration: 200, 
+            poseIds: [PLAYER_GRAPHIC_POSE_ID_PICK_UP], 
+        }, 
+        [ANIMATION_ID_THROWING]: { 
+            poseDuration: 180, 
+            poseIds: [PLAYER_GRAPHIC_POSE_ID_THROW_WIND_UP, PLAYER_GRAPHIC_POSE_ID_THROW_PITCH],
+        }, 
+        [ANIMATION_ID_DROPPING]: {
+            poseDuration: 200, 
+            poseIds: [PLAYER_GRAPHIC_POSE_ID_DROP], 
+        }, 
+        [ANIMATION_ID_PRESSING_BUTTON]: {
+            poseDuration: 300, 
+            poseIds: [PLAYER_GRAPHIC_POSE_ID_PUSH_BUTTON], 
+            repeat: 1, 
+        }, 
+        [ANIMATION_ID_DEATH]: {
+            poseDuration: 100, 
+            poseIds: [PLAYER_GRAPHIC_POSE_ID_JUMP], 
         }
     }, 
 };

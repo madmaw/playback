@@ -4,7 +4,12 @@ type Room = {
     tiles: Entity[][][]; 
     bounds: Rectangle;
     gravity: Vector;
+    backgroundColor: HSL;
 }
+
+type IdFactory = () => number;
+
+type RoomFactory = (x: number, y: number, id: IdFactory) => Room;
 
 let roomCreate = (x: number, y: number, w: number, h: number) => {
     const tiles: Entity[][][] = array2DCreate(w, h, () => []);
@@ -15,6 +20,7 @@ let roomCreate = (x: number, y: number, w: number, h: number) => {
         tiles, 
         bounds: [x, y, w, h], 
         gravity: DEFAULT_GRAVITY, 
+        backgroundColor: [240, 20, 90], 
     };
     return room;
 };
@@ -52,16 +58,18 @@ let roomAddEntity = (room: Room, entity: Entity, deltas?: Vector) => {
 }
 
 let roomAddEntityToTiles = (room: Room, entity: Entity) => {
-    const movableEntity = entity as MovableEntity;
-    entityCalculateBoundsWithVelocity(entity);
-    if (FLAG_CHECK_TILES_VALID) {
-        const alreadyThere = room.tiles.find(tiles => tiles.find(entities => entities.find(e => e == entity)));
-        if (alreadyThere) {
-            console.log('added but already there');
+    if (!(entity as MortalEntity).deathAge) {
+        const movableEntity = entity as MovableEntity;
+        entityCalculateBoundsWithVelocity(entity);
+        if (FLAG_CHECK_TILES_VALID) {
+            const alreadyThere = room.tiles.find(tiles => tiles.find(entities => entities.find(e => e == entity)));
+            if (alreadyThere) {
+                console.log('added but already there');
+            }
         }
+    
+        roomIterateBounds(room, movableEntity.boundsWithVelocity || movableEntity.bounds, tile => tile.push(entity));            
     }
-
-    roomIterateBounds(room, movableEntity.boundsWithVelocity || movableEntity.bounds, tile => tile.push(entity));
 }
 
 let roomRemoveEntity = (room: Room, entity: Entity, includeCarried?: number | boolean) => {

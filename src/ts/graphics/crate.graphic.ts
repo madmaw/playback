@@ -6,14 +6,15 @@ const CRATE_GRAPHIC_IMAGE_INDEX_BOARD = 0;
 
 const CRATE_GRAPHIC_JOINT_ID_BODY = 0;
 
+const cratePalette: HSL[] = [
+    [30, 30, 60], 
+    [30, 30, 50],
+    [30, 30, 40],
+];
+
 const crateGraphic: Graphic = {
     width: 16, 
     height: 16, 
-    palette: [
-        [30, 30, 60], 
-        [30, 30, 50],
-        [30, 30, 40],
-    ], 
     images: [
         // board
         [   

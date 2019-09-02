@@ -1,5 +1,6 @@
 node_modules
-dist
+dist/index.css
+dist/out.min.js
 build
 closure.txt
 package-lock.json

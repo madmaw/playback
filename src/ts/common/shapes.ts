@@ -16,6 +16,8 @@ type Rectangle = [number, number, number, number];
 
 type Vector = [number, number];
 
+const rectangleCenterBounds = (x: number, y: number, w: number, h: number) => [x + (1 - w)/2, y + 1 - h, w, h] as Rectangle;
+
 let rectangleLineOverlaps = (r1: Rectangle, r2: Rectangle) => 
     axisMap(r1, r2, ([scalar1, length1]: number[], [scalar2, length2]: number[]) => {
         const min1 = scalar1;

@@ -3,8 +3,30 @@ body {
     padding: 0;    
 }
 
-#c {
-    width: 100%;
-    height: 100%;
+#c, #o, #h, #l {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    box-sizing: border-box;
 }
 
+#o, #h, #l {
+    color: #fff;
+    background: rgba(0, 0, 0, .5);
+    opacity: 0;
+    transition: opacity .5s;
+}
+
+#o, #l {
+    text-align: center;
+    font: 9vh fantasy;
+    padding-top: 40vh;    
+}
+
+#h {
+    padding: 9vh;    
+    font: 15px fantasy;
+}

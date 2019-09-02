@@ -89,9 +89,6 @@ module.exports = function (grunt) {
                     from: /build\/out\.js/g, 
                     to:"out.min.js"
                 }, { // gut the HTML entirely!
-                    from: "</canvas>", 
-                    to: ""
-                }, {
                     from: "</body></html>", 
                     to: ""
                 }, {
