@@ -18,7 +18,7 @@ const mainframeFactoryFactory = () => {
             velocity: [0, 0], 
             baseVelocity: BASE_VELOCITY/3, 
             boundsWithVelocity: [0, 0, 0, 0], 
-            orientation: 0, 
+            facing: 0, 
             orientationStartTime: 0, 
             activeInputs: {
                 reads: {}, 

@@ -21,7 +21,7 @@ const robotFactoryFactory = (orientation: Orientation, script?: number[], tapeCo
             velocity: [0, 0], 
             baseVelocity: BASE_VELOCITY/3, 
             boundsWithVelocity: [0, 0, 0, 0], 
-            orientation,
+            facing: orientation,
             orientationStartTime: 0, 
             activeInputs: {
                 reads: {}, 

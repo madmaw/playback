@@ -27,7 +27,7 @@ const randomSpikeGraphic = () => {
                 scaleY: (Math.random() + 2.5 - Math.abs(p)) / 2, 
             }, {
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                angle: Math.PI * (Math.random() - .5)/9 + p * Math.PI/9, 
+                rAngle: Math.PI * (Math.random() - .5)/9 + p * Math.PI/9, 
             }]
         });
     }

@@ -58,7 +58,7 @@ const crateGraphic: Graphic = {
                 scaleY:-1, 
             }, {
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                angle: -Math.PI/2, 
+                rAngle: -Math.PI/2, 
             }], 
         }, {
             imageIndex: CRATE_GRAPHIC_IMAGE_INDEX_BOARD, 
@@ -72,7 +72,7 @@ const crateGraphic: Graphic = {
                 scaleY:-1, 
             }, {
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                angle: -Math.PI/2, 
+                rAngle: -Math.PI/2, 
             }], 
         }, {
             imageIndex: CRATE_GRAPHIC_IMAGE_INDEX_BOARD, 

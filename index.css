@@ -4,7 +4,7 @@ body {
     background: #000;
 }
 
-#c, #o, #h, #l {
+#c, #o, /*#h,*/ #s {
     position: absolute;
     top: 0;
     left: 0;
@@ -14,20 +14,21 @@ body {
     box-sizing: border-box;
 }
 
-#o, #h, #l {
+#o, /*#h,*/ #s {
     color: #fff;
     background: rgba(0, 0, 0, .5);
     opacity: 0;
     transition: opacity .5s;
 }
 
-#o, #l {
+#o, #s {
     text-align: center;
     font: 9vh fantasy;
     padding-top: 40vh;    
 }
-
+/*
 #h {
     padding: 9vh;    
     font: 15px fantasy;
 }
+*/

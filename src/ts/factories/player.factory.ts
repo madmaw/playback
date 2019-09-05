@@ -8,7 +8,7 @@ const playerFactory = (x: number, y: number, id: IdFactory) => {
         collisionMask: COLLISION_MASK_PLAYER, 
         grabMask: GRAB_MASK, 
         gravityMultiplier: 1, 
-        orientation: ORIENTATION_RIGHT, 
+        facing: ORIENTATION_RIGHT, 
         orientationStartTime: 0, 
         id: id(),
         mass: 1, 
@@ -26,8 +26,7 @@ const playerFactory = (x: number, y: number, id: IdFactory) => {
         insertionJointId: PLAYER_GRAPHIC_JOINT_ID_TAPE_DECK,
         instructionsHeard: [], 
         toSpeak: [],             
-        capabilities: [INSTRUCTION_ID_HELP],
-        canLearnNew: 1, 
+        capabilities: INSTRUCTIONS.map((instruction, i) => i).filter(i => INSTRUCTIONS[i].keyCodes),
     };    
     return [player];
 }

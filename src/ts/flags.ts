@@ -10,3 +10,4 @@ const FLAG_EMOJIS = false;
 const FLAG_SPEECH_SYNTHESIS = false;
 const FLAG_LOCAL_SPEECH_SYNTHESIS = true;
 const FLAG_CHECK_OVERLAP_SELF = false;
+const FLAG_HELP = false;

@@ -94,7 +94,7 @@ const pressurePlateGraphicFactory = (width: number, height: number, edge: Edge) 
             [ANIMATION_ID_PRESSING_BUTTON]: {
                 poseDuration: 100, 
                 poseIds: [PRESSURE_PLATE_POSE_ID_TRIGGER], 
-                count: 1, 
+                repeatCount: 1, 
             }
         }
     };

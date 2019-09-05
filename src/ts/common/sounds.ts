@@ -104,7 +104,7 @@ let vibratoSoundFactory = (
 
         oscillator.start();    
         oscillator.stop(now + durationSeconds);
-        oscillator.onended = function() {
+        oscillator.onended = () => {
             if( !FLAG_MINIMAL_AUDIO_CLEANUP ) {
                 [oscillator, gain, vibrato, vibratoGain, filter].map(audioDisconnectSingleNode);
             } else {
@@ -131,14 +131,14 @@ const linearRampGain = (gain: GainNode, now: number, attackVolume: number, susta
     gain.gain.linearRampToValueAtTime(0, now + durationSeconds);
 }
 
-function boomSoundFactory(
+const boomSoundFactory =(
     audioContext: AudioContext, 
     durationSeconds: number, 
     attackSeconds: number, 
     filterFrequency: number, 
     attackVolume: number, 
     sustainVolume: number
-): Sound {
+): Sound => {
 	let sampleRate = audioContext.sampleRate;
     var frameCount = durationSeconds * sampleRate | 0;
     var buffer = audioContext.createBuffer(1, frameCount, sampleRate);
@@ -170,7 +170,7 @@ function boomSoundFactory(
 		
 		staticNode.start();
 		staticNode.stop(audioContext.currentTime + durationSeconds);
-		staticNode.onended = function() {
+		staticNode.onended = () => {
 			if( FLAG_MINIMAL_AUDIO_CLEANUP ) {
 				audioDisconnectSingleNode(gain);
 			} else {
@@ -208,7 +208,7 @@ const synthesizeSpeech = (
 
 		staticNode.start();
 		staticNode.stop(audioContext.currentTime + durationSeconds);
-		staticNode.onended = function() {
+		staticNode.onended = () => {
 			if( FLAG_MINIMAL_AUDIO_CLEANUP ) {
 				audioDisconnectSingleNode(gain);
 			} else {

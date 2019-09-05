@@ -143,7 +143,7 @@ const robotGraphic: Graphic = {
     poses: [{ // ROBOT_GRAPHIC_POSE_ID_STEP_LEFT
         [ROBOT_GRAPHIC_JOINT_ID_BODY]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            angle: -Math.PI/20, 
+            rAngle: -Math.PI/20, 
         }],
         [ROBOT_GRAPHIC_JOINT_ID_LEFT_LEG]: [{
             transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -152,12 +152,12 @@ const robotGraphic: Graphic = {
         }], 
         [ROBOT_GRAPHIC_JOINT_ID_HEAD]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            angle: Math.PI/20, 
+            rAngle: Math.PI/20, 
         }], 
     }, { // ROBOT_GRAPHIC_POSE_ID_STEP_RIGHT
         [ROBOT_GRAPHIC_JOINT_ID_BODY]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            angle: Math.PI/20, 
+            rAngle: Math.PI/20, 
         }], 
         [ROBOT_GRAPHIC_JOINT_ID_RIGHT_LEG]: [{
             transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -166,7 +166,7 @@ const robotGraphic: Graphic = {
         }], 
         [ROBOT_GRAPHIC_JOINT_ID_HEAD]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            angle: -Math.PI/20, 
+            rAngle: -Math.PI/20, 
         }], 
     }], 
     animations: {

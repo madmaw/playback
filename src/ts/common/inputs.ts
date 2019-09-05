@@ -35,10 +35,10 @@ const TOTAL_INSTRUCTION_COUNT = 30;
 type Instruction = {
     keyCodes?: number[], 
     keyChar?: string, 
-    name?: string, 
+    readableName?: string, 
     animationId?: number, 
     hold?: number | boolean, 
-    utterance?: Sound, 
+    spoken?: Sound, 
 };
 
 const INSTRUCTIONS: Instruction[] = [{ 
@@ -76,94 +76,94 @@ const INSTRUCTIONS: Instruction[] = [{
 }, {
     // up
     keyCodes: [87, 38], // w, up arrow
-    name: FLAG_EMOJIS ? '⬆️' : 'up', 
+    readableName: FLAG_EMOJIS ? '⬆️' : 'up', 
     hold: 1, 
 }, { 
     // down
     keyCodes: [83, 40], // s, down arrow 
-    name: FLAG_EMOJIS ? '⬇️' : 'down', 
+    readableName: FLAG_EMOJIS ? '⬇️' : 'down', 
     hold: 1, 
 }, {
     // left
     keyCodes: [65, 37], // a, left arrow
-    name: FLAG_EMOJIS ? '⬅️' : 'left', 
+    readableName: FLAG_EMOJIS ? '⬅️' : 'left', 
     animationId: ANIMATION_ID_WALKING,
     hold: 1,  
 }, {
     // right
     keyCodes: [68, 39], // d, right arrow 
-    name: FLAG_EMOJIS ? '➡️' : 'right', 
+    readableName: FLAG_EMOJIS ? '➡️' : 'right', 
     animationId: ANIMATION_ID_WALKING, 
     hold: 1, 
 }, {
     // jump
     keyCodes: [74, 32], // j, space
-    name: FLAG_EMOJIS ? '🐇' : 'jump', 
+    readableName: FLAG_EMOJIS ? '🐇' : 'jump', 
 }, {
     // say
-    name: FLAG_EMOJIS ? '🗣️' : 'say', 
+    readableName: FLAG_EMOJIS ? '🗣️' : 'say', 
 }, {
     // rewind
     keyCodes: [188], // ,<
     keyChar: '>', 
-    name: FLAG_EMOJIS ? '⏪' : 'rewind',
+    readableName: FLAG_EMOJIS ? '⏪' : 'rewind',
     animationId: ANIMATION_ID_PRESSING_BUTTON,  
     hold: 1, 
 }, {
     // fast forward
     keyCodes: [190], // .>
     keyChar: '<', 
-    name: FLAG_EMOJIS ? '⏩' : 'fast forward', 
+    readableName: FLAG_EMOJIS ? '⏩' : 'fast forward', 
     animationId: ANIMATION_ID_PRESSING_BUTTON,  
     hold: 1, 
 }, {
     // stop
-    name: FLAG_EMOJIS ? '⏹' : 'stop', 
+    readableName: FLAG_EMOJIS ? '⏹' : 'stop', 
 }, {
     // pick up 
     keyCodes: [80], // p
-    name: FLAG_EMOJIS ? '⇡' : 'pick up', 
+    readableName: FLAG_EMOJIS ? '⇡' : 'pick up', 
     animationId: ANIMATION_ID_PICKING_UP,  
 }, {
     // drop
     keyCodes: [76], // l
-    name: FLAG_EMOJIS ? '⇣' : 'drop', 
+    readableName: FLAG_EMOJIS ? '⇣' : 'drop', 
     animationId: ANIMATION_ID_DROPPING,  
 }, {
     // throw
     keyCodes: [84], // t
-    name: FLAG_EMOJIS ? '🏹' : 'throw', 
+    readableName: FLAG_EMOJIS ? '🏹' : 'throw', 
     animationId: ANIMATION_ID_THROWING,  
 }, {
     // insert
     keyCodes: [73], // i
-    name: FLAG_EMOJIS ? '📩' : 'insert', 
+    readableName: FLAG_EMOJIS ? '📩' : 'insert', 
     animationId: ANIMATION_ID_INSERTING, 
 }, {
     // eject
     keyCodes: [75], // k
-    name: FLAG_EMOJIS ? '⏏️' : 'eject',  
+    readableName: FLAG_EMOJIS ? '⏏️' : 'eject',  
 }, {
     // play
     keyCodes: [77], // m 
-    name: FLAG_EMOJIS ? '▶' : 'play', 
+    readableName: FLAG_EMOJIS ? '▶' : 'play', 
     animationId: ANIMATION_ID_PRESSING_BUTTON,  
     hold: 1, 
 }, {
     // record
     keyCodes: [82], // r
-    name: FLAG_EMOJIS ? '⏺️' : 'record', 
+    readableName: FLAG_EMOJIS ? '⏺️' : 'record', 
     hold: 1, 
 }, {
     // help
     keyCodes: [72], // h
-    name: FLAG_EMOJIS ? '📖' : 'help', 
+    readableName: FLAG_EMOJIS ? '📖' : 'help', 
 }, {
     // save world 
-    name: FLAG_EMOJIS ? '💾' : 'save',
+    readableName: FLAG_EMOJIS ? '💾' : 'save',
 }, {
     // shoot
-    name: FLAG_EMOJIS ? '🔫' : 'shoot', 
+    readableName: FLAG_EMOJIS ? '🔫' : 'shoot', 
 }];
 
 const INPUT_KEY_CODE_MAPPINGS: {[_: number]: number } = {};
@@ -175,26 +175,26 @@ const initInstructions = (audioContext: AudioContext, sounds: {[_:number]: Sound
         if (FLAG_SPEECH_SYNTHESIS && window.speechSynthesis) {
             const utterance = new SpeechSynthesisUtterance(instructionToName(id))
             utterance.volume = .2;
-            instruction.utterance = () => {
+            instruction.spoken = () => {
                 window.speechSynthesis.speak(utterance);
             };
         } else if (FLAG_LOCAL_SPEECH_SYNTHESIS) {
             const name = instructionToName(id);
-            instruction.utterance = name && synthesizeSpeech(audioContext, name, .1);
+            instruction.spoken = name && synthesizeSpeech(audioContext, name, .1);
         } else {
-            instruction.utterance = sounds[id] || (() => 0);
+            instruction.spoken = sounds[id] || (() => 0);
         }    
     });   
 }
 
 const instructionToName = (instructionId: number) => {
     const i = INSTRUCTIONS[instructionId];
-    return i.name || instructionToKey(i);
+    return i.readableName || instructionToKey(i);
 };
 
 const instructionToUtterance = (instructionId: number) => {
     const instruction = INSTRUCTIONS[instructionId];
-    return instruction.utterance;
+    return instruction.spoken;
 };
 
 const instructionToKey = (i: Instruction) => i.keyChar ||  i.keyCodes && String.fromCharCode(i.keyCodes[0]);

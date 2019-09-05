@@ -64,7 +64,7 @@ type MovableEntity = {
     gravityMultiplier: number;
     lastCollisions: [number, number, number, number, number];
     boundsWithVelocity: Rectangle;
-    timeRemaining?: number;
+    remainingTime?: number;
     carrier?: MovableEntity;
     carrying?: MovableEntity[];
     carryingPreviously?: MovableEntity[];
@@ -95,7 +95,7 @@ type ScriptedEntity = {
 } & PlaybackEntity & ActiveMovableEntity;
 
 type OrientableEntity = {
-    orientation: Orientation;    
+    facing: Orientation;    
     orientationStartTime: number;
 } & SpatialEntity;
 
@@ -120,12 +120,6 @@ type RecordingEntity = {
     recording?: boolean | number;    
 } & ListeningEntity & PlaybackEntity;
 
-type LearningEntity = {
-    canLearnNew?: boolean | number;
-    lastLearnedAt?: number;
-    lastLearnedInstructionId?: number;
-};
-
 type MortalEntity = {
     deathAge?: number;
 }
@@ -143,14 +137,13 @@ type EveryEntity = CommonEntity
     & SpeakingEntity
     & ListeningEntity
     & RecordingEntity
-    & LearningEntity
     & MortalEntity;
 
 const ENTITY_TYPE_PLAYER = 0; 
 type Player = {
     entityType: 0,
     commandsVisible?: boolean | number,
-} & CommonEntity & GrabbingEntity & ActiveGraphicalEntity & PlaybackEntity & SpeakingEntity & ListeningEntity & LearningEntity & MortalEntity;
+} & CommonEntity & GrabbingEntity & ActiveGraphicalEntity & PlaybackEntity & SpeakingEntity & ListeningEntity & MortalEntity;
 
 const ENTITY_TYPE_ROBOT = 1; 
 type Robot = {
@@ -210,8 +203,8 @@ let entitySetVelocity = (room: Room, entity: MovableEntity, v: number, axis: num
 let entityAddVelocity = (room: Room, entity: MovableEntity, dv: number, axis: number, timeRemaining: number, reposition?: number | boolean) => {
     if (reposition) {
         roomRemoveEntityFromTiles(room, entity as Entity)
-        let delta = entity.timeRemaining - timeRemaining;
-        entity.timeRemaining = timeRemaining;
+        let delta = entity.remainingTime - timeRemaining;
+        entity.remainingTime = timeRemaining;
         axisMap(entity.bounds, entity.velocity, entityUpdatePosition(delta), entity.bounds);
     }
     entity.velocity[axis] += dv;
@@ -224,7 +217,7 @@ let entityAddVelocity = (room: Room, entity: MovableEntity, dv: number, axis: nu
 let entityCalculateBoundsWithVelocity = (entity: Entity) => {
     const movableEntity = entity as MovableEntity;
     if (movableEntity.boundsWithVelocity) {
-        const millis = movableEntity.timeRemaining;
+        const millis = movableEntity.remainingTime;
         if (millis) {
             axisMap(movableEntity.bounds, movableEntity.velocity, ([s], [v]) => s + Math.min(0, v * millis) - MAX_ROUNDING_ERROR_SIZE, movableEntity.boundsWithVelocity);
             axisMap(movableEntity.bounds, movableEntity.velocity, ([_, l], [v]) => l + Math.abs(v * millis) + MAX_ROUNDING_ERROR_SIZE * 2, movableEntity.boundsWithVelocity, 2);    
@@ -267,10 +260,10 @@ let entityUpdatePosition = (delta: number) => ([s]: [number], [v]: [number]) => 
 
 let entityUpdatePositionToTimeRemaining = (room: Room, entity: Entity, remainingTime: number) => {
     const movableEntity = entity as MovableEntity;
-    if (movableEntity.velocity && movableEntity.timeRemaining > remainingTime) {
+    if (movableEntity.velocity && movableEntity.remainingTime > remainingTime) {
         roomRemoveEntityFromTiles(room, entity);
-        const delta = movableEntity.timeRemaining - remainingTime;
-        movableEntity.timeRemaining = remainingTime;
+        const delta = movableEntity.remainingTime - remainingTime;
+        movableEntity.remainingTime = remainingTime;
         axisMap(movableEntity.bounds, movableEntity.velocity, entityUpdatePosition(delta), movableEntity.bounds);
         roomAddEntityToTiles(room, entity);
     }

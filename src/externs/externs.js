@@ -8,4 +8,4 @@ var innerHeight;
 var c;
 var o;
 var h;
-var l;
+var s;

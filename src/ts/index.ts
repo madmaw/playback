@@ -21,7 +21,7 @@ onload = () => {
     let scale: number;
     let clientWidth: number; 
     let clientHeight: number;
-    const elements = [c, o, h];
+    const elements = [c, o, s];
     const resize = () => {
         const aspectRatio = innerWidth/innerHeight;
         const targetWidth = MAX_TILES_ACROSS - EDGE_HIDE_PROPORTION*2;
@@ -96,31 +96,32 @@ onload = () => {
             recreateWorld();   
         }
         // game over, help, etc...
-        renderPlayer(world.player, world.age);
+        renderPlayer(world.player, world);
         requestAnimationFrame(update);
         then = now;
     };    
     update();
 };
 
-const renderPlayer = (player: Player, worldAge: number) => {
-    o.style.opacity = player.deathAge ? '1' : '0' 
-    if (player.commandsVisible) {
-        h.style.opacity = '1';
-        // render out all the commands
-        h.innerHTML = INSTRUCTIONS.map((instruction, instructionId) => {
-            if( player.capabilities.indexOf(instructionId) >= 0 && instruction.keyCodes ) {
-                return `<b>${instructionToKey(instruction)}${instruction.hold?'+hold':''}</b>) ${instructionToName(instructionId)}<br>`
-            }
-            return '';
-        }).join('');
+const renderPlayer = (player: Player, world: World) => {
+    o.style.opacity = player.deathAge ? '1' : '0';
+    if (world.lastSaved > world.age - MESSAGE_DISPLAY_TIME) {
+        s.style.opacity = '1';
     } else {
-        h.style.opacity = '0';
+        s.style.opacity = '0';
     }
-    if (player.lastLearnedAt > worldAge - LEARN_INSTRUCTION_DISPLAY_TIME && INSTRUCTIONS[player.lastLearnedInstructionId].keyCodes) {
-        l.innerHTML = `New ability<br><i>${instructionToName(player.lastLearnedInstructionId).toUpperCase()}`
-        l.style.opacity = '1';
-    } else {
-        l.style.opacity = '0';
+    if (FLAG_HELP) {
+        if (player.commandsVisible) {
+            h.style.opacity = '1';
+            // render out all the commands
+            h.innerHTML = INSTRUCTIONS.map((instruction, instructionId) => {
+                if( player.capabilities.indexOf(instructionId) >= 0 && instruction.keyCodes ) {
+                    return `<b>${instructionToKey(instruction)}${instruction.hold?'+hold':''}</b>) ${instructionToName(instructionId)}<br>`
+                }
+                return '';
+            }).join('');
+        } else {
+            h.style.opacity = '0';
+        }    
     }
 }

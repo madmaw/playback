@@ -10,7 +10,7 @@
 //
 // ---------------------------------------------------------------------------
 
-function Sawtooth ( x: number ) {
+const Sawtooth = ( x: number ) => {
 	return ( 0.5 - ( x - Math.floor ( x / (Math.PI * 2) ) * Math.PI * 2 ) / (Math.PI * 2) );
 }
 
@@ -83,7 +83,7 @@ const INDEX_PLOSIVE = 9;
 
 
 // Synthesizes speech and adds it to specified buffer
-function SynthSpeech ( buf: Float32Array, text: string, f0: number, speed: number, bufPos: number, sampleFrequency: number ) {
+const SynthSpeech = ( buf: Float32Array, text: string, f0: number, speed: number, bufPos: number, sampleFrequency: number ) => {
 	// Loop through all phonemes
 	for (var textPos=0; textPos<text.length; textPos++) {
 		var l = text.charAt(textPos);

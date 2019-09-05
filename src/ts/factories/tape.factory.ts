@@ -21,7 +21,7 @@ const tapeFactoryFactory = (script: number[], hsl: HSL) => {
             boundsWithVelocity: [0, 0, 0, 0], 
             velocity: [0, 0], 
             restitution: .4, 
-            orientation: 0,
+            facing: 0,
             orientationStartTime: 0, 
             script: [...script], 
         }

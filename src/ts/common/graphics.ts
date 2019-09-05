@@ -31,7 +31,7 @@ type Pose = {[_:number]: Transform[]};
 type AnimationSequence = {
     poseIds: number[];
     poseDuration: number;
-    count?: number;
+    repeatCount?: number;
 }
 
 type Graphic = {
@@ -58,7 +58,7 @@ type Transform = {
     dy: number;
 } | {
     transformType: 2;
-    angle: number;
+    rAngle: number;
     aroundX?: number;
     aroundY?: number;
 } | {
@@ -156,7 +156,7 @@ let applyGraphicTransformations = (c: CanvasRenderingContext2D, transforms: Tran
                     break;
                 case 2: 
                     c.translate(t.aroundX || 0, t.aroundY || 0);
-                    c.rotate(t.angle * progress);
+                    c.rotate(t.rAngle * progress);
                     c.translate(-t.aroundX || 0, -t.aroundY || 0);
                     break;
                 case 3:
