@@ -28,7 +28,7 @@ let roomCreate = (x: number, y: number, w: number, h: number) => {
 let roomIterateEntities = (room: Room, bounds: Rectangle | undefined, i: (entity: Entity) => void, useBoundsWithVelocity?: number | boolean) => {
     const handled = new Set<number>();
     roomIterateBounds(room, bounds, tile => tile.forEach(e => {
-        if (!handled.has(e.id) && rectangleOverlaps(useBoundsWithVelocity && (e as MovableEntity).boundsWithVelocity || e.bounds, bounds)) {
+        if (!handled.has(e.id) && rectangleOverlap(useBoundsWithVelocity && (e as MovableEntity).boundsWithVelocity || e.bounds, bounds)) {
             i(e);
             handled.add(e.id);
         }

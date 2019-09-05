@@ -22,9 +22,9 @@ const repeaterPaletteCyan: HSL[] = [
 ];
 
 const repeaterGraphic: Graphic = {
-    width: 32, 
-    height: 24, 
-    images: [
+    imageryWidth: 32, 
+    imageryHeight: 24, 
+    imagery: [
         // body
         [   
             [-16, -12, 32, 24, REPEATER_GRAPHIC_PALETTE_INDEX_DARK, REPEATER_ROUNDING],

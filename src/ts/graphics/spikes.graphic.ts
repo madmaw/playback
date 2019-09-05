@@ -27,14 +27,14 @@ const randomSpikeGraphic = () => {
                 scaleY: (Math.random() + 2.5 - Math.abs(p)) / 2, 
             }, {
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rotation: Math.PI * (Math.random() - .5)/9 + p * Math.PI/9, 
+                angle: Math.PI * (Math.random() - .5)/9 + p * Math.PI/9, 
             }]
         });
     }
     const spikeGraphic: Graphic = {
-        width, 
-        height, 
-        images: [
+        imageryWidth: width, 
+        imageryHeight: height, 
+        imagery: [
             // spike
             [   
                 [0, -12, 4, 0, -4, 0, SPIKES_GRAPHIC_PALETTE_INDEX_LIGHT, SPIKES_GRAPHIC_PALETTE_INDEX_DARK], 

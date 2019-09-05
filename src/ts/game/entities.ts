@@ -20,6 +20,8 @@ const COLLISION_MASK_ENEMIES = 0xAA0F8F;
 const COLLISION_MASK_BACKGROUNDED = 0;
 
 const EDGE_GRAB = 4;
+//const GRAB_MASK = 1 + 2 + 4 + 16 + 64 + 128;
+const GRAB_MASK = 215;
 
 type Orientation = 0 | 1;
 
@@ -31,6 +33,7 @@ type PassiveAnimation = {
 type CommonEntity = {
     id: number;
     entityType: number;
+    persistentId?: number;
 }
 
 type GraphicalEntity = {
@@ -41,7 +44,7 @@ type GraphicalEntity = {
     currentPoseId?: number;
     currentAnimationId?: number;
     currentAnimationStartTime?: number;
-    passiveAnimations?: Map<number, PassiveAnimation>; 
+    passiveAnimations?: {[_:number]: PassiveAnimation}; 
 } & CommonEntity;
 
 type ActiveGraphicalEntity = {
@@ -68,13 +71,13 @@ type MovableEntity = {
     restitution?: number;
     hardnessMultiplier?: 1 | -1;
     strong?: boolean | number;
+    airTurn?: number | boolean;
 } & SpatialEntity;
 
 type ActiveMovableEntity = {
     baseVelocity: number;
-    inputs: Inputs;
-    airTurn?: number | boolean;
-    holding: Map<number, MovableEntity>;
+    activeInputs: Inputs;
+    holding: {[_:number]: MovableEntity};
     handJointId: number;
     insertionJointId?: number;
 } & MovableEntity;
@@ -84,6 +87,7 @@ type PlaybackEntity = {
     playbackStartTime?: number;
     nextScriptIndex?: number;
     autoRewind?: number | boolean;
+    capabilities: number[];
 } & MovableEntity;
 
 type ScriptedEntity = {
@@ -97,6 +101,7 @@ type OrientableEntity = {
 
 type GrabbingEntity = {
     grabbing?: SpatialEntity;
+    grabMask: number;
 } & ActiveMovableEntity & OrientableEntity;
 
 type SpeakingEntity = {
@@ -116,7 +121,7 @@ type RecordingEntity = {
 } & ListeningEntity & PlaybackEntity;
 
 type LearningEntity = {
-    learnedInstructions: Set<number>;
+    canLearnNew?: boolean | number;
     lastLearnedAt?: number;
     lastLearnedInstructionId?: number;
 };
@@ -186,10 +191,16 @@ type Lethal = {
 const ENTITY_TYPE_PRESSURE_PLATE = 8;
 type PressurePlate = {
     entityType: 8,     
-    edge: Edge, 
 } & CommonEntity & ActiveMovableEntity & PlaybackEntity & ActiveGraphicalEntity & SpeakingEntity;
 
-type Entity = Player | Robot | Block | Crate | Brick | Tape | Repeater | Lethal | PressurePlate;
+const ENTITY_TYPE_PLATFORM = 9;
+type Platform = {
+    entityType: 9, 
+    home: Vector, 
+    direction: Edge, 
+} & CommonEntity & ActiveMovableEntity & ScriptedEntity & ActiveGraphicalEntity & ListeningEntity;
+
+type Entity = Player | Robot | Block | Crate | Brick | Tape | Repeater | Lethal | PressurePlate | Platform;
 
 let entitySetVelocity = (room: Room, entity: MovableEntity, v: number, axis: number, timeRemaining: number) => {
     let dv = v - entity.velocity[axis];
@@ -248,8 +259,8 @@ let entitySetCarrying = (carrier?: SpatialEntity, carrying?: SpatialEntity, isCa
     }
 }
 
-let entityCalculateMass = (e: MovableEntity): number => {
-    return e.mass && [...e.carrying, ...e.carryingPreviously].reduce((totalMass, carried) => totalMass + entityCalculateMass(carried), e.mass) || 0;
+let entityCalculateMass = (e: MovableEntity, includeZeroMass?: number | boolean): number => {
+    return (e.mass || includeZeroMass) && [...e.carrying, ...e.carryingPreviously].reduce((totalMass, carried) => totalMass + entityCalculateMass(carried), e.mass) || 0;
 }
 
 let entityUpdatePosition = (delta: number) => ([s]: [number], [v]: [number]) => s + v * delta;
@@ -276,9 +287,9 @@ let entityAddPassiveAnimation = <T>(
     const graphicalEntity = entity as GraphicalEntity;
     const animationId = INSTRUCTION_TO_ANIMATION_IDS[instructionId];
     const t = check();
-    if (!graphicalEntity.passiveAnimations.has(animationId) && t) {
+    if (!graphicalEntity.passiveAnimations[animationId] && t) {
         if (graphicalEntity.graphic.animations[animationId] != null) {
-            graphicalEntity.passiveAnimations.set(animationId, {
+            graphicalEntity.passiveAnimations[animationId] = {
                 resolve: (worldAge: number) => {
                     const newT = check();
                     if (newT == t) {
@@ -287,7 +298,7 @@ let entityAddPassiveAnimation = <T>(
                     }
                 }, 
                 startTime: worldAge, 
-            });    
+            };    
         } else {
             doit(t, worldAge);
             entityPlaySound(entity, instructionId, sounds); 
@@ -296,13 +307,13 @@ let entityAddPassiveAnimation = <T>(
 } 
 
 let entityPlaySound = (entity: Entity, instruction: number, sounds: {[_: number]: Sound}, saying?: number | boolean) => {
-    const sound = sounds[instruction];
-    if (sound) {
-        if (saying) {
-            const speakingEntity = entity as SpeakingEntity;
-            speakingEntity.toSpeak.unshift(instruction);
-        } else {
+    if (saying) {
+        const speakingEntity = entity as SpeakingEntity;
+        speakingEntity.toSpeak.unshift(instruction);
+    } else {
+        const sound = sounds[instruction];
+        if (sound) {
             sound((entity as MovableEntity).mass || 1);
-        }    
-    }
+        }
+    }    
 }

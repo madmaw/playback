@@ -30,9 +30,9 @@ const robotPalette: HSL[] = [
 ];
 
 const robotGraphic: Graphic = {
-    width: 32, 
-    height: 32, 
-    images: [
+    imageryWidth: 32, 
+    imageryHeight: 32, 
+    imagery: [
         [   // body
             [-12, -28, 32, 16, ROBOT_GRAPHIC_PALETTE_INDEX_BODY],
             [-12, -28, 16, 28, ROBOT_GRAPHIC_PALETTE_INDEX_BODY]
@@ -143,7 +143,7 @@ const robotGraphic: Graphic = {
     poses: [{ // ROBOT_GRAPHIC_POSE_ID_STEP_LEFT
         [ROBOT_GRAPHIC_JOINT_ID_BODY]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rotation: -Math.PI/20, 
+            angle: -Math.PI/20, 
         }],
         [ROBOT_GRAPHIC_JOINT_ID_LEFT_LEG]: [{
             transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -152,12 +152,12 @@ const robotGraphic: Graphic = {
         }], 
         [ROBOT_GRAPHIC_JOINT_ID_HEAD]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rotation: Math.PI/20, 
+            angle: Math.PI/20, 
         }], 
     }, { // ROBOT_GRAPHIC_POSE_ID_STEP_RIGHT
         [ROBOT_GRAPHIC_JOINT_ID_BODY]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rotation: Math.PI/20, 
+            angle: Math.PI/20, 
         }], 
         [ROBOT_GRAPHIC_JOINT_ID_RIGHT_LEG]: [{
             transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -166,7 +166,7 @@ const robotGraphic: Graphic = {
         }], 
         [ROBOT_GRAPHIC_JOINT_ID_HEAD]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rotation: -Math.PI/20, 
+            angle: -Math.PI/20, 
         }], 
     }], 
     animations: {

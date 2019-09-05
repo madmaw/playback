@@ -1,11 +1,23 @@
-const pressurePlateFactoryFactory = (width: number, height: number, hue: number, saturationMidpoint: number = 30, lightnessMidpoint: number = 60) => {
+const pressurePlateFactoryFactory = (
+    width: number, 
+    height: number, 
+    hue: number, 
+    saturationMidpoint: number = 30, 
+    lightnessMidpoint: number = 60, 
+    script?: number[], 
+    tapeColour?: HSL
+) => {
     const palette: HSL[] = [
         [hue, saturationMidpoint, lightnessMidpoint + 9], 
         [hue, saturationMidpoint - 9, lightnessMidpoint],
         [hue, saturationMidpoint, lightnessMidpoint - 9],    
+        [hue, saturationMidpoint, lightnessMidpoint - 19], 
+        [0, 0, 100], 
     ];
     const graphic = pressurePlateGraphicFactory(width * 32, height * 32, EDGE_TOP);
+    const tapeGenerator = script && tapeFactoryFactory(script, tapeColour);
     return (x: number, y: number, id: IdFactory) => {
+        const tape = tapeGenerator && tapeGenerator(x, y, id);        
         const pressurePlate: PressurePlate = {
             id: id(),
             graphic, 
@@ -16,11 +28,10 @@ const pressurePlateFactoryFactory = (width: number, height: number, hue: number,
             bounds: [x, y, width, height], 
             baseVelocity: 0, 
             boundsWithVelocity: [0, 0, 0, 0],
-            edge: EDGE_TOP, 
-            holding: new Map(), 
+            holding: {[PRESSURE_PLATE_GRAPHIC_JOINT_ID_TAPE]: tape && tape[0]}, 
             handJointId: 0, 
-            insertionJointId: 0, 
-            inputs: {
+            insertionJointId: PRESSURE_PLATE_GRAPHIC_JOINT_ID_TAPE, 
+            activeInputs: {
                 reads: {}, 
                 states: {}, 
             } , 
@@ -29,6 +40,8 @@ const pressurePlateFactoryFactory = (width: number, height: number, hue: number,
             mass: 0, 
             toSpeak: [], 
             velocity: [0, 0], 
+            autoRewind: 1, 
+            capabilities: [INSTRUCTION_ID_PLAY, INSTRUCTION_ID_REWIND, INSTRUCTION_ID_FAST_FORWARD, INSTRUCTION_ID_EJECT], 
         }
         return [pressurePlate];
     }

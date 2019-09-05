@@ -31,13 +31,13 @@ type Pose = {[_:number]: Transform[]};
 type AnimationSequence = {
     poseIds: number[];
     poseDuration: number;
-    repeat?: number;
+    count?: number;
 }
 
 type Graphic = {
-    width: number;
-    height: number;
-    images: Image[];
+    imageryWidth: number;
+    imageryHeight: number;
+    imagery: Image[];
     joints: Joint[];
     poses?: Pose[];
     animations?: {[_:number]: AnimationSequence};
@@ -58,7 +58,7 @@ type Transform = {
     dy: number;
 } | {
     transformType: 2;
-    rotation: number;
+    angle: number;
     aroundX?: number;
     aroundY?: number;
 } | {
@@ -92,7 +92,7 @@ let drawGraphicJoints = (c: CanvasRenderingContext2D, g: Graphic, palette: HSL[]
             poses.forEach(p => applyGraphicTransformations(c, g.poses[p.poseId][j.id], p.progress));
             drawGraphicJoints(c, g, palette, j.renderBefore, callback, poses);
             if (j.imageIndex != null) {
-                g.images[j.imageIndex].forEach(image => {      
+                g.imagery[j.imageIndex].forEach(image => {      
                     c.beginPath();
                     let fillPaletteIndex: number;
                     let strokePaletteIndex: number;
@@ -156,7 +156,7 @@ let applyGraphicTransformations = (c: CanvasRenderingContext2D, transforms: Tran
                     break;
                 case 2: 
                     c.translate(t.aroundX || 0, t.aroundY || 0);
-                    c.rotate(t.rotation * progress);
+                    c.rotate(t.angle * progress);
                     c.translate(-t.aroundX || 0, -t.aroundY || 0);
                     break;
                 case 3:

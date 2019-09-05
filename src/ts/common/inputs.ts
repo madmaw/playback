@@ -17,19 +17,19 @@ const INSTRUCTION_ID_LEFT = 13;
 const INSTRUCTION_ID_RIGHT = 14;
 const INSTRUCTION_ID_JUMP = 15;
 const INSTRUCTION_ID_SAY = 16;
-const INSTRUCTION_ID_OPEN = 17;
-const INSTRUCTION_ID_REWIND = 18;
-const INSTRUCTION_ID_FAST_FORWARD = 19;
-const INSTRUCTION_ID_STOP = 20;
-const INSTRUCTION_ID_PICK_UP = 21;
-const INSTRUCTION_ID_DROP = 22;
-const INSTRUCTION_ID_THROW = 23;
-const INSTRUCTION_ID_INSERT = 24;
-const INSTRUCTION_ID_EJECT = 25;
-const INSTRUCTION_ID_PLAY = 26;
-const INSTRUCTION_ID_RECORD = 27;
-const INSTRUCTION_ID_HELP = 28;
-const INSTRUCTION_ID_SAVE = 29
+const INSTRUCTION_ID_REWIND = 17;
+const INSTRUCTION_ID_FAST_FORWARD = 18;
+const INSTRUCTION_ID_STOP = 19;
+const INSTRUCTION_ID_PICK_UP = 20;
+const INSTRUCTION_ID_DROP = 21;
+const INSTRUCTION_ID_THROW = 22;
+const INSTRUCTION_ID_INSERT = 23;
+const INSTRUCTION_ID_EJECT = 24;
+const INSTRUCTION_ID_PLAY = 25;
+const INSTRUCTION_ID_RECORD = 26;
+const INSTRUCTION_ID_HELP = 27;
+const INSTRUCTION_ID_SAVE = 28;
+const INSTRUCTION_ID_SHOOT = 29;
 const TOTAL_INSTRUCTION_COUNT = 30;
 
 type Instruction = {
@@ -73,11 +73,11 @@ const INSTRUCTIONS: Instruction[] = [{
     keyCodes: [57], // 9
 }, {
     // do nothing
-    name: FLAG_EMOJIS ? '🔑' : 'unlock', 
 }, {
     // up
     keyCodes: [87, 38], // w, up arrow
     name: FLAG_EMOJIS ? '⬆️' : 'up', 
+    hold: 1, 
 }, { 
     // down
     keyCodes: [83, 40], // s, down arrow 
@@ -102,9 +102,6 @@ const INSTRUCTIONS: Instruction[] = [{
 }, {
     // say
     name: FLAG_EMOJIS ? '🗣️' : 'say', 
-}, {
-    // open
-    name: FLAG_EMOJIS ? '🔓' : 'open', 
 }, {
     // rewind
     keyCodes: [188], // ,<
@@ -151,6 +148,7 @@ const INSTRUCTIONS: Instruction[] = [{
     keyCodes: [77], // m 
     name: FLAG_EMOJIS ? '▶' : 'play', 
     animationId: ANIMATION_ID_PRESSING_BUTTON,  
+    hold: 1, 
 }, {
     // record
     keyCodes: [82], // r
@@ -161,8 +159,11 @@ const INSTRUCTIONS: Instruction[] = [{
     keyCodes: [72], // h
     name: FLAG_EMOJIS ? '📖' : 'help', 
 }, {
-    // save world (intentionally left blank
+    // save world 
     name: FLAG_EMOJIS ? '💾' : 'save',
+}, {
+    // shoot
+    name: FLAG_EMOJIS ? '🔫' : 'shoot', 
 }];
 
 const INPUT_KEY_CODE_MAPPINGS: {[_: number]: number } = {};
@@ -178,7 +179,8 @@ const initInstructions = (audioContext: AudioContext, sounds: {[_:number]: Sound
                 window.speechSynthesis.speak(utterance);
             };
         } else if (FLAG_LOCAL_SPEECH_SYNTHESIS) {
-            instruction.utterance = synthesizeSpeech(audioContext, instructionToName(id), .1);
+            const name = instructionToName(id);
+            instruction.utterance = name && synthesizeSpeech(audioContext, name, .1);
         } else {
             instruction.utterance = sounds[id] || (() => 0);
         }    
@@ -195,7 +197,7 @@ const instructionToUtterance = (instructionId: number) => {
     return instruction.utterance;
 };
 
-const instructionToKey = (i: Instruction) => i.keyChar ||  String.fromCharCode(i.keyCodes[0]);
+const instructionToKey = (i: Instruction) => i.keyChar ||  i.keyCodes && String.fromCharCode(i.keyCodes[0]);
 
 /*
 const INPUT_KEY_CODE_MAPPINGS = {
@@ -240,12 +242,12 @@ type Inputs = {
 };
 
 let readInput = (entity: Entity, input: number, now: number) => {
-    const inputs = (entity as ActiveMovableEntity).inputs;
-    const learnedInputs = (entity as LearningEntity).learnedInstructions;
+    const everyEntity = entity as EveryEntity;
+    const inputs = everyEntity.activeInputs;
     const hold = INSTRUCTIONS[input].hold;
     const value = inputs.states[input];
     const lastRead = (inputs.reads[input] || 0);
-    if ((!learnedInputs || learnedInputs.has(input)) && value && (hold || lastRead < value)) {
+    if ((!everyEntity.capabilities || everyEntity.capabilities.indexOf(input) >= 0) && value && (hold || lastRead < value)) {
         inputs.reads[input] = now;
         return 1;
     } else {
@@ -254,18 +256,21 @@ let readInput = (entity: Entity, input: number, now: number) => {
 }
 
 let doRepeatingInput = (entity: Entity, input: number, now: number, delta: number, interval?: number) => {
-    const inputs = (entity as ActiveMovableEntity).inputs;
-    if (!interval) {
-        const graphic = (entity as GraphicalEntity).graphic;
-        const animationId = INSTRUCTION_TO_ANIMATION_IDS[input];
-        const animation = graphic.animations[animationId];
-        if (animation) {
-            interval = animation.poseDuration;
+    const everyEntity = entity as EveryEntity;
+    const inputs = everyEntity.activeInputs;
+    if (!everyEntity.capabilities || everyEntity.capabilities.indexOf(input) >= 0) {
+        if (!interval) {
+            const graphic = everyEntity.graphic;
+            const animationId = INSTRUCTION_TO_ANIMATION_IDS[input];
+            const animation = graphic.animations[animationId];
+            if (animation) {
+                interval = animation.poseDuration;
+            }
         }
-    }
-    if (interval) {
-        const value = inputs.states[input];
-        const diff = now - value;
-        return ((diff/interval | 0) != ((diff + delta)/interval | 0));    
+        if (interval) {
+            const value = inputs.states[input];
+            const diff = now - value;
+            return ((diff/interval | 0) != ((diff + delta)/interval | 0));    
+        }    
     }
 }

@@ -26,9 +26,9 @@ const tapePaletteGreen: HSL[] = [
 ];
 
 const tapeGraphic: Graphic = {
-    width: 18, 
-    height: 12, 
-    images: [
+    imageryWidth: 18, 
+    imageryHeight: 12, 
+    imagery: [
         // tape body
         [   
             [-9, -6, 18, 12, TAPE_GRAPHIC_PALETTE_INDEX_BODY_COLOR, [2, 2]],

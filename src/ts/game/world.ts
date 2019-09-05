@@ -7,13 +7,27 @@ type World = {
     previousFrames?: string[];
     player: Player;
     instructionSounds: {[_:number]: Sound};
+    lastSaved?: number;
 };
 
-const createWorld = (audioContext: AudioContext, w: number, h: number, roomFactory: RoomFactory, player: Player, startX: number, startY: number) => {
-    let nextId = 0;
+const createWorld = (audioContext: AudioContext, w: number, h: number, roomFactory: RoomFactory) => {
+    // leave some space for persistent ids, start at 99
+    let nextId = 99;
     const idFactory = () => nextId++;
-    const rooms = array2DCreate(w, h, (x, y) => roomFactory(x, y, idFactory));
-    roomAddEntity(rooms[startX][startY], player);
+    let player: Player;
+    let startX: number;
+    let startY: number;
+    const rooms = array2DCreate(w, h, (x, y) => {
+        const room = roomFactory(x, y, idFactory)
+        const found = room.updatableEntities.find(e => e.entityType == ENTITY_TYPE_PLAYER);
+        if (found) {
+            player = found as Player;
+            startX = x;
+            startY = y;
+        }
+        return room;
+    });
+    
     const instructionSounds: {[_:number]: Sound} = {
         //[SOUND_ID_JUMP]: vibratoSoundFactory(audioContext, .5, .1, 1, .2, 'square', 440, 220),  
         //[SOUND_ID_JUMP]: vibratoSoundFactory(audioContext, .2, 0, .1, .05, 'triangle', 500, 2e3, 599),  
@@ -26,12 +40,10 @@ const createWorld = (audioContext: AudioContext, w: number, h: number, roomFacto
         [INSTRUCTION_ID_REWIND]: vibratoSoundFactory(audioContext, .2, 0, .1, .05, 'sine', 1440, 2999, 999, 'sawtooth', 200),
         [INSTRUCTION_ID_FAST_FORWARD]: vibratoSoundFactory(audioContext, .2, 0, .1, .05, 'sine', 2999, 1440, 2000, 'triangle', 200),
         [INSTRUCTION_ID_LEFT]: boomSoundFactory(audioContext, .05, .01, 2e3, .1, .05), 
-        [INSTRUCTION_ID_RIGHT]: boomSoundFactory(audioContext, .05, .01, 1e3, .1, .05), 
+        [INSTRUCTION_ID_RIGHT]: boomSoundFactory(audioContext, .05, .01, 2e3, .1, .05),  
         [INSTRUCTION_ID_EJECT]: vibratoSoundFactory(audioContext, .2, 0, .2, .05, 'triangle', 300, 2e3, 599),  
         [INSTRUCTION_ID_DROP]: vibratoSoundFactory(audioContext, .2, 0, .2, .05, 'triangle', 200, 2e3, 599),  
         [INSTRUCTION_ID_PICK_UP]: vibratoSoundFactory(audioContext, .2, 0, .2, .05, 'triangle', 700, 2e3, 599),  
-        [INSTRUCTION_ID_INSERT]: vibratoSoundFactory(audioContext, .2, 0, .2, .05, 'triangle', 400, 2e3, 599),  
-        [INSTRUCTION_ID_DOWN]: vibratoSoundFactory(audioContext, .4, 0, .1, .05, 'triangle', 999, 300),  
     };
     for (let instruction = 0; instruction < 10; instruction++) {
         // numeric, use DTMF
@@ -43,13 +55,15 @@ const createWorld = (audioContext: AudioContext, w: number, h: number, roomFacto
         );
     }
     initInstructions(audioContext, instructionSounds);
-    
+
+    const age = parseInt(localStorage.getItem('w') || 0 as any);
+
     const world: World = {
         currentRoom: [startX, startY], 
         size: [w, h], 
         rooms, 
         nextId, 
-        age: 0, 
+        age, 
         player, 
         instructionSounds, 
     };

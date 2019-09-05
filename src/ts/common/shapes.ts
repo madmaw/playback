@@ -18,19 +18,37 @@ type Vector = [number, number];
 
 const rectangleCenterBounds = (x: number, y: number, w: number, h: number) => [x + (1 - w)/2, y + 1 - h, w, h] as Rectangle;
 
-let rectangleLineOverlaps = (r1: Rectangle, r2: Rectangle) => 
+// let rectangleLineOverlaps = (r1: Rectangle, r2: Rectangle) => 
+//     axisMap(r1, r2, ([scalar1, length1]: number[], [scalar2, length2]: number[]) => {
+//         const min1 = scalar1;
+//         const min2 = scalar2;
+//         const max1 = scalar1 + length1;
+//         const max2 = scalar2 + length2;
+//         return min1 >= min2 && min1 < max2 || min2 >= min1 && min2 < max1;
+//     });
+
+// let rectangleOverlaps = (r1: Rectangle, r2: Rectangle) => {
+//     const overlap = rectangleLineOverlap(r1, r2);
+//     return overlap[0] && overlap[1];
+// };
+
+let rectangleLineOverlap = (r1: Rectangle, r2: Rectangle) => 
     axisMap(r1, r2, ([scalar1, length1]: number[], [scalar2, length2]: number[]) => {
         const min1 = scalar1;
         const min2 = scalar2;
         const max1 = scalar1 + length1;
         const max2 = scalar2 + length2;
-        return min1 >= min2 && min1 < max2 || min2 >= min1 && min2 < max1;
+        return min1 >= min2 && min1 < max2 
+            ? max2 - min1
+            : min2 >= min1 && min2 < max1 
+                ? max1 - min2
+                : 0;
     });
 
-let rectangleOverlaps = (r1: Rectangle, r2: Rectangle) => {
-    const overlaps = rectangleLineOverlaps(r1, r2);
-    return overlaps[0] && overlaps[1];
-};
+let rectangleOverlap = (r1: Rectangle, r2: Rectangle) => {
+    const overlap = rectangleLineOverlap(r1, r2);
+    return overlap[0] * overlap[1];
+}
 
 let rectangleRoundInBounds = (r: Rectangle, roomBounds: Rectangle) => {
     return axisMap(r, roomBounds, ([s, l]: [number, number], [_, max]: [number, number]) => {

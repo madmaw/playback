@@ -1,12 +1,15 @@
 const PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_LIGHT = 0;
 const PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_MEDIUM = 1;
 const PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_DARK = 2;
+const PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_TAPE_DECK = 3;
+const PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_EYES = 4;
 
 const PRESSURE_PLATE_GRAPHIC_IMAGE_INDEX_BODY = 0;
 const PRESSURE_PLATE_GRAPHIC_IMAGE_INDEX_PLATE = 1;
 
 const PRESSURE_PLATE_GRAPHIC_JOINT_ID_BODY = 0;
 const PRESSURE_PLATE_GRAPHIC_JOINT_ID_PLATE = 1;
+const PRESSURE_PLATE_GRAPHIC_JOINT_ID_TAPE = 3;
 
 const PRESSURE_PLATE_ROUNDING = 4;
 const PRESSURE_PLATE_PLATE_HEIGHT = 6;
@@ -31,23 +34,26 @@ const pressurePlateGraphicFactory = (width: number, height: number, edge: Edge) 
     }
 
     const graphic: Graphic = {
-        width, 
-        height, 
-        images: [
+        imageryWidth: width, 
+        imageryHeight: height, 
+        imagery: [
             // block
             [   
                 ...struts,             
                 [0, 0, width, blockHeight, PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_MEDIUM, blockRounding],
                 [0, 0, width - PRESSURE_PLATE_INSET, blockHeight - PRESSURE_PLATE_INSET, PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_LIGHT, blockRounding], 
-                [PRESSURE_PLATE_INSET, 0, width - PRESSURE_PLATE_INSET, blockHeight, PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_DARK, blockRounding], 
-                [PRESSURE_PLATE_INSET, 0, width - PRESSURE_PLATE_INSET*2, blockHeight - PRESSURE_PLATE_INSET, PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_MEDIUM, blockRounding],
+                [PRESSURE_PLATE_INSET, 1, width - PRESSURE_PLATE_INSET, blockHeight - 1, PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_DARK, blockRounding], 
+                [PRESSURE_PLATE_INSET, 1, width - PRESSURE_PLATE_INSET*2, blockHeight - PRESSURE_PLATE_INSET - 1, PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_MEDIUM, blockRounding],
+                [9, 6, 14, 9, PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_TAPE_DECK], // tape deck
+                [12, 10, 1, 1, PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_EYES], 
+                [18, 10, 1, 1, PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_EYES], 
             ], 
             // plate
             [ 
                 [0, 0, width, PRESSURE_PLATE_PLATE_HEIGHT, PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_MEDIUM, plateRounding],
                 [0, 0, width - PRESSURE_PLATE_INSET, PRESSURE_PLATE_PLATE_HEIGHT, PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_LIGHT, plateRounding], 
                 [PRESSURE_PLATE_INSET, PRESSURE_PLATE_INSET, width - PRESSURE_PLATE_INSET, PRESSURE_PLATE_PLATE_HEIGHT - PRESSURE_PLATE_INSET, PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_DARK, plateRounding], 
-                [PRESSURE_PLATE_INSET, PRESSURE_PLATE_INSET, width - PRESSURE_PLATE_INSET*2, PRESSURE_PLATE_PLATE_HEIGHT - PRESSURE_PLATE_INSET, PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_MEDIUM, plateRounding],
+                [PRESSURE_PLATE_INSET, PRESSURE_PLATE_INSET, width - PRESSURE_PLATE_INSET*2, PRESSURE_PLATE_PLATE_HEIGHT - PRESSURE_PLATE_INSET - 1, PRESSURE_PLATE_GRAPHIC_PALETTE_INDEX_MEDIUM, plateRounding],
             ]
         ], 
         joints: [{
@@ -66,6 +72,13 @@ const pressurePlateGraphicFactory = (width: number, height: number, edge: Edge) 
                 dx: -width/2, 
                 dy: -PRESSURE_PLATE_PLATE_GAP, 
             }], 
+        }, {
+            id: PRESSURE_PLATE_GRAPHIC_JOINT_ID_TAPE, 
+            transformations: [{
+                transformType: TRANSFORM_TYPE_TRANSLATE, 
+                dx: 16 - width/2, 
+                dy: PRESSURE_PLATE_PLATE_HEIGHT + 6, 
+            }], 
         }], 
         poses: [
             // trigger pressure plate
@@ -78,10 +91,10 @@ const pressurePlateGraphicFactory = (width: number, height: number, edge: Edge) 
             }
         ], 
         animations: {
-            [ANIMATION_ID_CARRYING]: {
+            [ANIMATION_ID_PRESSING_BUTTON]: {
                 poseDuration: 100, 
                 poseIds: [PRESSURE_PLATE_POSE_ID_TRIGGER], 
-                repeat: 1, 
+                count: 1, 
             }
         }
     };

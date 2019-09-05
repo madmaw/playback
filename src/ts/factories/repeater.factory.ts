@@ -11,9 +11,9 @@ const repeaterFactoryFactory = (script?: number[], tapeColour?: HSL) => {
             collisionGroup: COLLISION_GROUP_BACKGROUNDED, 
             collisionMask: COLLISION_MASK_BACKGROUNDED, 
             gravityMultiplier: 0, 
-            holding: new Map([[REPEATER_GRAPHIC_JOINT_ID_TAPE_DECK, tape && tape[0]]]), 
+            holding: {[REPEATER_GRAPHIC_JOINT_ID_TAPE_DECK]: tape && tape[0]},
             id: id(), 
-            inputs: {
+            activeInputs: {
                 reads: {}, 
                 states: {}, 
             }, 
@@ -27,6 +27,7 @@ const repeaterFactoryFactory = (script?: number[], tapeColour?: HSL) => {
             playing: 1, 
             playbackStartTime: 0, 
             toSpeak: [],               
+            capabilities: [INSTRUCTION_ID_PLAY, INSTRUCTION_ID_REWIND, INSTRUCTION_ID_FAST_FORWARD, INSTRUCTION_ID_INSERT, INSTRUCTION_ID_EJECT], 
         };
         return [repeater];        
     }

@@ -13,9 +13,9 @@ const cratePalette: HSL[] = [
 ];
 
 const crateGraphic: Graphic = {
-    width: 16, 
-    height: 16, 
-    images: [
+    imageryWidth: 16, 
+    imageryHeight: 16, 
+    imagery: [
         // board
         [   
             [-7.5, -1.5, 15, 3, CRATE_GRAPHIC_PALETTE_INDEX_MEDIUM],
@@ -58,7 +58,7 @@ const crateGraphic: Graphic = {
                 scaleY:-1, 
             }, {
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rotation: -Math.PI/2, 
+                angle: -Math.PI/2, 
             }], 
         }, {
             imageIndex: CRATE_GRAPHIC_IMAGE_INDEX_BOARD, 
@@ -72,7 +72,7 @@ const crateGraphic: Graphic = {
                 scaleY:-1, 
             }, {
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rotation: -Math.PI/2, 
+                angle: -Math.PI/2, 
             }], 
         }, {
             imageIndex: CRATE_GRAPHIC_IMAGE_INDEX_BOARD, 

@@ -90,7 +90,7 @@ function SynthSpeech ( buf: Float32Array, text: string, f0: number, speed: numbe
 		// Find phoneme description
 		var p = g_phonemes[l];
 		if (!p) {
-			if (l == " " || l == "\n") {
+			if (l == " ") {
 				bufPos += Math.floor(sampleFrequency * 0.2 * speed);
 			}
 			continue;

@@ -4,8 +4,6 @@ const BLOCK_GRAPHIC_PALETTE_INDEX_DARK = 2;
 
 const BLOCK_GRAPHIC_IMAGE_INDEX_BODY = 0;
 
-const BLOCK_GRAPHIC_JOINT_ID_BODY = 0;
-
 const BLOCK_ROUNDING = 4;
 
 const blockPaletteCyan: HSL[] = [
@@ -19,26 +17,22 @@ const blockPaletteRed: HSL[] = [
     [0, 20, 50],
     [0, 30, 40],    
 ]
-
-const blockGraphic: Graphic = {
-    width: 32, 
-    height: 32, 
-    images: [
-        // block
-        [   
-            [-16, -16, 32, 32, BLOCK_GRAPHIC_PALETTE_INDEX_MEDIUM, BLOCK_ROUNDING],
-            [-16, -16, 30, 30, BLOCK_GRAPHIC_PALETTE_INDEX_LIGHT, BLOCK_ROUNDING], 
-            [-14, -14, 30, 30, BLOCK_GRAPHIC_PALETTE_INDEX_DARK, BLOCK_ROUNDING], 
-            [-14, -14, 28, 28, BLOCK_GRAPHIC_PALETTE_INDEX_MEDIUM, BLOCK_ROUNDING],
+const blockGraphicFactory = (width: number, height: number) => {
+    const blockGraphic: Graphic = {
+        imageryWidth: width, 
+        imageryHeight: height, 
+        imagery: [
+            // block
+            [   
+                [-width/2, 0, width, height, BLOCK_GRAPHIC_PALETTE_INDEX_MEDIUM, BLOCK_ROUNDING],
+                [-width/2, 0, width - 2, height - 2, BLOCK_GRAPHIC_PALETTE_INDEX_LIGHT, BLOCK_ROUNDING], 
+                [2 - width/2, 2, width - 2, height - 2, BLOCK_GRAPHIC_PALETTE_INDEX_DARK, BLOCK_ROUNDING], 
+                [2 - width/2, 2, width - 4, height - 4, BLOCK_GRAPHIC_PALETTE_INDEX_MEDIUM, BLOCK_ROUNDING],
+            ], 
         ], 
-    ], 
-    joints: [{
-        id: BLOCK_GRAPHIC_JOINT_ID_BODY, 
-        imageIndex: BLOCK_GRAPHIC_IMAGE_INDEX_BODY, 
-        transformations: [{
-            transformType: TRANSFORM_TYPE_TRANSLATE, 
-            dx: 0, 
-            dy: 16, 
-        }], 
-    }]
-}
+        joints: [{
+            imageIndex: BLOCK_GRAPHIC_IMAGE_INDEX_BODY, 
+        }]
+    }
+    return blockGraphic;
+};

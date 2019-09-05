@@ -105,7 +105,16 @@ module.exports = function (grunt) {
                 replacements: [{ 
                     from: "'use strict';", 
                     to:""
-                }]
+                }, {
+                    from: "\n", 
+                    to: ""
+                }, {
+                    from: "const ", 
+                    to: "let "
+                }/*, {
+                    from: /\[(\d+)\]\:/,
+                    to: "${1}:"
+                }*/]
             }, 
         },
         copy: {

@@ -8,46 +8,12 @@ onload = () => {
     const audioContext = new AudioContext();
     const {
         factory, 
-        height, 
-        width, 
-        playerRoomX, 
-        playerRoomY, 
-        playerX, 
-        playerY, 
+        roomHeight: height, 
+        roomWidth: width, 
     } = roomFactoryFactory();
     let world: World;
     const recreateWorld = () => {
-        const player: Player = {
-            graphic: playerGraphic, 
-            palette: playerPalette, 
-            entityType: ENTITY_TYPE_PLAYER, 
-            bounds: rectangleCenterBounds(playerX, playerY, .6, .8),
-            // only collide with robots on the bottom or top
-            // don't collide with items at all
-            collisionMask: COLLISION_MASK_PLAYER, 
-            collisionGroup: COLLISION_GROUP_PLAYER, 
-            gravityMultiplier: 1, 
-            orientation: ORIENTATION_RIGHT, 
-            orientationStartTime: 0, 
-            id: -1,
-            mass: 1, 
-            velocity: [0, 0], 
-            lastCollisions: [0, 0, 0, 0, 0],
-            baseVelocity: BASE_VELOCITY, 
-            boundsWithVelocity: [0, 0, 0, 0], 
-            airTurn: 1, 
-            inputs: {
-                reads: {}, 
-                states: {}, 
-            }, 
-            holding: new Map<number, MovableEntity>(),  
-            handJointId: PLAYER_GRAPHIC_JOINT_ID_RIGHT_HAND,
-            insertionJointId: PLAYER_GRAPHIC_JOINT_ID_TAPE_DECK,
-            instructionsHeard: [], 
-            toSpeak: [], 
-            learnedInstructions: new Set([INSTRUCTION_ID_HELP]), 
-        };    
-        world = createWorld(audioContext, width, height, factory, player, playerRoomX, playerRoomY);
+        world = createWorld(audioContext, width, height, factory);
     };
     recreateWorld();
 
@@ -100,7 +66,7 @@ onload = () => {
     let remainder = 0;
     const update = (now?: number) => {
         let delta = Math.min((now||0) - (then||0), MAX_DELTA * 2) + remainder;
-        const inputs = world.player.inputs;
+        const inputs = world.player.activeInputs;
         inputs.states = {};
         for (let keyCode in INPUT_KEY_CODE_MAPPINGS) {
             const input = INPUT_KEY_CODE_MAPPINGS[keyCode];
@@ -119,7 +85,6 @@ onload = () => {
                 context.save();
                 context.scale(scale, scale); 
                 context.translate(-EDGE_HIDE_PROPORTION, -EDGE_HIDE_PROPORTION);
-                context.beginPath();
             }
             updateAndRenderWorld(context, world, d, render);
             if (render) {
@@ -144,15 +109,15 @@ const renderPlayer = (player: Player, worldAge: number) => {
         h.style.opacity = '1';
         // render out all the commands
         h.innerHTML = INSTRUCTIONS.map((instruction, instructionId) => {
-            if( player.learnedInstructions.has(instructionId)) {
-                return `<b>${instructionToKey(instruction)}</b>) ${instructionToName(instructionId)}<br>`
+            if( player.capabilities.indexOf(instructionId) >= 0 && instruction.keyCodes ) {
+                return `<b>${instructionToKey(instruction)}${instruction.hold?'+hold':''}</b>) ${instructionToName(instructionId)}<br>`
             }
             return '';
         }).join('');
     } else {
         h.style.opacity = '0';
     }
-    if (player.lastLearnedAt > worldAge - LEARN_INSTRUCTION_DISPLAY_TIME) {
+    if (player.lastLearnedAt > worldAge - LEARN_INSTRUCTION_DISPLAY_TIME && INSTRUCTIONS[player.lastLearnedInstructionId].keyCodes) {
         l.innerHTML = `New ability<br><i>${instructionToName(player.lastLearnedInstructionId).toUpperCase()}`
         l.style.opacity = '1';
     } else {
