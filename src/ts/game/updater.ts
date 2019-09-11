@@ -369,7 +369,7 @@ const drawEntity = (c: CanvasRenderingContext2D, entity: Entity, worldAge: numbe
         }
         const orientableEntity = entity as OrientableEntity;
         let orientationXScale = 1;
-        if (orientableEntity.facing != null) {
+        if (orientableEntity.entityOrientation != null) {
             let turnProgress = Math.min(1, (worldAge - orientableEntity.orientationStartTime)/TURN_DURATION) * 2 - 1;
             // TODO there's got to be a better way to do this
             if (turnProgress > 0) {
@@ -377,7 +377,7 @@ const drawEntity = (c: CanvasRenderingContext2D, entity: Entity, worldAge: numbe
             } else {
                 turnProgress = Math.min(-.2, turnProgress);
             }
-            orientationXScale = orientableEntity.facing?turnProgress:-turnProgress;
+            orientationXScale = orientableEntity.entityOrientation?turnProgress:-turnProgress;
         }            
 
         const newXScale = w/(graphicalEntity.graphic.imageryWidth * xscale);
@@ -431,7 +431,7 @@ const drawEntity = (c: CanvasRenderingContext2D, entity: Entity, worldAge: numbe
         if (graphicalEntity.passiveAnimations) {
             objectIterate(graphicalEntity.passiveAnimations, (a, animationId) => {
                 const animation = graphicalEntity.graphic.animations[animationId]; 
-                let progress = (worldAge - a.startTime)/animation.poseDuration;
+                let progress = (worldAge - a.animationStartTime)/animation.poseDuration;
                 let index: number;
                 let previousIndex: number;
                 if (progress < animation.poseIds.length) {
@@ -445,12 +445,12 @@ const drawEntity = (c: CanvasRenderingContext2D, entity: Entity, worldAge: numbe
                 }
                 poses.push({
                     poseId: animation.poseIds[index], 
-                    progress, 
+                    animationProgress: progress, 
                 });
                 if (previousIndex >= 0) {
                     poses.push({
                         poseId: animation.poseIds[previousIndex], 
-                        progress: 1 - progress, 
+                        animationProgress: 1 - progress, 
                     });    
                 }
             });
@@ -459,13 +459,13 @@ const drawEntity = (c: CanvasRenderingContext2D, entity: Entity, worldAge: numbe
         if (currentPoseId != null) {
             poses.unshift({
                 poseId: currentPoseId, 
-                progress, 
+                animationProgress: progress, 
             });
         }
         if (graphicalEntity.previousPoseId != null && progress < 1) {
             poses.unshift({
                 poseId: graphicalEntity.previousPoseId, 
-                progress: 1 - progress, 
+                animationProgress: 1 - progress, 
             });
         }
         drawGraphic(
@@ -609,10 +609,10 @@ const updateEntity = (
     graphicalEntity.passiveAnimations = (graphicalEntity.passiveAnimations || {});
     objectIterate(graphicalEntity.passiveAnimations, (passive, animationId) => {
         const animation = graphicalEntity.graphic.animations[animationId];
-        const endTime = passive.startTime + animation.poseDuration * animation.poseIds.length;
+        const endTime = passive.animationStartTime + animation.poseDuration * animation.poseIds.length;
         if (endTime < worldAge + delta) {
             if (endTime >= worldAge) {
-                passive.resolve(worldAge);
+                passive.notifyComplete(worldAge);
             }
             if (endTime + animation.poseDuration < worldAge + delta) {
                 delete graphicalEntity.passiveAnimations[animationId];
@@ -632,7 +632,7 @@ const updateEntity = (
     const grabAge = worldAge - activeMovableEntity.lastCollisions[EDGE_GRAB];
     const attachedAge = Math.min(groundAge, grabAge);
     let carrierVelocity = [0, 0];
-    let carrierOrientation: Orientation = orientableEntity.facing;
+    let carrierOrientation: Orientation = orientableEntity.entityOrientation;
     let pickingUp: boolean | number;
     let rewinding: boolean | number;
     let fastForwarding: boolean | number;
@@ -646,9 +646,9 @@ const updateEntity = (
             carrierVelocity = activeMovableEntity.carrier.velocity || carrierVelocity;
             if (FLAG_CARRIER_TURNS_CARRIED) {
                 const orientableCarrier = activeMovableEntity.carrier as any as OrientableEntity;
-                carrierOrientation = orientableCarrier.facing != null 
+                carrierOrientation = orientableCarrier.entityOrientation != null 
                     && orientableCarrier.orientationStartTime > orientableEntity.orientationStartTime
-                    ? orientableCarrier.facing 
+                    ? orientableCarrier.entityOrientation 
                     : carrierOrientation;    
             }
         }
@@ -805,11 +805,11 @@ const updateEntity = (
                                     carrier: undefined, 
                                     grabbing: undefined, 
                                     holding: {},  
-                                    inputs: {
+                                    activeInputs: {
                                         states: {}, 
                                         reads: {}, 
                                     }, 
-                                    lastLearnedAt: 0, 
+                                    orientationStartTime: 0, 
                                 };
                                 const roomAndEntity: RoomAndEntity = [x, y, cleanEntity];
                                 localStorage.setItem(e.persistentId as any, JSON.stringify(roomAndEntity));
@@ -817,12 +817,12 @@ const updateEntity = (
                         })
                     )
                 );
-                localStorage.setItem('w', worldAge as any);
+                localStorage.setItem(0 as any, worldAge as any);
                 world.lastSaved = worldAge;
             });
         }
 
-        if (activeMovableEntity.holding[activeMovableEntity.insertionJointId]) {
+        if (activeMovableEntity.holding[activeMovableEntity.insertionJointId] && script) {
             if (rewinding) {
                 animationId = ANIMATION_ID_PRESSING_BUTTON;
                 if (doRepeatingInput(entity, INSTRUCTION_ID_REWIND, worldAge, delta, REWIND_INTERVAL)) {
@@ -937,7 +937,7 @@ const updateEntity = (
                     ];
                 delete activeMovableEntity.holding[activeMovableEntity.insertionJointId];
                 axisMap(activeMovableEntity.bounds, inserted.bounds, ([p1, l1], [_, l2]) => p1 + (l1 - l2)/2, inserted.bounds);
-                (inserted as any as OrientableEntity).facing = orientableEntity.facing;
+                (inserted as any as OrientableEntity).entityOrientation = orientableEntity.entityOrientation;
                 roomAddEntity(room, inserted as Entity);
                 entityPlaySound(entity, INSTRUCTION_ID_EJECT, sounds);
             }
@@ -950,12 +950,11 @@ const updateEntity = (
                 worldAge, 
                 () => activeMovableEntity.carryingPreviously[0] || activeMovableEntity.carrying[0] || activeMovableEntity.holding && activeMovableEntity.holding[activeMovableEntity.handJointId], 
                 (toThrow: MovableEntity) => {
-                    const mass = entityCalculateMass(toThrow);
-                    toThrow.velocity = [((orientation * 2) - 1)*THROW_POWER/mass, -THROW_POWER/mass];
+                    toThrow.velocity = [((orientation * 2) - 1)*THROW_POWER, -THROW_POWER];
                     if (activeMovableEntity.holding[activeMovableEntity.handJointId] == toThrow) {
                         delete activeMovableEntity.holding[activeMovableEntity.handJointId];
                         axisMap(activeMovableEntity.bounds, toThrow.bounds, ([p1, l1], [_, l2]) => p1 + (l1 - l2)/2, toThrow.bounds);
-                        (toThrow as any as OrientableEntity).facing = orientableEntity.facing;
+                        (toThrow as any as OrientableEntity).entityOrientation = orientableEntity.entityOrientation;
                         roomAddEntity(room, toThrow as Entity);
                     }
                     entitySetCarrying(activeMovableEntity, toThrow); 
@@ -971,7 +970,7 @@ const updateEntity = (
                         entityType: ENTITY_TYPE_BULLET, 
                         graphic: bulletGraphic, 
                         palette: bulletPalette, 
-                        bounds: [ox + (everyEntity.facing ? ow : -BULLET_WIDTH), oy + oh/2 - BULLET_HEIGHT * Math.random(), BULLET_WIDTH, BULLET_HEIGHT], 
+                        bounds: [ox + (everyEntity.entityOrientation ? ow : -BULLET_WIDTH), oy + oh/2 - BULLET_HEIGHT * Math.random(), BULLET_WIDTH, BULLET_HEIGHT], 
                         collisionGroup: COLLISION_GROUP_BULLETS, 
                         collisionMask: COLLISION_MASK_BULLETS, 
                         gravityMultiplier: 0, 
@@ -979,9 +978,9 @@ const updateEntity = (
                         lastCollisions: [0, 0, 0, 0, 0], 
                         mass: .1, 
                         boundsWithVelocity: [0, 0, 0, 0], 
-                        velocity: [(everyEntity.facing * 2 - 1) * MAX_VELOCITY, 0], 
+                        velocity: [(everyEntity.entityOrientation * 2 - 1) * MAX_VELOCITY, 0], 
                         restitution: .4, 
-                        facing: everyEntity.facing,
+                        entityOrientation: everyEntity.entityOrientation,
                         orientationStartTime: 0, 
                     };
                     roomAddEntity(room, bullet);
@@ -1096,8 +1095,8 @@ const updateEntity = (
         }
     }
 
-    if (orientableEntity.facing != orientation && orientation != null && orientableEntity.facing != null) {
-        orientableEntity.facing = orientation;
+    if (orientableEntity.entityOrientation != orientation && orientation != null && orientableEntity.entityOrientation != null) {
+        orientableEntity.entityOrientation = orientation;
         orientableEntity.orientationStartTime = worldAge;
     }  
 
@@ -1138,6 +1137,7 @@ const updateEntity = (
                     worldAge, 
                     check, 
                     () => {
+                        (e as EveryEntity).entityOrientation = ORIENTATION_LEFT;
                         roomRemoveEntity(room, e);
                         activeMovableEntity.holding[activeMovableEntity.handJointId] = e as MovableEntity;    
                     }

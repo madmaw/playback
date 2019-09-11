@@ -110,7 +110,7 @@ module.exports = function (grunt) {
                     to: ""
                 }, {
                     from: "const ", 
-                    to: "let "
+                    to: "var "
                 }/*, {
                     from: /\[(\d+)\]\:/,
                     to: "${1}:"

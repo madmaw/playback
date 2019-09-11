@@ -26,9 +26,9 @@ onload = () => {
         const aspectRatio = innerWidth/innerHeight;
         const targetWidth = MAX_TILES_ACROSS - EDGE_HIDE_PROPORTION*2;
         const targetHeight = MAX_TILES_DOWN - EDGE_HIDE_PROPORTION*2;
-        scale = Math.floor((aspectRatio < targetWidth/targetHeight
+        scale = (((aspectRatio < targetWidth/targetHeight
             ? innerWidth/targetWidth
-            : innerHeight/targetHeight)/SCALING_JUMP) * SCALING_JUMP;
+            : innerHeight/targetHeight)/SCALING_JUMP)|0) * SCALING_JUMP;
         // for some reason, fonts don't render when scale is a multiple of 5!?
         if (FLAG_CHROME_FONT_HACK && !(scale % 5)) {
             scale--;

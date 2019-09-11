@@ -20,7 +20,7 @@ const tapeFactoryFactory = (script: number[], hue: number, into?: EntityFactory)
             boundsWithVelocity: [0, 0, 0, 0], 
             velocity: [0, 0], 
             restitution: .4, 
-            facing: 0,
+            entityOrientation: 0,
             orientationStartTime: 0, 
             script: [...script], 
             hue, 

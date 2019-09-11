@@ -74,7 +74,7 @@ interface PostJointRenderCallback {
 
 type PoseAndProgress = {
     poseId: number;
-    progress: number;
+    animationProgress: number;
 }
 
 let hslToStyle = (hsl: HSL) => {
@@ -91,7 +91,7 @@ let drawGraphicJoints = (c: CanvasRenderingContext2D, g: Graphic, palette: HSL[]
         joints.forEach(j => {
             c.save();
             applyGraphicTransformations(c, j.transformations, 1);
-            poses.forEach(p => applyGraphicTransformations(c, g.poses[p.poseId][j.id], p.progress));
+            poses.forEach(p => applyGraphicTransformations(c, g.poses[p.poseId][j.id], p.animationProgress));
             drawGraphicJoints(c, g, palette, j.renderBefore, callback, poses);
             if (j.imageIndex != null) {
                 g.imagery[j.imageIndex].forEach(image => {      

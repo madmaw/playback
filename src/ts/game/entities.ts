@@ -10,7 +10,7 @@ const COLLISION_GROUP_PLAYER = 4;
 const COLLISION_GROUP_ENEMIES = 5;
 const COLLISION_GROUP_BACKGROUNDED = 6;
 const COLLISION_GROUP_BULLETS = 7;
-
+ 
 const COLLISION_MASK_TERRAIN = ~0;
 // don't collide with bullets or items or backgrounded
 const COLLISION_MASK_SPIKES = 0x22000F;
@@ -19,9 +19,9 @@ const COLLISION_MASK_PUSHABLES = 0xFFFF0FF;
 // collides with terrain and pushables
 const COLLISION_MASK_ITEMS = 0xF00F;
 // collides with terrain and pushables
-const COLLISION_MASK_PLAYER = 0xA0F80F;
+const COLLISION_MASK_PLAYER = 0x80F80F;
 // collides with terrain, spikes on the bottom, pushables, other enemies and the player on the top/bottom
-const COLLISION_MASK_ENEMIES = 0xAAF80F;
+const COLLISION_MASK_ENEMIES = 0xA2F80F;
 const COLLISION_MASK_BACKGROUNDED = 0;
 const COLLISION_MASK_BULLETS = 0xF;
 
@@ -34,8 +34,8 @@ const BULLET_MASK = 48; // enemies and player
 type Orientation = 0 | 1;
 
 type PassiveAnimation = {
-    startTime: number;
-    resolve: (worldAge: number) => void;
+    animationStartTime: number;
+    notifyComplete: (worldAge: number) => void;
 };
 
 type CommonEntity = {
@@ -106,7 +106,7 @@ type InstructableEntity = {
 } & PlaybackEntity & ActiveMovableEntity & ListeningEntity;
 
 type OrientableEntity = {
-    facing: Orientation;    
+    entityOrientation: Orientation;    
     orientationStartTime: number;
 } & SpatialEntity;
 
@@ -322,14 +322,14 @@ let entityAddPassiveAnimation = <T>(
     if (!graphicalEntity.passiveAnimations[animationId] && t) {
         if (graphicalEntity.graphic.animations[animationId] != null) {
             graphicalEntity.passiveAnimations[animationId] = {
-                resolve: (worldAge: number) => {
+                notifyComplete: (worldAge: number) => {
                     const newT = check();
                     if (newT == t) {
                         doit(t, worldAge)
                         entityPlaySound(entity, instructionId, sounds); 
                     }
                 }, 
-                startTime: worldAge, 
+                animationStartTime: worldAge, 
             };    
         } else {
             doit(t, worldAge);

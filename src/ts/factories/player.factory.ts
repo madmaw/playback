@@ -8,7 +8,7 @@ const playerFactory = (x: number, y: number, id: IdFactory) => {
         collisionMask: COLLISION_MASK_PLAYER, 
         grabMask: GRAB_MASK, 
         gravityMultiplier: 1, 
-        facing: ORIENTATION_RIGHT, 
+        entityOrientation: ORIENTATION_RIGHT, 
         orientationStartTime: 0, 
         id: id(),
         mass: 1, 

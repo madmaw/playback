@@ -25,7 +25,7 @@ const mainframeFactoryFactory = (hue: number) => {
             velocity: [0, 0], 
             baseVelocity: BASE_VELOCITY/3, 
             boundsWithVelocity: [0, 0, 0, 0], 
-            facing: 1, 
+            entityOrientation: 1, 
             orientationStartTime: 0, 
             activeInputs: {
                 reads: {}, 

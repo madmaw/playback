@@ -1,13 +1,17 @@
 type EntityFactory = (x: number, y: number, id: IdFactory) => Entity[];
 
 const PLAYER_PERSISTENT_ID = 1;
-const TUTORIAL_END_DOOR_PERSISTENT_ID = 2;
-const TUTORIAL_TAPE_PLATOFORM_PERSITENT_ID = 3;
-const PERSISTENT_ID_GUN_ROOM_1 = 4;
-const PERSISTENT_ID_GUN_ROOM_2 = 5;
-const PERSISTENT_ID_GUN_ROOM_3 = 6;
+const PERSISTENT_ID_TUTORIAL_END_1 = 2;
+const PERSISTENT_ID_TUTORIAL_END_2 = 3;
+const PERSISTENT_ID_TUTORIAL_END_3 = 4;
+const TUTORIAL_TAPE_PLATOFORM_PERSITENT_ID = 5;
+const PERSISTENT_ID_GUN_ROOM_1 = 6;
+const PERSISTENT_ID_GUN_ROOM_2 = 7;
+const PERSISTENT_ID_GUN_ROOM_3 = 8;
+const PERSISTENT_ID_LEFT_RIGHT_ROOM_1 = 9;
+const PERSISTENT_ID_LEFT_RIGHT_ROOM_2 = 10;
 
-const MAX_PERSISTENT_ID_PLUS_1 = 7;
+const MAX_PERSISTENT_ID_PLUS_1 = 11;
 
 // do not use 0 as hue for red as we do a lazy null check
 const HUE_TAPE_SET_1 = 60;
@@ -16,11 +20,19 @@ const HUE_TAPE_SET_3 = 120;
 const HUE_TAPE_SET_4 = 240;
 const HUE_TAPE_SET_5 = 300;
 
-const HSL_AREA_0_BLOCKS: HSL = [0, 40, 40];
-const BACKGROUND_AREA_0: HSL[] = [[240, 60, 80], [240, 50, 30]];
+const HSL_AREA_0_BLOCKS: HSL = [15, 35, 40];
+const BACKGROUND_AREA_0: HSL[] = [[240, 60, 80], [240, 50, 50], [200, 30, 20]];
 
-const HSL_AREA_1_BLOCKS: HSL = [240, 30, 40];
-const BACKGROUND_AREA_1: HSL[] = [[200, 5, 20]];
+const HSL_AREA_1_BLOCKS: HSL = [240, 40, 40];
+const BACKGROUND_AREA_1: HSL[] = [[200, 5, 20], [200, 30, 20]];
+
+const HSL_AREA_2_BLOCKS: HSL = [180, 40, 25];
+const BACKGROUND_AREA_2: HSL[] = [[200, 30, 20], [0, 30, 20]];
+ 
+const HSL_AREA_3_BLOCKS: HSL = [300, 20, 40];
+const BACKGROUND_AREA_3: HSL[] = [[300, 20, 30], [200, 5, 20]];
+
+const BACKGROUND_AREA_4: HSL[] = [[240, 20, 10], [300, 20, 30]];
 
 
 
@@ -45,44 +57,131 @@ const roomFactoryFactory = () => {
 
     // set up all the entities
     const baseLegend: Legend = {
-        'o': blockFactoryFactory(HSL_AREA_0_BLOCKS, 1), 
+        'o': blockFactoryFactory(HSL_AREA_0_BLOCKS, 6), 
         'y': blockFactoryFactory(HSL_AREA_1_BLOCKS), 
+        //'x': blockFactoryFactory(HSL_AREA_2_BLOCKS, 6), 
+        'z': blockFactoryFactory(HSL_AREA_3_BLOCKS, 2), 
         'a': crateFactoryFactory(),
-        '^': spikeFactory, 
+        'v': spikeFactory, 
         'T': sceneryFactoryFactory('🌳', 3), // 🌳
         //'A': sceneryFactoryFactory('🌲', 3), // 🌲
         'O': sceneryFactoryFactory('☁️', 2), // ☁️
         'F': sceneryFactoryFactory('🌻', 1), // 🌻
-        'M': sceneryFactoryFactory('🍄', .5), // 🍄
+        //'M': sceneryFactoryFactory('🍄', .5), // 🍄
         'I': sceneryFactoryFactory('🕯️', .5), // 🕯️
         'Z': sceneryFactoryFactory('🖼️', 1), // 🖼️
-        'm': mainframeFactoryFactory(HUE_TAPE_SET_1),
-        'd': platformFactoryFactory(1, 2, EDGE_TOP, HUE_TAPE_SET_1),
+        //'H': sceneryFactoryFactory('🏺', 1), // 🏺
+        //'K': sceneryFactoryFactory('⚗️', 2), // ⚗️
         'P': persistentEntityFactoryFactory(playerFactory, PLAYER_PERSISTENT_ID), 
     }
 
     const roomFactories: RoomFactory[][] = [
         [
-            ,,,,
+            // 0, 0
+            ,
+            // 1, 0
+            ,
+            // 2, 0
+            ,
+            // 3, 0
+            legendRoomFactory(
+                {...baseLegend,
+                    'P': platformFactoryFactory(4, 1, EDGE_TOP, HUE_TAPE_SET_1), 
+                }, 
+                'zzzzzzzzzzzzzzzzzz' + 
+                'z                z' +
+                'z                z' +
+                'z                z' +
+                'z                z' +
+                'z                z' +
+                'z                z' +
+                'z                z' +
+                'z                z' +
+                'z                z' +
+                'z                z' +
+                'z                z' +
+                'zzzzzzz    zzzzzzz',
+                MAX_TILES_ACROSS, 
+                BACKGROUND_AREA_3, 
+            ), 
+        ],         
+        [
+            // 0, 0
+            ,
+            // 1, 0
+            ,
+            // 2, 0
+            ,
+            // 3, 0
+            legendRoomFactory(
+                {...baseLegend,
+                }, 
+                'zzzzzzz    zzzzzzz' + 
+                'z                z' +
+                'z                z' +
+                'z     zzzzzz     z' +
+                'z                z' +
+                'z                z' +
+                'z                z' +
+                'z                z' +
+                'z                z' +
+                'z                z' +
+                'z     P          z' +
+                'z     z    z     z' +
+                'zzzzzzz    zzzzzzz',
+                MAX_TILES_ACROSS, 
+                BACKGROUND_AREA_4, 
+            ), 
+        ], 
+        [
+            // 0, 0
+            ,
+            // 1, 0
+            ,
+            // 2, 0
+            ,
+            // 3, 0
+            legendRoomFactory(
+                {...baseLegend,
+                    'F': platformFactoryFactory(4, 1, EDGE_TOP, HUE_TAPE_SET_5), 
+                    'f': tapeFactoryFactory([INSTRUCTION_ID_COUNT_6, INSTRUCTION_ID_UP], HUE_TAPE_SET_5, pressurePlateFactoryFactory(1, 1, HSL_AREA_3_BLOCKS, EDGE_RIGHT)), 
+                    't': tapeFactoryFactory([INSTRUCTION_ID_THROW], HUE_TAPE_SET_1), 
+                }, 
+                'zzzzzzz    zzzzzzz' + 
+                'z    yy          z' +
+                'z     y          z' +
+                'z                z' +
+                'f      t         z' +
+                'z      F         z' +
+                'z         yy     z' +
+                'z          yy    z' +
+                'z           yy   z' +
+                'z            yy  z' +
+                'z                z' +
+                'z              yyz' +
+                'zzzzzzz       yyzz',
+                MAX_TILES_ACROSS, 
+                BACKGROUND_AREA_3, 
+            ), 
         ], 
         [
             // 0, 1
             legendRoomFactory(
                 {...baseLegend, 
-                    '4': tapeFactoryFactory([INSTRUCTION_ID_SAVE, INSTRUCTION_ID_HELP, INSTRUCTION_ID_DOWN], HUE_TAPE_SET_1, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS)),
+                    't': tapeFactoryFactory([INSTRUCTION_ID_UP, INSTRUCTION_ID_DOWN, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_RIGHT], HUE_TAPE_SET_4), 
                 }, 
                 'oo                ' + 
-                '    P        O    ' +
-                ' F                ' + 
+                'oo           O    ' +
+                'oo                ' + 
                 'oo    O           ' + 
-                'oo          aT T  ' +
+                'oo          aT  T ' +
                 'oo          oooooo' +
                 'ooo         oooooo' +
                 'ooo         oooooo' +
                 'oooo       ooooooo' +
-                'oooooooooooooo  oo' +
-                'ooooooooooooM     ' +
-                'ooooooooooooo M   ' +
+                'ooooooooooooo    o' +
+                'ooooooooooooI     ' +
+                'ooooooooooooo  t  ' +
                 'oooooooooooooooooo',
                 MAX_TILES_ACROSS, 
                 BACKGROUND_AREA_0, 
@@ -92,20 +191,21 @@ const roomFactoryFactory = () => {
                 {...baseLegend, 
                     'R': robotFactoryFactory(ORIENTATION_LEFT, HUE_TAPE_SET_1), 
                     '1': tapeFactoryFactory([INSTRUCTION_ID_COUNT_1, INSTRUCTION_ID_COUNT_3, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_COUNT_1, INSTRUCTION_ID_COUNT_3, INSTRUCTION_ID_RIGHT,,,,,,,], HUE_TAPE_SET_1, repeaterFactoryFactory(HUE_TAPE_SET_1)), 
+                    'p': platformFactoryFactory(2, 1, EDGE_RIGHT, HUE_TAPE_SET_4), 
                 }, 
                 '                  ' + 
                 '   O      1       ' + 
                 '          o       ' + 
                 '                  ' + 
-                ' T TFFR         T ' + 
-                'ooooooo        ooo' +
+                ' T TFFR        a T' + 
                 'ooooooo        ooo' +
                 'ooooooo        ooo' +
                 'oooooooooooooooooo' +
                 'oooooooooooooooooo' +
-                '                 o' +
-                '    y^^^^^^^^y   o' +
-                'o  yyyyyyyyyyyy  o',
+                'ooo            ooo' +
+                '     p            ' +
+                '    yvvvvvvvv     ' +
+                'o  yyyyyyyyyyyyyyy',
                 MAX_TILES_ACROSS, 
                 BACKGROUND_AREA_0, 
             ),                
@@ -132,35 +232,60 @@ const roomFactoryFactory = () => {
                 'ooo           yyyy' +
                 'ooob       B  2yyy' +
                 'oooo              ' +
-                'ooooa       A  1yy' +
-                'ooooo^^^^^^^^^^yyy' +
-                'ooooooooooooooooyy',
+                '   oa       A  1yy' +
+                '   oovvvvvvvvvvyyy' +
+                'yy oooooooooooooyy',
                 MAX_TILES_ACROSS, 
                 BACKGROUND_AREA_0, 
             ),                
             // 3, 1
             legendRoomFactory(
                 {...baseLegend,
-                    'd': persistentEntityFactoryFactory(platformFactoryFactory(1, 5, EDGE_TOP, HUE_TAPE_SET_1), TUTORIAL_END_DOOR_PERSISTENT_ID),
+                    'd': platformFactoryFactory(1, 5, EDGE_TOP, HUE_TAPE_SET_1),
                     'U': tapeFactoryFactory([INSTRUCTION_ID_UP,INSTRUCTION_ID_UP,INSTRUCTION_ID_UP,INSTRUCTION_ID_UP,INSTRUCTION_ID_SAVE], HUE_TAPE_SET_1, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
                     'D': tapeFactoryFactory([INSTRUCTION_ID_DOWN,INSTRUCTION_ID_DOWN,INSTRUCTION_ID_DOWN,INSTRUCTION_ID_DOWN], HUE_TAPE_SET_1, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS, EDGE_LEFT)), 
-                    'P': platformFactoryFactory(1, 1, EDGE_TOP, HUE_TAPE_SET_3),
+                    'P': persistentEntityFactoryFactory(platformFactoryFactory(1, 1, EDGE_TOP, HUE_TAPE_SET_3), PERSISTENT_ID_TUTORIAL_END_3),
                     'h': platformFactoryFactory(1, 1, EDGE_RIGHT, HUE_TAPE_SET_2),
                     'H': tapeFactoryFactory([INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_LEFT], HUE_TAPE_SET_2, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
+                    'S': persistentEntityFactoryFactory(platformFactoryFactory(2, 1, EDGE_TOP, HUE_TAPE_SET_4), PERSISTENT_ID_TUTORIAL_END_2),
+                    'm': mainframeFactoryFactory(HUE_TAPE_SET_1),
                 }, 
-                'yyyyyyy       yy y' + 
-                'yha ydyI     yy  y' +
-                'y y y yy    yy   y' + 
+                'yyyyyyy       yyyy' + 
+                'yha ydyI     yyy  ' +
+                'y y y yy    yy y  ' + 
                 '               y y' + 
-                '             Z y y' + 
-                'yyyH  U yyy    y y' + 
-                'y         yy   y y' + 
-                'ym         yy  y y' +
+                '             Z   y' + 
+                'yyyH  U yyy      y' + 
+                'y         yS   y y' + 
+                'ym         yyy y y' +
                 'yyyyy          y y' +
                 '    y yyyyyyyyyy y' +
                 'y   D            y' +
                 'yyyyyy         yPy' +
                 'yyyyyyyy  yyyyyyyy',
+                MAX_TILES_ACROSS, 
+                BACKGROUND_AREA_1, 
+            ),                
+            // 4, 1
+            legendRoomFactory(
+                {...baseLegend,
+                    '1': tapeFactoryFactory([INSTRUCTION_ID_DOWN, INSTRUCTION_ID_COUNT_2, INSTRUCTION_ID_COUNT_0, INSTRUCTION_ID_DOWN,,,], HUE_TAPE_SET_5, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS, EDGE_BOTTOM)), 
+                    '2': tapeFactoryFactory([INSTRUCTION_ID_COUNT_2, INSTRUCTION_ID_COUNT_0, INSTRUCTION_ID_DOWN], HUE_TAPE_SET_5, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS, EDGE_LEFT)), 
+                    't': tapeFactoryFactory([INSTRUCTION_ID_DOWN], HUE_TAPE_SET_2), 
+                }, 
+                'yyyyyyyyyyyyyyyy1y' + 
+                '             y   y' +
+                '           t y   y' +
+                'yyyy yyyyyyyyy   y' +
+                'y         yyy    y' +
+                'y         2yy y  y' +
+                'y                y' +
+                'y    yyyyyy      y' +
+                'y    yyyyyy      y' +
+                'y    yyyyyy      y' +
+                'y    yyyyyyyy    y' +
+                'y    yyyyyyyy    y' +
+                'yyy  yyyyyyyy    y',
                 MAX_TILES_ACROSS, 
                 BACKGROUND_AREA_1, 
             ),                
@@ -170,47 +295,73 @@ const roomFactoryFactory = () => {
             // 0, 2
             ,             
             // 1, 2
-            ,             
+            legendRoomFactory(
+                {...baseLegend, 
+                    'Y': blockFactoryFactory(HSL_AREA_1_BLOCKS, 1, .8, .6), 
+                    '0': tapeFactoryFactory([INSTRUCTION_ID_UP, INSTRUCTION_ID_UP, INSTRUCTION_ID_UP,,, INSTRUCTION_ID_DOWN, INSTRUCTION_ID_DOWN, INSTRUCTION_ID_DOWN], HUE_TAPE_SET_1, repeaterFactoryFactory(HUE_TAPE_SET_1)), 
+                    '1': tapeFactoryFactory([INSTRUCTION_ID_DOWN, INSTRUCTION_ID_DOWN, INSTRUCTION_ID_DOWN,INSTRUCTION_ID_UP, INSTRUCTION_ID_UP, INSTRUCTION_ID_UP], HUE_TAPE_SET_2, repeaterFactoryFactory(HUE_TAPE_SET_2)), 
+                    '2': platformFactoryFactory(2, .5, EDGE_LEFT, HUE_TAPE_SET_2),
+                    '3': platformFactoryFactory(2, .5, EDGE_RIGHT, HUE_TAPE_SET_1), 
+                    '4': platformFactoryFactory(1, 4, EDGE_TOP, HUE_TAPE_SET_1), 
+                    '5': platformFactoryFactory(1, 4, EDGE_BOTTOM, HUE_TAPE_SET_2), 
+                    '6': compositeEntityFactoryFactory([tapeFactoryFactory([INSTRUCTION_ID_LEFT, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_LEFT,INSTRUCTION_ID_LEFT, INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_RIGHT,INSTRUCTION_ID_RIGHT,,], HUE_TAPE_SET_1, repeaterFactoryFactory(HUE_TAPE_SET_1)), spikeFactory]), 
+                    '7': compositeEntityFactoryFactory([tapeFactoryFactory([INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_RIGHT,,, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_LEFT], HUE_TAPE_SET_2, repeaterFactoryFactory(HUE_TAPE_SET_2)), spikeFactory]), 
+                }, 
+                'y   yyyyyyyyyyyyyy' + 
+                'yy  y  5 5 5 5   y' +
+                'y   yy         1 y' + 
+                'y  yy             ' + 
+                'y   y y 4 4 4 yyyy' + 
+                'y   y            y' + 
+                'y4  yy           y' +
+                'y   y0           y' +
+                'y  YYYYYYYYYYyy  y' +
+                'y       3 2      y' +
+                'yy2           3  y' +
+                'y7vvvvvvvvvvvvvv6y' +
+                'yyyyyyyyyyyyyyyyyy',
+                MAX_TILES_ACROSS, 
+                BACKGROUND_AREA_2,
+            ), 
             // 2, 2
             legendRoomFactory(
                 {...baseLegend, 
-                    'D': tapeFactoryFactory([INSTRUCTION_ID_UP], HUE_TAPE_SET_1, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
-                    'd': platformFactoryFactory(2, 1, EDGE_BOTTOM, HUE_TAPE_SET_1),
-                    'E': tapeFactoryFactory([INSTRUCTION_ID_LEFT], HUE_TAPE_SET_1, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
-                    'e': platformFactoryFactory(2, 1, EDGE_LEFT, HUE_TAPE_SET_1),
-                    'F': tapeFactoryFactory([INSTRUCTION_ID_RIGHT], HUE_TAPE_SET_1, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
-                    'G': tapeFactoryFactory([INSTRUCTION_ID_LEFT], HUE_TAPE_SET_1, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
-                    'H': tapeFactoryFactory([INSTRUCTION_ID_DOWN], HUE_TAPE_SET_1, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
+                    'M': tapeFactoryFactory([INSTRUCTION_ID_SAVE], HUE_TAPE_SET_1, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
+                    'm': mainframeFactoryFactory(HUE_TAPE_SET_1), 
+                    'R': gunFactoryFactory(robotFactoryFactory(ORIENTATION_RIGHT, HUE_TAPE_SET_1)), 
+                    'd': platformFactoryFactory(1, 2, EDGE_TOP, HUE_TAPE_SET_1), 
+                    'D': tapeFactoryFactory([INSTRUCTION_ID_UP, INSTRUCTION_ID_COUNT_6, INSTRUCTION_ID_SHOOT, INSTRUCTION_ID_DOWN], HUE_TAPE_SET_1, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
+                    'c': tapeFactoryFactory([INSTRUCTION_ID_COUNT_2], HUE_TAPE_SET_1, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS, EDGE_RIGHT)), 
                 }, 
+                'yy  yyyyyyyyyyyyyy' + 
+                'yy                ' +
                 'yyyyyyyyyyyyyyyyyy' + 
-                '           y      ' +
-                'yyyyyyyyyy y      ' + 
-                'y        y y     y' + 
-                'y        y y     y' +
-                'y        y y     y' +
-                'y                y' +
-                'y                y' +
-                'y        y y      ' +
-                'y        y y     y' +
-                'y        y y     y' +
-                'y        y       y' +
-                'yyyyyyyyyyyyyyyyyy',
+                '       yy       yy' + 
+                'yy     y         y' +
+                'y     my   yyy   y' +
+                'y yyM yy    y    y' +
+                'y  yyyyyy   y   yy' +
+                'yy yy       y     ' +
+                'y  yc      yy     ' +
+                'y yyyyyyyyyyyd  yy' +
+                'y R             yy' +
+                'yyyyyyyyyyyyyyD yy',
                 MAX_TILES_ACROSS, 
-                BACKGROUND_AREA_1, 
+                BACKGROUND_AREA_2, 
             ),             
             // 3, 2
             legendRoomFactory(
                 {...baseLegend, 
-                    '1': tapeFactoryFactory([,INSTRUCTION_ID_RIGHT,], HUE_TAPE_SET_1, repeaterFactoryFactory(HUE_TAPE_SET_3)), 
-                    '2': tapeFactoryFactory([,,INSTRUCTION_ID_LEFT], HUE_TAPE_SET_1, repeaterFactoryFactory(HUE_TAPE_SET_4)), 
+                    '1': tapeFactoryFactory([,INSTRUCTION_ID_RIGHT], HUE_TAPE_SET_1, repeaterFactoryFactory(HUE_TAPE_SET_3)), 
+                    '2': tapeFactoryFactory([INSTRUCTION_ID_LEFT,], HUE_TAPE_SET_1, repeaterFactoryFactory(HUE_TAPE_SET_4)), 
                     'a': platformFactoryFactory(1, 2, EDGE_BOTTOM, HUE_TAPE_SET_1), 
                     'A': tapeFactoryFactory([INSTRUCTION_ID_UP], HUE_TAPE_SET_1, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS, EDGE_BOTTOM)), 
                     '3': tapeFactoryFactory([INSTRUCTION_ID_DOWN], HUE_TAPE_SET_1, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS)), 
                     'b': platformFactoryFactory(1, 2, EDGE_BOTTOM, HUE_TAPE_SET_2), 
                     'B': tapeFactoryFactory([INSTRUCTION_ID_UP], HUE_TAPE_SET_2, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS, EDGE_BOTTOM)), 
                     '4': tapeFactoryFactory([INSTRUCTION_ID_DOWN], HUE_TAPE_SET_2, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS)), 
-                    'c': platformFactoryFactory(1, 2, EDGE_BOTTOM, HUE_TAPE_SET_3), 
-                    'd': platformFactoryFactory(1, 2, EDGE_BOTTOM, HUE_TAPE_SET_4), 
+                    'c': persistentEntityFactoryFactory(platformFactoryFactory(1, 2, EDGE_BOTTOM, HUE_TAPE_SET_3), PERSISTENT_ID_LEFT_RIGHT_ROOM_1), 
+                    'd': persistentEntityFactoryFactory(platformFactoryFactory(1, 2, EDGE_BOTTOM, HUE_TAPE_SET_4), PERSISTENT_ID_LEFT_RIGHT_ROOM_2), 
                     'R': compositeEntityFactoryFactory([robotFactoryFactory(ORIENTATION_RIGHT, HUE_TAPE_SET_1), spikeFactory]),
                 }, 
                 'yyyyyyyy  yyyyyyyy' + 
@@ -220,14 +371,14 @@ const roomFactoryFactory = () => {
                 'y yyyy4    3yyyy y' + 
                 'y y     BA     y y' + 
                 'y                y' + 
-                'Byyyy  yyyy  yyyyA' +
+                'yByyy  yyyy  yyyAy' +
                 '    yy      yy    ' +
                 '                  ' +
-                'yy y^^^^R^^^^^y yy' +
+                'yy yvvvvRvvvvvy yy' +
                 'y  yyyyyyyyyyyy  y' +
                 'y3yyyyyyyyyyyyyy4y',
                 MAX_TILES_ACROSS, 
-                BACKGROUND_AREA_1, 
+                BACKGROUND_AREA_2, 
             ),
             // 4, 2
             legendRoomFactory(
@@ -246,175 +397,54 @@ const roomFactoryFactory = () => {
                     'D': tapeFactoryFactory([INSTRUCTION_ID_SHOOT], HUE_TAPE_SET_4, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
                     '4': tapeFactoryFactory([INSTRUCTION_ID_SHOOT], HUE_TAPE_SET_4, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS, EDGE_RIGHT)), 
                     '$': tapeFactoryFactory([INSTRUCTION_ID_LEFT], HUE_TAPE_SET_4, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS, EDGE_BOTTOM)), 
-                    'e': persistentEntityFactoryFactory(platformFactoryFactory(1, 10, EDGE_BOTTOM, HUE_TAPE_SET_5), PERSISTENT_ID_GUN_ROOM_1), 
+                    'e': persistentEntityFactoryFactory(platformFactoryFactory(1, 8, EDGE_BOTTOM, HUE_TAPE_SET_5), PERSISTENT_ID_GUN_ROOM_1), 
                     'f': platformFactoryFactory(1, 1, EDGE_BOTTOM, HUE_TAPE_SET_5), 
-                    'g': persistentEntityFactoryFactory(platformFactoryFactory(1, 8, EDGE_BOTTOM, HUE_TAPE_SET_5), PERSISTENT_ID_GUN_ROOM_2), 
-                    'E': tapeFactoryFactory([INSTRUCTION_ID_COUNT_2, INSTRUCTION_ID_COUNT_0, INSTRUCTION_ID_UP], HUE_TAPE_SET_5, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
-                    'l': persistentEntityFactoryFactory(platformFactoryFactory(3, 1, EDGE_RIGHT, HUE_TAPE_SET_5), PERSISTENT_ID_GUN_ROOM_3),
+                    'g': persistentEntityFactoryFactory(platformFactoryFactory(1, 7, EDGE_BOTTOM, HUE_TAPE_SET_5), PERSISTENT_ID_GUN_ROOM_2), 
+                    'E': tapeFactoryFactory([INSTRUCTION_ID_COUNT_2, INSTRUCTION_ID_COUNT_0, INSTRUCTION_ID_UP,,,], HUE_TAPE_SET_5, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
+                    'l': persistentEntityFactoryFactory(platformFactoryFactory(4, 1, EDGE_RIGHT, HUE_TAPE_SET_5), PERSISTENT_ID_GUN_ROOM_3),
                     'k': platformFactoryFactory(1, 1, EDGE_RIGHT, HUE_TAPE_SET_5),
                     'L': tapeFactoryFactory([INSTRUCTION_ID_COUNT_6, INSTRUCTION_ID_RIGHT], HUE_TAPE_SET_5, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS, EDGE_BOTTOM)), 
                     'm': mainframeFactoryFactory(HUE_TAPE_SET_5),
                     'M': tapeFactoryFactory([INSTRUCTION_ID_SAVE], HUE_TAPE_SET_5, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
                 }, 
-                'yyy ey$2#y    g  y' + 
-                '  y      y       y' + 
-                'l        L      ay' + 
-                'yy1             yy' +
-                'yyyf A         b y' + 
+                'yyy eyy$2#yyyg   y' + 
+                '  y       y      y' + 
+                'l        Ly     ay' + 
+                'y1              fy' +
+                'yyy  A         b y' + 
                 'yyk     B      yyy' + 
-                'yy4            c y' + 
-                'yyy   y   y    yyy' +
-                '  y3            dy' +
+                'yyy4          c   ' +
+                'yyy   yyy    yyyyy' + 
+                '  yy3           dy' +
                 '  y             yy' +
-                'y yy4            y' +
-                'yP       E      my' +
+                'y yyy4           y' +
+                'y        E      my' +
                 'yyM yyyyyyyyyyyyyy',
                 MAX_TILES_ACROSS, 
-                BACKGROUND_AREA_1, 
-            ),            
+                BACKGROUND_AREA_2, 
+            ),         
+            // 5, 2
+            legendRoomFactory(
+                {...baseLegend, 
+                    't': tapeFactoryFactory([INSTRUCTION_ID_LEFT, INSTRUCTION_ID_UP, INSTRUCTION_ID_DOWN], HUE_TAPE_SET_3),
+                }, 
+                '                  ' + 
+                '                  ' +
+                '                  ' +
+                '                  ' +
+                'yyyyyyy           ' + 
+                'y     y           ' + 
+                '      y           ' + 
+                'y  t Iy           ' +
+                'yyyyyyy           ' +
+                '                  ' +
+                '                  ' +
+                '                  ' +
+                '                  ',
+                MAX_TILES_ACROSS, 
+                BACKGROUND_AREA_2, 
+            ),                        
         ], 
-        [
-            // 0, 2
-            legendRoomFactory(
-                {...baseLegend,
-                    '1': tapeFactoryFactory([INSTRUCTION_ID_LEFT, INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_EJECT], HUE_TAPE_SET_1),
-                    '2': platformFactoryFactory(3, 1, EDGE_RIGHT, HUE_TAPE_SET_1), 
-                    'R': robotFactoryFactory(ORIENTATION_LEFT, HUE_TAPE_SET_1), 
-                }, 
-                'yyyyyyyyyyyy R yyy' + 
-                'y      y     a   y' + 
-                'y      y    yyy  y' + 
-                'y      y         y' +
-                'y      y         y' + 
-                'y    1 y   a     y' + 
-                'y   yyyy  yyyyyyyy' +
-                'yy               y' +
-                'y                y' +
-                'y   y2        y  y' +
-                'yy  y         y  y' +
-                'y   y^^^^^^^^^y  y' +
-                'y  yyyyyyyyyyyy  y',
-                MAX_TILES_ACROSS, 
-            ),
-            // 1, 2
-            legendRoomFactory(
-                {...baseLegend, 
-                    '1': tapeFactoryFactory([,INSTRUCTION_ID_RIGHT,], HUE_TAPE_SET_1, repeaterFactoryFactory(HUE_TAPE_SET_1)), 
-                    '2': tapeFactoryFactory([,,INSTRUCTION_ID_LEFT], HUE_TAPE_SET_1, repeaterFactoryFactory(HUE_TAPE_SET_1)), 
-                    '3': tapeFactoryFactory([INSTRUCTION_ID_SAVE], HUE_TAPE_SET_1, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
-                    'R': compositeEntityFactoryFactory([robotFactoryFactory(ORIENTATION_RIGHT, HUE_TAPE_SET_1), spikeFactory]),
-                }, 
-                'yyyyyyyyyyyyyyy  y' + 
-                'y                y' + 
-                'ym    yyyyyy     y' +
-                'yyyy  y1yy2y  y3 y' + 
-                'y        a       y' + 
-                'y   yyyyyyyyyy   y' + 
-                'y                y' +
-                'yy              yy' +
-                'yyyyyyyy  yyyyyyyy' +
-                'y                y' +
-                'y                y' +
-                'y  yR^^^^^^^^^^^^y' +
-                'y  yyyyyyyyyyyyyyy',
-                MAX_TILES_ACROSS, 
-            ),
-            // 2, 2
-            legendRoomFactory(
-                {...baseLegend, 
-                }, 
-                'yyyyyyyyyyyyyyyyyy' + 
-                'y                y' +
-                'y                y' + 
-                'y                y' + 
-                'y                y' + 
-                'y                y' + 
-                'y                y' +
-                'y                y' +
-                'y                y' +
-                'y                y' +
-                'y                y' +
-                'y                y' +
-                'yyyyyyyyyyyyyyyyyy',
-                MAX_TILES_ACROSS, 
-            ),             
-        ], 
-        [
-            // 0, 3
-            legendRoomFactory(
-                {...baseLegend, 
-                    'Y': blockFactoryFactory(HSL_AREA_1_BLOCKS, 1, .8, .6), 
-                    '0': tapeFactoryFactory([INSTRUCTION_ID_UP, INSTRUCTION_ID_UP, INSTRUCTION_ID_UP,,, INSTRUCTION_ID_DOWN, INSTRUCTION_ID_DOWN, INSTRUCTION_ID_DOWN], HUE_TAPE_SET_1, repeaterFactoryFactory(HUE_TAPE_SET_1)), 
-                    '1': tapeFactoryFactory([INSTRUCTION_ID_DOWN, INSTRUCTION_ID_DOWN, INSTRUCTION_ID_DOWN,INSTRUCTION_ID_UP, INSTRUCTION_ID_UP, INSTRUCTION_ID_UP], HUE_TAPE_SET_2, repeaterFactoryFactory(HUE_TAPE_SET_2)), 
-                    '2': platformFactoryFactory(2, .5, EDGE_LEFT, HUE_TAPE_SET_2),
-                    '3': platformFactoryFactory(2, .5, EDGE_RIGHT, HUE_TAPE_SET_1), 
-                    '4': platformFactoryFactory(1, 4, EDGE_TOP, HUE_TAPE_SET_1), 
-                    '5': platformFactoryFactory(1, 4, EDGE_BOTTOM, HUE_TAPE_SET_2), 
-                    '6': compositeEntityFactoryFactory([tapeFactoryFactory([INSTRUCTION_ID_LEFT, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_LEFT,INSTRUCTION_ID_LEFT, INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_RIGHT,INSTRUCTION_ID_RIGHT,,,], HUE_TAPE_SET_1, repeaterFactoryFactory(HUE_TAPE_SET_1)), spikeFactory]), 
-                    '7': compositeEntityFactoryFactory([tapeFactoryFactory([INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_RIGHT,,, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_LEFT], HUE_TAPE_SET_2, repeaterFactoryFactory(HUE_TAPE_SET_2)), spikeFactory]), 
-                }, 
-                'y   yyyyyyyyyyy  y' + 
-                'yy  y  5 5 5 5    ' +
-                'y   yy         1  ' + 
-                'y  yy            y' + 
-                'y   y y 4 4 4 yyyy' + 
-                'y   y            y' + 
-                'y4  yy          yy' +
-                'y   y0           y' +
-                'y  YYYYYYYYYYyy  y' +
-                'y     3   2      y' +
-                'yy2           3  y' +
-                'y7^^^^^^^^^^^^^^6^' +
-                'yyyyyyyyyyyyyyyyyy',
-                MAX_TILES_ACROSS, 
-            ), 
-            // 1, 3
-            legendRoomFactory(
-                {...baseLegend, 
-                    '0': tapeFactoryFactory([INSTRUCTION_ID_LEFT, INSTRUCTION_ID_RIGHT, INSTRUCTION_ID_EJECT], HUE_TAPE_SET_1),
-                    '1': tapeFactoryFactory([INSTRUCTION_ID_SAVE, INSTRUCTION_ID_UP, INSTRUCTION_ID_COUNT_9, INSTRUCTION_ID_SHOOT,, INSTRUCTION_ID_DOWN], HUE_TAPE_SET_1, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)),
-                    '2': platformFactoryFactory(2, 1, EDGE_BOTTOM, HUE_TAPE_SET_2),
-                    'R': gunFactoryFactory(robotFactoryFactory(ORIENTATION_LEFT, HUE_TAPE_SET_1)),
-                }, 
-                'y  yyyybbbbbbbbbbb' + 
-                '      y           ' +
-                '    0my           ' + 
-                'yy  yyy2 bbbbbbbbb' + 
-                'y   y             ' +
-                'y   y             ' +
-                'y  dybbbbbbbbb   b' + 
-                'y              R b' + 
-                'y1 yybbbbbbbbbbb b' + 
-                'b                b' +
-                'b                b' +
-                '^                b' +
-                'bbbbbbbbbbbbbbbbbb',
-                MAX_TILES_ACROSS, 
-            ), 
-            // 2, 3
-            legendRoomFactory(
-                {...baseLegend, 
-                    '1': tapeFactoryFactory([INSTRUCTION_ID_SAVE, INSTRUCTION_ID_UP, INSTRUCTION_ID_COUNT_9, INSTRUCTION_ID_SHOOT,, INSTRUCTION_ID_DOWN], HUE_TAPE_SET_1, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)),
-                    '2': platformFactoryFactory(3, 1, EDGE_BOTTOM, HUE_TAPE_SET_2),
-                    'R': gunFactoryFactory(robotFactoryFactory(ORIENTATION_LEFT, HUE_TAPE_SET_1)),
-                }, 
-                'bbbbbbbbbbbbbbbbbb' + 
-                '                 b' +
-                '                 b' + 
-                'bbbbbbbbbbbbbbbbbb' + 
-                '     b           b' +
-                '  a  b           b' +
-                'bbbbbb           b' + 
-                'b                b' + 
-                'b                b' + 
-                'b                b' +
-                'b                b' +
-                'b                b' +
-                'bbbbbbbbbbbbbbbbbb',
-                MAX_TILES_ACROSS, 
-            ),  
-
-        ] 
     ];
     // NOTE: the x/y s are reversed
     const result: RoomFactoryMetadata = {
@@ -422,8 +452,8 @@ const roomFactoryFactory = () => {
             const factory = roomFactories[ry][rx];
             return factory && factory(rx, ry, id);
         },
-        worldWidth: 5, 
-        worldHeight: 3, 
+        worldWidth: 6, 
+        worldHeight: 5, 
     }
     return result;
 }

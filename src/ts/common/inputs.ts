@@ -17,22 +17,20 @@ const INSTRUCTION_ID_DOWN = 12;
 const INSTRUCTION_ID_LEFT = 13;
 const INSTRUCTION_ID_RIGHT = 14;
 const INSTRUCTION_ID_JUMP = 15;
-const INSTRUCTION_ID_SAY = 16;
-const INSTRUCTION_ID_REWIND = 17;
-const INSTRUCTION_ID_FAST_FORWARD = 18;
-const INSTRUCTION_ID_STOP = 19;
-const INSTRUCTION_ID_PICK_UP = 20;
-const INSTRUCTION_ID_DROP = 21;
-const INSTRUCTION_ID_THROW = 22;
-const INSTRUCTION_ID_INSERT = 23;
-const INSTRUCTION_ID_EJECT = 24;
-const INSTRUCTION_ID_PLAY = 25;
-const INSTRUCTION_ID_RECORD = 26;
-const INSTRUCTION_ID_SAVE = 27;
-const INSTRUCTION_ID_SHOOT = 28;
-const INSTRUCTION_ID_WAIT = 29;
-const INSTRUCTION_ID_HELP = 30;
-const TOTAL_INSTRUCTION_COUNT = 31;
+const INSTRUCTION_ID_REWIND = 16;
+const INSTRUCTION_ID_FAST_FORWARD = 17;
+const INSTRUCTION_ID_STOP = 18;
+const INSTRUCTION_ID_PICK_UP = 19;
+const INSTRUCTION_ID_DROP = 20;
+const INSTRUCTION_ID_THROW = 21;
+const INSTRUCTION_ID_INSERT = 22;
+const INSTRUCTION_ID_EJECT = 23;
+const INSTRUCTION_ID_PLAY = 24;
+const INSTRUCTION_ID_RECORD = 25;
+const INSTRUCTION_ID_SAVE = 26;
+const INSTRUCTION_ID_SHOOT = 27;
+const INSTRUCTION_ID_WAIT = 28;
+const TOTAL_INSTRUCTION_COUNT = 29;
 
 type Instruction = {
     keyCodes?: number[], 
@@ -115,13 +113,10 @@ const INSTRUCTIONS: Instruction[] = [{
     keyCodes: [74, 32], // j, space
     readableName: FLAG_EMOJIS ? '🐇' : 'jump', 
 }, {
-    // say
-    readableName: FLAG_EMOJIS ? '🗣️' : 'say', 
-}, {
     // rewind
     keyCodes: [219], // [
     keyChar: '[', 
-    readableName: FLAG_EMOJIS ? '⏪' : 'rewind',
+    //readableName: FLAG_EMOJIS ? '⏪' : 'rewind',
     animationId: ANIMATION_ID_PRESSING_BUTTON,  
     hold: 1, 
     automatedDuration: REWIND_INTERVAL, 
@@ -129,22 +124,22 @@ const INSTRUCTIONS: Instruction[] = [{
     // fast forward
     keyCodes: [221], // ]
     keyChar: ']', 
-    readableName: FLAG_EMOJIS ? '⏩' : 'fast forward', 
+    //readableName: FLAG_EMOJIS ? '⏩' : 'fast forward', 
     animationId: ANIMATION_ID_PRESSING_BUTTON,  
     hold: 1, 
     automatedDuration: REWIND_INTERVAL, 
 }, {
     // stop
-    readableName: FLAG_EMOJIS ? '⏹' : 'stop', 
+    //readableName: FLAG_EMOJIS ? '⏹' : 'stop', 
 }, {
     // pick up / get
     keyCodes: [71], // g
-    readableName: FLAG_EMOJIS ? '⇡' : 'pick up', 
+    //readableName: FLAG_EMOJIS ? '⇡' : 'pick up', 
     animationId: ANIMATION_ID_PICKING_UP,  
 }, {
     // drop
     keyCodes: [66], // b
-    readableName: FLAG_EMOJIS ? '⇣' : 'drop', 
+    //readableName: FLAG_EMOJIS ? '⇣' : 'drop', 
     animationId: ANIMATION_ID_DROPPING,  
 }, {
     // throw
@@ -154,7 +149,7 @@ const INSTRUCTIONS: Instruction[] = [{
 }, {
     // insert
     keyCodes: [73], // i
-    readableName: FLAG_EMOJIS ? '📩' : 'insert', 
+    //readableName: FLAG_EMOJIS ? '📩' : 'insert', 
     animationId: ANIMATION_ID_INSERTING, 
 }, {
     // eject
@@ -163,7 +158,7 @@ const INSTRUCTIONS: Instruction[] = [{
 }, {
     // play
     keyCodes: [80], // p
-    readableName: FLAG_EMOJIS ? '▶' : 'play', 
+    //readableName: FLAG_EMOJIS ? '▶' : 'play', 
     animationId: ANIMATION_ID_PRESSING_BUTTON,  
     hold: 1, 
     remember: 1, 
@@ -171,7 +166,7 @@ const INSTRUCTIONS: Instruction[] = [{
 }, {
     // record
     keyCodes: [82], // r
-    readableName: FLAG_EMOJIS ? '⏺️' : 'record', 
+    //readableName: FLAG_EMOJIS ? '⏺️' : 'record', 
     hold: 1, 
     automatedDuration: PLAYBACK_INTERVAL, 
 }, {
@@ -181,17 +176,18 @@ const INSTRUCTIONS: Instruction[] = [{
 }, {
     // shoot
     readableName: FLAG_EMOJIS ? '🔫' : 'shoot', 
+    keyCodes: [13], // enter
     hold: 1, 
     automatedDuration: BULLET_INTERVAL, 
 }, {
     // wait
     readableName: FLAG_EMOJIS ? '⌛' : 'wait',
     automatedDuration: 1000, 
-}, {
+}/*, {
     // help
     keyCodes: [72], // h
     readableName: FLAG_EMOJIS ? '📖' : 'help', 
-}];
+}*/];
 
 const INPUT_KEY_CODE_MAPPINGS: {[_: number]: number } = {};
 const INSTRUCTION_TO_ANIMATION_IDS: {[_: number]: number} = {};

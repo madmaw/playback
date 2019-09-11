@@ -91,7 +91,7 @@ const SynthSpeech = ( buf: Float32Array, text: string, f0: number, speed: number
 		var p = g_phonemes[l];
 		if (!p) {
 			if (l == " ") {
-				bufPos += Math.floor(sampleFrequency * 0.2 * speed);
+				bufPos += (sampleFrequency * 0.2 * speed) | 0;
 			}
 			continue;
 		}

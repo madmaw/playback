@@ -36,7 +36,7 @@ const createWorld = (audioContext: AudioContext, w: number, h: number, roomFacto
         //[SOUND_ID_THROW]: dtmfSoundFactory(audioContext, 697, 1209, .1),  
         [INSTRUCTION_ID_JUMP]: vibratoSoundFactory(audioContext, .3, 0, .2, .05, 'triangle', 500, 700, 400, 'sine', 60),  
         [INSTRUCTION_ID_THROW]: vibratoSoundFactory(audioContext, .2, 0, .2, .05, 'triangle', 500, 2e3, 599),  
-        [INSTRUCTION_ID_DO_NOTHING]: dtmfSoundFactory(audioContext, 350, 440, INSTRUCTION_DURATION), 
+        //[INSTRUCTION_ID_DO_NOTHING]: dtmfSoundFactory(audioContext, 350, 440, INSTRUCTION_DURATION), 
         [INSTRUCTION_ID_REWIND]: vibratoSoundFactory(audioContext, .2, 0, .1, .05, 'sine', 1440, 2999, 999, 'sawtooth', 200),
         [INSTRUCTION_ID_FAST_FORWARD]: vibratoSoundFactory(audioContext, .2, 0, .1, .05, 'sine', 2999, 1440, 2000, 'triangle', 200),
         [INSTRUCTION_ID_LEFT]: boomSoundFactory(audioContext, .05, .01, 2e3, .1, .05), 
@@ -59,7 +59,7 @@ const createWorld = (audioContext: AudioContext, w: number, h: number, roomFacto
     // }
     initInstructions(audioContext, instructionSounds);
 
-    const age = parseInt(localStorage.getItem('w') || 0 as any);
+    const age = parseInt(localStorage.getItem(0 as any) || 0 as any);
 
     const world: World = {
         currentRoom: [startX, startY], 
