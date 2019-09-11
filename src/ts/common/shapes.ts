@@ -38,11 +38,7 @@ let rectangleLineOverlap = (r1: Rectangle, r2: Rectangle) =>
         const min2 = scalar2;
         const max1 = scalar1 + length1;
         const max2 = scalar2 + length2;
-        return min1 >= min2 && min1 < max2 
-            ? max2 - min1
-            : min2 >= min1 && min2 < max1 
-                ? max1 - min2
-                : 0;
+        return Math.max(0, Math.min(max1, max2) - Math.max(min1, min2));
     });
 
 let rectangleOverlap = (r1: Rectangle, r2: Rectangle) => {

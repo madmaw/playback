@@ -10,6 +10,8 @@ const ANIMATION_ID_DROPPING = 8;
 const ANIMATION_ID_PRESSING_BUTTON = 9;
 const ANIMATION_ID_DEATH = 10;
 const ANIMATION_ID_CARRYING = 11;
+const ANIMATION_ID_SHOOTING = 12;
+const ANIMATION_ID_SAVING = 13;
 
 type HSL = [number, number, number];
 

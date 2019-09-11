@@ -336,7 +336,7 @@ const playerGraphic: Graphic = {
         },
         // pick up
         {
-            [PLAYER_GRAPHIC_JOINT_ID_TORSO]: [, {
+            [PLAYER_GRAPHIC_JOINT_ID_TORSO]: [{
                 transformType: TRANSFORM_TYPE_SCALE, 
                 scaleX: 1.1, 
                 scaleY: 0.8, 
@@ -352,7 +352,7 @@ const playerGraphic: Graphic = {
         }, 
         // throw wind up
         {
-            [PLAYER_GRAPHIC_JOINT_ID_BODY]: [, {
+            [PLAYER_GRAPHIC_JOINT_ID_BODY]: [{
                 transformType: TRANSFORM_TYPE_ROTATE, 
                 rAngle: -Math.PI/4, 
                 aroundX: 3, 

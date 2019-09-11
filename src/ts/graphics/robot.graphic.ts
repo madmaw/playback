@@ -21,6 +21,7 @@ const ROBOT_GRAPHIC_JOINT_ID_RIGHT_HAND = 8;
 
 const ROBOT_GRAPHIC_POSE_ID_STEP_LEFT = 0;
 const ROBOT_GRAPHIC_POSE_ID_STEP_RIGHT = 1;
+const ROBOT_GRAPHIC_POSE_ID_SHOOT = 2;
 
 const robotPalette: HSL[] = [
     [0, 40, 50], 
@@ -168,11 +169,20 @@ const robotGraphic: Graphic = {
             transformType: TRANSFORM_TYPE_ROTATE, 
             rAngle: -Math.PI/20, 
         }], 
+    }, { // ROBOT_GRAPHIC_POSE_ID_SHOOT
+        [ROBOT_GRAPHIC_JOINT_ID_BODY]: [{
+            transformType: TRANSFORM_TYPE_ROTATE, 
+            rAngle: -Math.PI/8, 
+        }], 
     }], 
     animations: {
         [ANIMATION_ID_WALKING]: {
             poseDuration: 300, 
             poseIds: [ROBOT_GRAPHIC_POSE_ID_STEP_LEFT, ROBOT_GRAPHIC_POSE_ID_STEP_RIGHT], 
-        }
+        }, 
+        [ANIMATION_ID_SHOOTING]: {
+            poseDuration: BULLET_INTERVAL, 
+            poseIds: [ROBOT_GRAPHIC_POSE_ID_SHOOT], 
+        },
     }, 
 };

@@ -1,34 +1,28 @@
+type SoundWave = {
+    tileReachability: number[][];
+    hue: number;
+    timeSaid: number;
+}
+
 type Room = {
     allEntities: Entity[];
     updatableEntities: Entity[];
     tiles: Entity[][][]; 
     bounds: Rectangle;
     gravity: Vector;
-    backgroundColor: HSL;
+    recorder?: RecordingEntity;
+    soundWaves: SoundWave[];
+    background: HSL[], 
 }
 
 type IdFactory = () => number;
 
 type RoomFactory = (x: number, y: number, id: IdFactory) => Room;
 
-let roomCreate = (x: number, y: number, w: number, h: number) => {
-    const tiles: Entity[][][] = array2DCreate(w, h, () => []);
-    
-    const room: Room = {
-        allEntities: [], 
-        updatableEntities: [], 
-        tiles, 
-        bounds: [x, y, w, h], 
-        gravity: DEFAULT_GRAVITY, 
-        backgroundColor: [240, 20, 90], 
-    };
-    return room;
-};
-
 let roomIterateEntities = (room: Room, bounds: Rectangle | undefined, i: (entity: Entity) => void, useBoundsWithVelocity?: number | boolean) => {
     const handled = new Set<number>();
     roomIterateBounds(room, bounds, tile => tile.forEach(e => {
-        if (!handled.has(e.id) && rectangleOverlap(useBoundsWithVelocity && (e as MovableEntity).boundsWithVelocity || e.bounds, bounds)) {
+        if (!handled.has(e.id) && rectangleOverlap(useBoundsWithVelocity && (e as MovableEntity).boundsWithVelocity || (e as MovableEntity).bounds, bounds)) {
             i(e);
             handled.add(e.id);
         }
@@ -42,11 +36,12 @@ let roomIterateBounds = (room: Room, bounds: Rectangle | undefined, i: (tile: En
 }
 
 let roomAddEntity = (room: Room, entity: Entity, deltas?: Vector) => {
+    const everyEntity = entity as EveryEntity;
     if (deltas) {
-        axisMap(deltas, entity.bounds, ([d], [v]) => v + d, entity.bounds);
+        axisMap(deltas, everyEntity.bounds, ([d], [v]) => v + d, everyEntity.bounds);
     }
     room.allEntities.push(entity);        
-    if((entity as MovableEntity).velocity) {
+    if(everyEntity.velocity) {
         room.updatableEntities.push(entity);
     }
     roomAddEntityToTiles(room, entity);

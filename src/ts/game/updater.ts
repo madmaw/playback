@@ -4,44 +4,53 @@ const updateAndRenderWorld = (c: CanvasRenderingContext2D, world: World, delta: 
     const worldBounds = [0, 0, ...world.size] as Rectangle;
     rectangleIterateBounds(activeBounds, worldBounds, (rx, ry) => {
         let room = world.rooms[rx][ry];
-        if (FLAG_RECORD_PREVIOUS_FRAMES && currentRoomX == rx && currentRoomY == ry) {
-            world.previousFrames = world.previousFrames || [];
-            world.previousFrames.unshift(JSON.stringify(room))
-        }
-        const activeRoom = currentRoomX == rx && currentRoomY == ry;
-        const sounds = activeRoom 
-            ? world.instructionSounds
-            : {};
-        const offloads = updateAndRenderRoom(c, world, room, delta, sounds, activeRoom && render);
-        const [worldWidth, worldHeight] = world.size;
-        offloads.forEach((entities, edge) => {
-            const offset = EDGE_OFFSETS[edge];
-            const roomX = rx + offset[0];
-            const roomY = ry + offset[1];
-            if (roomX >= 0 && roomY >= 0 && roomX < worldWidth && roomY < worldHeight) {
-                const room = world.rooms[roomX][roomY];
-                entities.forEach(e => {
-                    // reposition entity
-                    let adjust = 1;
-                    if (e.entityType == ENTITY_TYPE_PLAYER) {
-                        world.currentRoom = [roomX, roomY];
-                        adjust = 0;
-                    }
-                    const deltas = axisMap([...offset, ...room.bounds], e.bounds, ([o, _, l], [v, d]) => {
-                        if (o > 0) {
-                            return (1-d) + adjust - v;
-                        } else if (o < 0) {
-                            return (l - 1) - adjust - v;
-                        } else {
-                            return 0;
-                        }
-                    }) as Vector;
-                    roomAddEntity(room, e, deltas);
-                });    
+        if (room) {
+            if (FLAG_RECORD_PREVIOUS_FRAMES && currentRoomX == rx && currentRoomY == ry) {
+                world.previousFrames = world.previousFrames || [];
+                world.previousFrames.unshift(JSON.stringify(room))
             }
-        });
+            const activeRoom = currentRoomX == rx && currentRoomY == ry;
+            const sounds = activeRoom 
+                ? world.instructionSounds
+                : {};
+            const offloads = updateAndRenderRoom(c, world, room, delta, sounds, activeRoom && render);
+            const [worldWidth, worldHeight] = world.size;
+            offloads.forEach((entities, edge) => {
+                const offset = EDGE_OFFSETS[edge];
+                const roomX = rx + offset[0];
+                const roomY = ry + offset[1];
+                if (roomX >= 0 && roomY >= 0 && roomX < worldWidth && roomY < worldHeight) {
+                    const room = world.rooms[roomX][roomY];
+                    if (room) {
+                        entities.forEach(e => {
+                            const ee = e as EveryEntity;
+                            // reposition entity
+                            let adjust = 1;
+                            if (isPlayerOrIsCarryingPlayer(e as MovableEntity)) {
+                                world.currentRoom = [roomX, roomY];
+                                adjust = 0;
+                            }
+                            const deltas = axisMap([...offset, ...room.bounds], ee.bounds, ([o, _, l], [p, d]) => {
+                                if (o > 0) {
+                                    return (adjust - (d - GRAB_DIMENSION)) - p;
+                                } else if (o < 0) {
+                                    return ((l - GRAB_DIMENSION) - adjust) - p;
+                                } else {
+                                    return 0;
+                                }
+                            }) as Vector;
+                            roomAddEntity(room, e, deltas);
+                        });    
+                    }
+                }
+            });            
+        }
     });
     world.age += delta;
+}
+
+const isPlayerOrIsCarryingPlayer = (e: MovableEntity) => {
+    return [...e.carrying, ...e.carryingPreviously].reduce((isPlayer, e) => isPlayer || isPlayerOrIsCarryingPlayer(e), e.entityType == ENTITY_TYPE_PLAYER);
 }
 
 const isCarryingIndirectly = (carried: Entity, potentialCarrier: Entity) => {
@@ -55,7 +64,7 @@ const isCarryingIndirectly = (carried: Entity, potentialCarrier: Entity) => {
 }
 
 const carryingComparer = (a: Entity, b: Entity) => {
-    return (isCarryingIndirectly(a, b) || 0) - (isCarryingIndirectly(b, a) || 0) || b.bounds[1] - a.bounds[1];
+    return (isCarryingIndirectly(a, b) || 0) - (isCarryingIndirectly(b, a) || 0) || (b as EveryEntity).bounds[1] - (a as EveryEntity).bounds[1];
 };
 
 const updateAndRenderRoom = (
@@ -98,7 +107,7 @@ const updateAndRenderRoom = (
                         );
                         let [xCollisionTime, yCollisionTime] = axisMap(
                             [...dv, ...movableEntity1.bounds], 
-                            entity2.bounds, 
+                            movableEntity2.bounds, 
                             ([dv, s1, l1]: number[], [s2, l2]: number[]) => {
                                 if (dv > 0) {
                                     const distance = s2 - (s1 + l1);
@@ -132,12 +141,12 @@ const updateAndRenderRoom = (
                                 // does it actually collide ?
                                 const f = entityUpdatePosition(collisionTime);
                                 const r1 = axisMap(movableEntity1.bounds, movableEntity1.velocity, f, [...movableEntity1.bounds]) as Rectangle;
-                                const r2 = axisMap(entity2.bounds, movableEntity2.velocity || [0, 0], f, [...entity2.bounds]) as Rectangle;
+                                const r2 = axisMap(movableEntity2.bounds, movableEntity2.velocity || [0, 0], f, [...movableEntity2.bounds]) as Rectangle;
                                 const overlaps = rectangleLineOverlap(r1, r2);
                                 if (overlaps[(collisionEdge+1)%2]) {
                                     minCollisionTime = collisionTime;
                                     minCollisionEntity1 = movableEntity1;
-                                    minCollisionEntity2 = entity2;
+                                    minCollisionEntity2 = movableEntity2;
                                     minCollisionEdge1 = collisionEdge;    
                                 }
                             }
@@ -165,8 +174,8 @@ const updateAndRenderRoom = (
             && movableEntity2.lastCollisions 
             && movableEntity2.lastCollisions[minCollisionEdge1] < worldAge;
 
-        const velocity1 = minCollisionEntity1.velocity;
-        const velocity2 = movableEntity2.velocity || [0, 0];
+        const velocity1 = [...minCollisionEntity1.velocity];
+        const velocity2 = [...movableEntity2.velocity || [0, 0]];
         const axis = minCollisionEdge1 % 2;
         const minCollisionEdge2 = ((minCollisionEdge1+2)%4) as Edge;
         const crossAxis = (axis+1)%2;
@@ -186,9 +195,6 @@ const updateAndRenderRoom = (
         }
         let mass1 = calculatedMass2 && !ignoreMass1 ? calculatedMass1 || 1 : 0;
         let mass2 = calculatedMass1 && !ignoreMass2 ? calculatedMass2 || 1 : 0;
-        if (!mass1 && !mass2) {
-            mass1 = mass2 = 1;
-        }
         minCollisionEntity1.lastCollisions[minCollisionEdge1] = worldAge + remainingTime;
         const dv = velocity1[axis] - velocity2[axis];
 
@@ -206,20 +212,22 @@ const updateAndRenderRoom = (
         const collisionBehaviour2 = applyCollisionBehaviour(minCollisionEntity2 as Entity, minCollisionEntity1 as Entity, worldAge + minCollisionTime, dv, minCollisionEdge2);
 
         // restitution cannot be 0 as rounding errors can make things moving exactly the same speed overlap
-        const restitution = Math.max(minCollisionEntity1.restitution || .1, movableEntity2.restitution || .1);
-        const newVelocity = (velocity2[axis] * mass2 + velocity1[axis] * mass1) / (mass1 + mass2);
+        const restitution = Math.max(minCollisionEntity1.restitution || .15, movableEntity2.restitution || .15);
+        const newVelocity = mass1 || mass2 
+            ? (velocity2[axis] * mass2 + velocity1[axis] * mass1) / (mass1 + mass2)
+            : 0;
         if (collisionBehaviour1) {
-            const newVelocity1 = active 
+            const newVelocity1 = active && (mass1 || mass2)
                 ? newVelocity - (mass2 * restitution * dv)/(mass1 + mass2)
-                : velocity1[axis] > 0 && minCollisionEdge1 < 2 || velocity1[axis] < 0 && minCollisionEdge1 > 1
+                : velocity1[axis] > velocity2[axis] && minCollisionEdge1 < 2 || velocity1[axis] < velocity2[axis] && minCollisionEdge1 > 1
                     ? velocity1[axis]
                     : 0;
             entitySetVelocity(room, minCollisionEntity1, newVelocity1, axis, remainingTime);
         }
         if (collisionBehaviour2) {
-            const newVelocity2 = active
+            const newVelocity2 = active && (mass1 || mass2)
                 ? newVelocity + (mass1 * restitution * dv)/(mass1 + mass2)
-                : velocity2[axis] > 0 && minCollisionEdge1 > 1 || velocity2[axis] < 0 && minCollisionEdge1 < 2
+                : velocity2[axis] > velocity1[axis] && minCollisionEdge1 > 1 || velocity2[axis] < velocity1[axis] && minCollisionEdge1 < 2
                     ? velocity2[axis]
                     : 0;
             if (movableEntity2.velocity) {
@@ -235,7 +243,7 @@ const updateAndRenderRoom = (
             if (minCollisionEdge1 == EDGE_TOP && calculatedMass2 && mass1) {
                 // attach the other way around
                 entitySetCarrying(minCollisionEntity1, minCollisionEntity2, 1);
-            }    
+            }
         }        
 
         movableEntity2.remainingTime = minCollisionEntity1.remainingTime = remainingTime;
@@ -253,10 +261,33 @@ const updateAndRenderRoom = (
     // collision groups are ordered in render order
     room.allEntities.sort((a, b) => b.collisionGroup - a.collisionGroup);
 
-    c.fillStyle = hslToStyle(room.backgroundColor);
-    c.fillRect(0, 0, room.bounds[2], room.bounds[3]);
-
     // render
+    if (render) {
+        const gradient = c.createLinearGradient(0, 0, 0, room.bounds[3]);
+        room.background.forEach((hsl, i) => gradient.addColorStop(i/Math.max(1, room.background.length-1), hslToStyle(hsl)));
+        c.fillStyle = gradient;
+        c.fillRect(0, 0, room.bounds[2], room.bounds[3]);
+        // fill in any sound waves
+        c.save();
+        room.soundWaves = room.soundWaves.filter(soundWave => {
+            c.fillStyle = hslToStyle([soundWave.hue, 100, 80])
+            soundWave.tileReachability.forEach((col, y) => {
+                col.forEach((v, x) => {
+                    if (v < 0) {
+                        const displayTime = soundWave.timeSaid + -v * SOUND_WAVE_STEP_TIME;
+                        const alpha = 1 - Math.abs(worldAge - displayTime) / SOUND_WAVE_DISPLAY_TIME;
+                        if (alpha > 0) {
+                            c.globalAlpha = alpha/-v;
+                            c.fillRect(x, y, 1, 1);
+                        }
+                    }
+                });
+            });
+            return soundWave.timeSaid + SOUND_WAVE_DISPLAY_TIME * MAX_TILES_ACROSS > worldAge;
+        });
+        c.restore();
+    }
+
     let result: [Entity[], Entity[], Entity[], Entity[]] = [[], [], [], []];
     room.allEntities.forEach(entity => {
         const movableEntity = entity as ActiveMovableEntity;
@@ -275,28 +306,45 @@ const updateAndRenderRoom = (
             entitySetCarrying(grabbingEntity.grabbing, grabbingEntity, 1);
         }
         entityUpdatePositionToTimeRemaining(room, entity, 0);
-        FLAG_DEBUG_PHYSICS && roomIterateEntities(room, entity.bounds, e => {
+        FLAG_DEBUG_PHYSICS && roomIterateEntities(room, everyEntity.bounds, e => {
             if(e != entity) {
                 console.log('inside', e);
             }
         });
-        const newRoomPosition = axisMap(entity.bounds, room.bounds, ([s, l]: [number, number], [p, d]: [number, number]) => p + Math.floor((s+l/2)/d));
-        if (!movableEntity.carrier && !arrayEqualsNoBoundsCheck(newRoomPosition, room.bounds)) {
-            if (!everyEntity.deathAge) {
-                const [rx, ry] = room.bounds;
-                const [newRx, newRy] = newRoomPosition;
-                const dx = newRx - rx;
-                const dy = newRy - ry;
+        const newRoomPosition = axisMap(everyEntity.bounds, room.bounds, 
+            ([s, l]: [number, number], [p, d]: [number, number]) => {
+                //retrn p + Math.floor((s+l/2)/d)
+                if (s + l < GRAB_DIMENSION) {
+                    return p - 1;
+                } else if (s > d - GRAB_DIMENSION) {
+                    return p + 1;
+                } else {
+                    return p;
+                }
+            }
+        );
+        if (!movableEntity.carrier && (!arrayEqualsNoBoundsCheck(newRoomPosition, room.bounds) || worldAge - everyEntity.deathAge > MAX_DEATH_AGE)) {
+            let remove: boolean | number = everyEntity.deathAge;
+            if (!remove) {
+                const [dx, dy] = axisMap(room.bounds, [...newRoomPosition, ...everyEntity.velocity], ([p1]: number[], [p2, v]: number[]) => {
+                    const p = p2 - p1;
+                    if (p > 0 && v > 0 || p < 0 && v < 0 || !p) {
+                        return p;
+                    }
+                });
                 const edge = EDGE_OFFSETS.findIndex(([ox, oy]) => ox == dx && oy == dy);
-                if (edge >= 0) {
+                remove = edge >= 0;
+                if (remove) {
                     result[edge].push(entity);
                 }    
             }
-            roomRemoveEntity(room, entity, 1);
-        }    
+            if (remove) {
+                roomRemoveEntity(room, entity, !everyEntity.deathAge);
+            }
+        }     
         if (render) {
             c.save();
-            const [x, y, w, h] = entity.bounds;
+            const [x, y, w, h] = everyEntity.bounds;
             c.translate(x + w/2, y);
             drawEntity(c, entity, worldAge + delta);
             c.restore();
@@ -306,9 +354,11 @@ const updateAndRenderRoom = (
 };
 
 const drawEntity = (c: CanvasRenderingContext2D, entity: Entity, worldAge: number, xscale = 1, yscale = 1) => {
-    const [x, y, w, h] = entity.bounds;
     const movableEntity = entity as ActiveMovableEntity;
     const graphicalEntity = entity as ActiveGraphicalEntity;
+    const [x, y, w, h] = movableEntity.bounds;
+
+    c.save();
 
     if (graphicalEntity.graphic) {
         if (graphicalEntity.currentAnimationId != graphicalEntity.targetAnimationId) {
@@ -332,7 +382,6 @@ const drawEntity = (c: CanvasRenderingContext2D, entity: Entity, worldAge: numbe
 
         const newXScale = w/(graphicalEntity.graphic.imageryWidth * xscale);
         const newYScale = h/(graphicalEntity.graphic.imageryHeight * yscale)
-        c.save();
 
         c.scale(newXScale * orientationXScale, newYScale);
         let currentPoseId: number | undefined;
@@ -426,13 +475,14 @@ const drawEntity = (c: CanvasRenderingContext2D, entity: Entity, worldAge: numbe
             callback, 
             poses, 
         );  
-        c.restore();        
-    }
-
-    const speakingEntity = entity as SpeakingEntity;
-
-    if (speakingEntity.lastInstructionsSpoken && speakingEntity.lastSpoke > worldAge - SPEECH_FADE_INTERVAL) {
-        const s = speakingEntity.lastInstructionsSpoken.slice(-MAX_VISIBLE_INSTRUCTIONS).map(instructionToName).join('');
+    } else if (entity.entityType == ENTITY_TYPE_SCENERY) {
+        const scale = entity.bounds[3];
+        c.scale(scale, scale)
+        c.fillText(entity.text, 0, 1); 
+    } else {
+        // assume it's a speech bubble
+        const speechBubble = entity as SpeechBubble;
+        const s = instructionToName(speechBubble.instruction);
         const width = c.measureText(s).width;
         // draw a speech bubble
         // draw the text
@@ -441,8 +491,12 @@ const drawEntity = (c: CanvasRenderingContext2D, entity: Entity, worldAge: numbe
         const ih = SPEECH_TEXT_HEIGHT + SPEECH_TEXT_PADDING * 2;
         const iy = -ih - SPEECH_CALLOUT_HEIGHT - SPEECH_TEXT_PADDING;
         const ix = -width/2 - SPEECH_TEXT_PADDING;
-        const alpha = 1 - (worldAge - speakingEntity.lastSpoke)/SPEECH_FADE_INTERVAL;
-        c.globalAlpha = alpha * alpha;
+        const alpha = Math.sqrt(Math.abs(1 - (worldAge - speechBubble.spokenAge)/SPEECH_FADE_INTERVAL));
+        const scale = (speechBubble.deathAge 
+            ? 1 - (worldAge - speechBubble.deathAge)/MAX_DEATH_AGE
+            : 1) * SPEECH_TEXT_SCALE;
+        c.scale(scale, scale);
+        c.globalAlpha = alpha;
         c.beginPath();
         c.moveTo(ix + r, iy);
         c.arcTo(ix + iw, iy, ix + iw, iy + r, r);
@@ -452,14 +506,14 @@ const drawEntity = (c: CanvasRenderingContext2D, entity: Entity, worldAge: numbe
         c.lineTo(-SPEECH_CALLOUT_WIDTH/2, iy + ih);
         c.arcTo(ix, iy + ih, ix, iy + r, r);
         c.arcTo(ix, iy, ix + r, iy, r);
-        c.fillStyle = '#fff';
+        c.fillStyle = hslToStyle([speechBubble.hue, 80, 80]);
         c.fill();
         c.strokeStyle = c.fillStyle = '#333'; 
         c.stroke();
-        c.globalAlpha = alpha;
         c.fillText(s, 0, -SPEECH_CALLOUT_HEIGHT - SPEECH_TEXT_PADDING * 2);
-        c.globalAlpha = 1;        
     }
+    c.restore();
+
 }
 
 const updateEntity = (
@@ -469,62 +523,85 @@ const updateEntity = (
     delta: number, 
     sounds: {[_:number]: Sound}, 
 ) => {
+    let removedSelf: boolean | number;
     roomRemoveEntityFromTiles(room, entity);
     const worldAge = world.age;
 
     const everyEntity = entity as EveryEntity;
-    const activeMovableEntity = entity as ScriptedEntity;        
+    const activeMovableEntity = entity as InstructableEntity;        
     const orientableEntity = entity as OrientableEntity;
     const graphicalEntity = entity as GraphicalEntity;
     const tape = activeMovableEntity.holding && activeMovableEntity.holding[activeMovableEntity.insertionJointId] as Tape;
     const script = tape && tape.script;
+    activeMovableEntity.crushedEdges = 0;
     
-    const canSpeakNow: number | boolean = (worldAge / PLAYBACK_INTERVAL | 0) < ((worldAge + delta)/PLAYBACK_INTERVAL | 0);
+    //const canSpeakNow: number | boolean = (worldAge / PLAYBACK_INTERVAL | 0) < ((worldAge + delta)/PLAYBACK_INTERVAL | 0);
+    const canSpeakNow = true;
     if (everyEntity.toSpeak && everyEntity.toSpeak.length && canSpeakNow) {
         const instruction = everyEntity.toSpeak.pop();
         if (instruction != null) {
             const utterance = instructionToUtterance(instruction);
             // inform any reachable listeners in the room
             const [rx, ry, roomWidth, roomHeight] = room.bounds;
-            const tileReachability = array2DCreate(roomWidth, roomHeight, () => 0);
-            const uncheckedTiles: Vector[] = [[everyEntity.bounds[0]| 0, everyEntity.bounds[1] | 0]];
+            // note we reverse the axis so we can easily read this in debug mode
+            const tileReachability = array2DCreate(roomHeight, roomWidth, () => 0);
+            const uncheckedTiles: [number, number, number][] = [[everyEntity.bounds[0]| 0, everyEntity.bounds[1] | 0, -1]];
             while (uncheckedTiles.length) {
-                const [tx, ty] = uncheckedTiles.pop();
+                const [tx, ty, cost] = uncheckedTiles.pop();
                 if (tx >= 0 && ty >= 0 && tx < roomWidth && ty < roomHeight) {
-                    const reachability = tileReachability[tx][ty];
-                    if (!reachability) {
+                    const reachability = tileReachability[ty][tx];
+                    if (!reachability || cost > reachability) {
                         const tileBounds = [tx, ty, 1, 1] as Rectangle;
-                        const blocked = room.tiles[tx][ty].find(e => rectangleOverlap(e.bounds, tileBounds) > .8 && (e.collisionGroup == COLLISION_GROUP_TERRAIN || e.collisionGroup == COLLISION_GROUP_PUSHABLES));
+                        const blocked = room.tiles[tx][ty].find(e => rectangleOverlap((e as MovableEntity).bounds, tileBounds) > .8 && (e.collisionGroup == COLLISION_GROUP_TERRAIN || e.collisionGroup == COLLISION_GROUP_PUSHABLES));
                         if (blocked) {
-                            tileReachability[tx][ty] = blocked.id;
+                            tileReachability[ty][tx] = blocked.id;
                         } else {
-                            tileReachability[tx][ty] = -1;
+                            tileReachability[ty][tx] = cost;
                             EDGE_OFFSETS.forEach(([dx, dy]: Vector) => {
-                                uncheckedTiles.push([tx + dx, ty + dy]);
+                                uncheckedTiles.push([tx + dx, ty + dy, cost-1]);
                             });
                         }
                     }    
                 }
             }
     
-            let heard: boolean | number;
+            let playerHeard: boolean | number;
             room.updatableEntities.forEach(e => {
                 const everyEntity = e as EveryEntity;
-                const [x, y] = everyEntity.bounds;
-                const reachability = tileReachability[x | 0][y | 0];
-                if (reachability < 0 || reachability == e.id) {
-                    heard = heard || e.entityType == ENTITY_TYPE_PLAYER;
-                    if (everyEntity.instructionsHeard && e != entity) {
-                        everyEntity.instructionsHeard.push(instruction);
-                        everyEntity.lastHeard = worldAge;
+                let heard: boolean;
+                rectangleIterateBounds(everyEntity.bounds, room.bounds, (x, y) => heard = heard || tileReachability[y][x] < 0 || tileReachability[y][x] == e.id);
+                if (heard) {
+                    playerHeard = playerHeard || e.entityType == ENTITY_TYPE_PLAYER;
+                    if (everyEntity.instructionsHeard && e != entity && (!everyEntity.hue || everyEntity.hue == (tape && tape.hue))) {
+                        everyEntity.instructionsHeard.unshift(instruction);
                     }
                 }            
             });
-            if (heard) {
-                everyEntity.lastInstructionsSpoken = everyEntity.lastInstructionsSpoken || [];
-                everyEntity.lastInstructionsSpoken.push(instruction);    
+            if (playerHeard) {
+                // create a speech bubble
+                const hue = tape && tape.hue;
+                const speechBubble: SpeechBubble = {
+                    collisionGroup: COLLISION_GROUP_SPEECH_BUBBLES, 
+                    collisionMask: 0, 
+                    entityType: ENTITY_TYPE_SPEECH_BUBBLE, 
+                    hue, 
+                    id: world.idFactory(),
+                    bounds: [...everyEntity.bounds] as Rectangle,  
+                    spokenAge: worldAge, 
+                    instruction, 
+                    gravityMultiplier: 0, 
+                    boundsWithVelocity: [0, 0, 0, 0],
+                    mass: 0, 
+                    lastCollisions: [0, 0, 0, 0, 0], 
+                    velocity: [0, 0], 
+                };
+                roomAddEntity(room, speechBubble);
                 utterance(everyEntity.mass || 1, 1);
-                everyEntity.lastSpoke = worldAge;
+                room.soundWaves.push({
+                    hue, 
+                    tileReachability, 
+                    timeSaid: worldAge, 
+                });
             }
         }
     }
@@ -549,6 +626,7 @@ const updateEntity = (
         axisMap(activeMovableEntity.velocity, room.gravity, ([v]: [number], [g]: [number]) => v + g * activeMovableEntity.gravityMultiplier * delta, activeMovableEntity.velocity);
         activeMovableEntity.velocity = activeMovableEntity.velocity.map(v => Math.min(Math.max(v, -MAX_VELOCITY), MAX_VELOCITY)) as Vector;
     }        
+    let [ox, oy, ow, oh] = activeMovableEntity.bounds;
 
     let groundAge = worldAge - activeMovableEntity.lastCollisions[EDGE_BOTTOM];
     const grabAge = worldAge - activeMovableEntity.lastCollisions[EDGE_GRAB];
@@ -589,101 +667,95 @@ const updateEntity = (
         let animationId: number;
 
         switch(entity.entityType) {
+            case ENTITY_TYPE_REPEATER: 
             case ENTITY_TYPE_ROBOT:
             case ENTITY_TYPE_PLATFORM:
             {
                 
-                if (entity.nextScriptInstructionTime < worldAge) {
+                if ((entity.nextInstructionTime || 0) <= worldAge) {
                     // do a thing
-                    let nextScriptInstructionDelta = 0;
+                    let nextInstructionDelta = 0;
                     let nextScriptIndex = entity.nextScriptIndex;
-                    let instructionRepeat: number;
-                    while (!nextScriptInstructionDelta) {
-                        const scriptIndex = nextScriptIndex;
-                        nextScriptIndex = scriptIndex + 1;
-                        const instruction = everyEntity.instructionsHeard && everyEntity.instructionsHeard.pop() || 
-                            (script && scriptIndex < script.length
-                                ? script[scriptIndex]
-                                : INSTRUCTION_ID_DO_NOTHING
-                            );
-                        inputs.states = {};
-                        if (everyEntity.capabilities.indexOf(instruction) >= 0) {
-                            switch (instruction) {
-                                case INSTRUCTION_ID_LEFT:
+                    inputs.states = {};
+                    let instructionId = everyEntity.instructionsHeard && everyEntity.instructionsHeard.pop();
+                    if (instructionId == null) {
+                        instructionId = everyEntity.rememberedInstruction;             
+                    }
+                    if (instructionId >= 0) {
+                        let direction: Edge;
+                        // everyone can count and do nothing
+                        if (instructionId < 11 || everyEntity.capabilities.indexOf(instructionId) >= 0) {
+                            const instruction = INSTRUCTIONS[instructionId];
+                            everyEntity.rememberedInstruction = instruction.remember 
+                                ? instructionId
+                                : -1;
+                            switch (instructionId) {
                                 case INSTRUCTION_ID_RIGHT:
+                                    direction = EDGE_RIGHT;
                                 case INSTRUCTION_ID_UP: 
+                                    if (!direction) {
+                                        direction = EDGE_TOP;
+                                    }
                                 case INSTRUCTION_ID_DOWN:
-                                    nextScriptInstructionDelta = (instructionRepeat || 1)/entity.baseVelocity;
-                                    inputs.states[instruction] = worldAge;
-                                    break;
-                                case INSTRUCTION_ID_DO_NOTHING:
-                                    nextScriptInstructionDelta = (instructionRepeat || 1) * 1000;
-                                    break;
-                                case INSTRUCTION_ID_REWIND:
-                                case INSTRUCTION_ID_FAST_FORWARD:
-                                    inputs.states[instruction] = worldAge;
-                                    nextScriptInstructionDelta = (instructionRepeat || 1) * REWIND_INTERVAL;
-                                    break;
-                                case INSTRUCTION_ID_SAVE: 
-                                    // write every persistent entity in the world to local storage
-                                    world.rooms.forEach((rooms, x) => 
-                                        rooms.forEach((room, y) => 
-                                            room.updatableEntities.forEach(e => {
-                                                if (e.persistentId) {
-                                                    const bounds = e.entityType == ENTITY_TYPE_PLAYER  
-                                                        ? [entity.bounds[0], entity.bounds[1], e.bounds[2], e.bounds[3]] as Rectangle
-                                                        : e.bounds;
-                                                    const cleanEntity = {
-                                                        ...e, 
-                                                        bounds, 
-                                                        carryingPreviously: [], 
-                                                        carrying: [], 
-                                                        carrier: undefined, 
-                                                        grabbing: undefined, 
-                                                        holding: {},  
-                                                        inputs: {
-                                                            states: {}, 
-                                                            reads: {}, 
-                                                        }, 
-                                                        lastLearnedAt: 0, 
-                                                    };
-                                                    const roomAndEntity: RoomAndEntity = [x, y, cleanEntity];
-                                                    localStorage.setItem(e.persistentId as any, JSON.stringify(roomAndEntity));
-                                                }
-                                            })
-                                        )
-                                    );
-                                    localStorage.setItem('w', worldAge as any);
-                                    world.lastSaved = worldAge;
+                                    if (!direction) {
+                                        direction = EDGE_BOTTOM;
+                                    }
+                                case INSTRUCTION_ID_LEFT:
+                                    if (!direction) {
+                                        direction = EDGE_LEFT;
+                                    }
+                                    {
+                                        const pos = entity.bounds[direction%2];
+                                        const dim = Math.min(1, entity.bounds[direction%2 + 2]);
+                                        const delta = EDGE_OFFSETS[direction][direction%2];
+                                        const targetPos = ((pos + dim/2) | 0) + delta + (1 - dim)/2;
+                                        const targetDelta = Math.abs(targetPos - pos) + setInput(entity, instructionId, worldAge) - 1;
+                                        // adjust the base speed so we exactly hit the point
+                                        const milliseconds = targetDelta / entity.baseVelocity;
+                                        const steps = (milliseconds / MAX_DELTA | 0) + 1;
+                                        //nextInstructionDelta = Math.max(0, targetDelta/entity.baseVelocity - MAX_DELTA);
+                                        nextInstructionDelta = steps * MAX_DELTA;
+                                        entity.adjustedBaseVelocity = targetDelta / nextInstructionDelta;
+                                    }
                                     break;
                                 default:
-                                    // assume it's a count!
-                                    instructionRepeat = (instructionRepeat || 0) * 10 + instruction;
+                                    if (instructionId < 10) {
+                                        // assume it's a count!
+                                        entity.instructionRepeat = (entity.instructionRepeat || 0) * 10 + instructionId;
+                                    } else {
+                                        // attempt to do it as is
+                                        nextInstructionDelta = setInput(entity, instructionId, worldAge) * (INSTRUCTIONS[instructionId].automatedDuration || 1);
+                                    }
                                     break;
                             }    
                         } else {
-                            instructionRepeat = 0;
+                            entity.instructionRepeat = 0;
                         }
+                        entity.nextInstructionTime = worldAge + nextInstructionDelta;
+                        entity.nextScriptIndex = nextScriptIndex;
                     }
-                    entity.nextScriptInstructionTime = worldAge + nextScriptInstructionDelta;
-                    entity.nextScriptIndex = nextScriptIndex;
                 }
                 break;
             }
-            case ENTITY_TYPE_REPEATER: 
-                inputs.states[INSTRUCTION_ID_PLAY] = worldAge;                
-                break;
             case ENTITY_TYPE_PRESSURE_PLATE: 
-                // if mass >= 1 it will round down 
-                inputs.states[INSTRUCTION_ID_PLAY] = (entityCalculateMass(entity, 1) | 0) || everyEntity.nextScriptIndex < script.length 
-                    ? worldAge 
-                    : 0;
-                break;
-            case ENTITY_TYPE_PLAYER: 
-                if (readInput(entity, INSTRUCTION_ID_HELP, worldAge)) {
-                    entity.commandsVisible = !entity.commandsVisible;
+                {
+                    const playing = (entity.lastCollisions[entity.pressureEdge] > worldAge - MAX_DELTA) || (everyEntity.playing && (entity.nextScriptIndex || 0) < script.length);
+                    if (!entity.playing && playing) {
+                        // reset
+                        entity.nextScriptIndex = 0;
+                    }
+                    inputs.states[INSTRUCTION_ID_PLAY] = playing
+                        ? worldAge 
+                        : 0;
                 }
                 break;
+            // help is disabled
+            // case ENTITY_TYPE_PLAYER: 
+            
+            //     if (readInput(entity, INSTRUCTION_ID_HELP, worldAge)) {
+            //         entity.commandsVisible = !entity.commandsVisible;
+            //     }
+            //     break;
         }    
 
         const attached = attachedAge <= MAX_JUMP_AGE;
@@ -691,9 +763,10 @@ const updateEntity = (
         const right = readInput(entity, INSTRUCTION_ID_RIGHT, worldAge);
         const mass = entityCalculateMass(activeMovableEntity) || 1;
         const canJump = mass < activeMovableEntity.mass * 2;
+        const baseVelocity = activeMovableEntity.adjustedBaseVelocity || activeMovableEntity.baseVelocity;
         const effectiveBaseVelocity = activeMovableEntity.strong 
-            ? activeMovableEntity.baseVelocity
-            : activeMovableEntity.baseVelocity / mass;
+            ? baseVelocity
+            : baseVelocity / mass;
 
         if (groundAge < MAX_DELTA) {
             animationId = ANIMATION_ID_RESTING;
@@ -707,31 +780,46 @@ const updateEntity = (
         const inserting = readInput(entity, INSTRUCTION_ID_INSERT, worldAge);
         const ejecting = readInput(entity, INSTRUCTION_ID_EJECT, worldAge);
         const pressingPlay = readInput(entity, INSTRUCTION_ID_PLAY, worldAge);
+        const shooting = readInput(entity, INSTRUCTION_ID_SHOOT, worldAge);
+        const saving = readInput(entity, INSTRUCTION_ID_SAVE, worldAge);
 
         recording = readInput(entity, INSTRUCTION_ID_RECORD, worldAge);
         rewinding = readInput(entity, INSTRUCTION_ID_REWIND, worldAge);
         fastForwarding = readInput(entity, INSTRUCTION_ID_FAST_FORWARD, worldAge);
 
-        if (activeMovableEntity.airTurn || attached) {
-            let targetVelocity = (right - left) * effectiveBaseVelocity + carrierVelocity[0];
-            activeMovableEntity.velocity[0] = targetVelocity;
-            if (left) {
-                if (attached || !activeMovableEntity.mass) {
-                    animationId = ANIMATION_ID_WALKING;       
-                    if (doRepeatingInput(entity, INSTRUCTION_ID_LEFT, worldAge, delta)) {
-                        entityPlaySound(entity, INSTRUCTION_ID_LEFT, sounds);
-                    }
-                }
-                orientation = ORIENTATION_LEFT;                    
-            } else if (right) {
-                orientation = ORIENTATION_RIGHT;
-                if (attached || !activeMovableEntity.mass) {
-                    animationId = ANIMATION_ID_WALKING;
-                    if (doRepeatingInput(entity, INSTRUCTION_ID_RIGHT, worldAge, delta)) {
-                        entityPlaySound(entity, INSTRUCTION_ID_RIGHT, sounds);
-                    }
-                }
-            }    
+        if (saving) {
+            entityAddPassiveAnimation(entity, INSTRUCTION_ID_SAVE, sounds, worldAge, () => 1, () => {
+                // write every persistent entity in the world to local storage
+                world.rooms.forEach((rooms, x) => 
+                    rooms.forEach((room, y) => 
+                        room && room.updatableEntities.forEach(e => {
+                            if (e.persistentId) {
+                                const bounds = e.entityType == ENTITY_TYPE_PLAYER  
+                                    ? [entity.bounds[0], entity.bounds[1], e.bounds[2], e.bounds[3]] as Rectangle
+                                    : (e as MovableEntity).bounds;
+                                const cleanEntity = {
+                                    ...e, 
+                                    bounds, 
+                                    carryingPreviously: [], 
+                                    carrying: [], 
+                                    carrier: undefined, 
+                                    grabbing: undefined, 
+                                    holding: {},  
+                                    inputs: {
+                                        states: {}, 
+                                        reads: {}, 
+                                    }, 
+                                    lastLearnedAt: 0, 
+                                };
+                                const roomAndEntity: RoomAndEntity = [x, y, cleanEntity];
+                                localStorage.setItem(e.persistentId as any, JSON.stringify(roomAndEntity));
+                            }
+                        })
+                    )
+                );
+                localStorage.setItem('w', worldAge as any);
+                world.lastSaved = worldAge;
+            });
         }
 
         if (activeMovableEntity.holding[activeMovableEntity.insertionJointId]) {
@@ -741,7 +829,9 @@ const updateEntity = (
                     if (activeMovableEntity.nextScriptIndex > 0) {
                         activeMovableEntity.nextScriptIndex--;
                         entityPlaySound(entity, INSTRUCTION_ID_REWIND, sounds);
-                    }
+                    } else if (setRead(entity, INSTRUCTION_ID_REWIND, worldAge)) {
+                        entityPlaySound(entity, INSTRUCTION_ID_STOP, sounds);
+                    }    
                 }
             } else if (fastForwarding) {
                 animationId = ANIMATION_ID_PRESSING_BUTTON;
@@ -749,17 +839,26 @@ const updateEntity = (
                     if (activeMovableEntity.nextScriptIndex < script.length) {
                         activeMovableEntity.nextScriptIndex++;
                         entityPlaySound(entity, INSTRUCTION_ID_FAST_FORWARD, sounds);    
-                    }
+                    } else if (setRead(entity, INSTRUCTION_ID_FAST_FORWARD, worldAge)) {
+                        entityPlaySound(entity, INSTRUCTION_ID_STOP, sounds);
+                    }    
                 }
             } else if (recording) {
                 animationId = ANIMATION_ID_PRESSING_BUTTON;
-                if (!everyEntity.recording) {
-                    if (!everyEntity.playbackStartTime) {
-                        everyEntity.playbackStartTime = worldAge;
+                if (everyEntity.nextScriptIndex < script.length || !everyEntity.recording) {
+                    if (!everyEntity.recording) {
+                        if (!everyEntity.playbackStartTime) {
+                            everyEntity.playbackStartTime = worldAge;
+                        }
+                        if (everyEntity.nextScriptIndex >= script.length) {
+                            everyEntity.nextScriptIndex = 0;
+                        }
+                        room.recorder = everyEntity;
                     }
-                    entityPlaySound(entity, INSTRUCTION_ID_RECORD, sounds);
+                    everyEntity.recording = 1;    
+                } else if (setRead(entity, INSTRUCTION_ID_RECORD, worldAge)) {
+                    entityPlaySound(entity, INSTRUCTION_ID_STOP, sounds);
                 }
-                everyEntity.recording = 1;
             } else if (pressingPlay) {
                 animationId = ANIMATION_ID_PRESSING_BUTTON;
                 if (!everyEntity.playing) {
@@ -778,7 +877,6 @@ const updateEntity = (
             everyEntity.playing = 0;
         }
 
-        let [ox, oy, ow, oh] = activeMovableEntity.bounds;
         if (jump && attached && canJump) {
             activeMovableEntity.velocity[1] = -JUMP_VELOCITY;
             activeMovableEntity.lastCollisions[EDGE_BOTTOM] = 0;
@@ -787,13 +885,13 @@ const updateEntity = (
             groundAge = MAX_DELTA+1;
         }
         if (up && (grabAge <= delta || !everyEntity.mass)) {
-            activeMovableEntity.velocity[1] = everyEntity.mass ? -CLIMB_VELOCITY : -everyEntity.baseVelocity;
+            activeMovableEntity.velocity[1] = everyEntity.mass ? -CLIMB_VELOCITY : -effectiveBaseVelocity;
             activeMovableEntity.lastCollisions[EDGE_GRAB] = 0;
             groundAge = MAX_DELTA+1;
         }
         if (!everyEntity.mass) {
             if (down) {
-                activeMovableEntity.velocity[1] = everyEntity.baseVelocity;
+                activeMovableEntity.velocity[1] = effectiveBaseVelocity;
             } else if (!up) {
                 // reset velocity to zero 
                 activeMovableEntity.velocity[1] = 0;
@@ -823,6 +921,7 @@ const updateEntity = (
                 () => !activeMovableEntity.holding[activeMovableEntity.insertionJointId] && activeMovableEntity.holding[activeMovableEntity.handJointId] as MovableEntity, 
                 (held: MovableEntity) => {
                     activeMovableEntity.holding[activeMovableEntity.insertionJointId] = held;
+                    activeMovableEntity.nextScriptIndex = 0;
                     delete activeMovableEntity.holding[activeMovableEntity.handJointId];    
                 }
             );
@@ -830,8 +929,12 @@ const updateEntity = (
         if (ejecting && activeMovableEntity.holding) {
             const inserted = activeMovableEntity.holding[activeMovableEntity.insertionJointId];
             if (inserted) {
-                const mass = entityCalculateMass(inserted);
-                inserted.velocity = [(orientation - .5)*EJECT_POWER/mass, -EJECT_POWER/mass];
+                inserted.velocity = [
+                    orientation != null 
+                        ? (orientation - .5)*EJECT_VELOCITY
+                        : 0, 
+                        -EJECT_VELOCITY
+                    ];
                 delete activeMovableEntity.holding[activeMovableEntity.insertionJointId];
                 axisMap(activeMovableEntity.bounds, inserted.bounds, ([p1, l1], [_, l2]) => p1 + (l1 - l2)/2, inserted.bounds);
                 (inserted as any as OrientableEntity).facing = orientableEntity.facing;
@@ -859,6 +962,38 @@ const updateEntity = (
                 }
             );
         }
+        if (everyEntity.holding) {
+            const gun = everyEntity.holding[everyEntity.handJointId] as Gun;
+            if (gun && gun.entityType == ENTITY_TYPE_GUN) {
+                if (shooting && gun.lastFired < worldAge - gun.fireRate) {
+                    // add a bullet
+                    const bullet: Bullet = {
+                        entityType: ENTITY_TYPE_BULLET, 
+                        graphic: bulletGraphic, 
+                        palette: bulletPalette, 
+                        bounds: [ox + (everyEntity.facing ? ow : -BULLET_WIDTH), oy + oh/2 - BULLET_HEIGHT * Math.random(), BULLET_WIDTH, BULLET_HEIGHT], 
+                        collisionGroup: COLLISION_GROUP_BULLETS, 
+                        collisionMask: COLLISION_MASK_BULLETS, 
+                        gravityMultiplier: 0, 
+                        id: world.idFactory(), 
+                        lastCollisions: [0, 0, 0, 0, 0], 
+                        mass: .1, 
+                        boundsWithVelocity: [0, 0, 0, 0], 
+                        velocity: [(everyEntity.facing * 2 - 1) * MAX_VELOCITY, 0], 
+                        restitution: .4, 
+                        facing: everyEntity.facing,
+                        orientationStartTime: 0, 
+                    };
+                    roomAddEntity(room, bullet);
+                    gun.lastFired = worldAge;
+                    entityPlaySound(entity, INSTRUCTION_ID_SHOOT, sounds);
+                }
+                if (gun.lastFired > worldAge - gun.fireRate) {
+                    animationId = ANIMATION_ID_SHOOTING;
+                }
+            }
+        }
+
         // if (pressingPlay) {
         //     entityAddPassiveAnimation(
         //         entity, 
@@ -887,13 +1022,15 @@ const updateEntity = (
             let blockCount = 0;
             roomIterateEntities(room, grabArea, e => {
                 if ((1 << e.collisionGroup) & everyEntity.grabMask) {
-                    blockCount ++;
-                    const [bx, by, bw] = e.bounds;
+                    if ((e.collisionMask >> (everyEntity.collisionGroup * 4)) & (everyEntity.collisionMask >> (e.collisionGroup * 4)) & 0xF) {
+                        blockCount ++;
+                    }
+                    const [bx, by, bw] = (e as MovableEntity).bounds;
                     if (
                         (Math.abs(bx + bw * ((orientation + 1)%2) - grabX) < GRAB_DIMENSION/2 || e.collisionGroup == COLLISION_GROUP_BACKGROUNDED) 
                         && Math.abs(by - grabY) < GRAB_DIMENSION
                     ) {
-                        grabbed = e;
+                        grabbed = e as SpatialEntity;
                     }
                 }       
             });
@@ -908,62 +1045,120 @@ const updateEntity = (
                 animationId = ANIMATION_ID_GRABBING;
             }
         }
+
+        if (activeMovableEntity.airTurn || attached) {
+            let targetVelocity = (right - left) * effectiveBaseVelocity + carrierVelocity[0];
+            activeMovableEntity.velocity[0] = targetVelocity;
+            if (left) {
+                if ((attached || !activeMovableEntity.mass) && !grabbed) {
+                    animationId = ANIMATION_ID_WALKING;       
+                    if (doRepeatingInput(entity, INSTRUCTION_ID_LEFT, worldAge, delta)) {
+                        entityPlaySound(entity, INSTRUCTION_ID_LEFT, sounds);
+                    }
+                }
+                orientation = ORIENTATION_LEFT;                    
+            } else if (right) {
+                orientation = ORIENTATION_RIGHT;
+                if ((attached || !activeMovableEntity.mass) && !grabbed) {
+                    animationId = ANIMATION_ID_WALKING;
+                    if (doRepeatingInput(entity, INSTRUCTION_ID_RIGHT, worldAge, delta)) {
+                        entityPlaySound(entity, INSTRUCTION_ID_RIGHT, sounds);
+                    }
+                }
+            }    
+        }
+
         const activeGraphicalEntity = entity as ActiveGraphicalEntity;
         activeGraphicalEntity.targetAnimationId = animationId;
     } else if (activeMovableEntity.velocity) { 
+        if (entity.entityType == ENTITY_TYPE_SPEECH_BUBBLE) {
+            // find anyone recording and head toward that
+            entity.velocity = [0, 0];
+            const recorder = room.recorder as EveryEntity;
+            if (recorder && recorder.recording && recorder.holding) {
+                const tape = recorder.holding[recorder.insertionJointId] as Tape;
+                if (tape && tape.hue == entity.hue) {
+                    const [dx, dy] = axisMap(room.recorder.bounds, entity.bounds, ([rp, rl], [ep, el]) => rp - ep + (rl - el)/2);
+                    const a = Math.atan2(dy, dx);
+                    entity.velocity = [
+                        Math.cos(a) * MAX_VELOCITY, 
+                        Math.sin(a) * MAX_VELOCITY, 
+                    ];    
+                }
+            }
+            if (entity.spokenAge + SPEECH_FADE_INTERVAL < worldAge) {
+                roomRemoveEntity(room, entity);
+                removedSelf = 1;
+            }
+        }
         if ((groundAge <= MAX_DELTA || activeMovableEntity.airTurn) && activeMovableEntity.velocity[1] > 0) {
             activeMovableEntity.velocity[0] = carrierVelocity[0];
         }
     }
 
-    if (orientableEntity.facing != orientation && orientation != null) {
+    if (orientableEntity.facing != orientation && orientation != null && orientableEntity.facing != null) {
         orientableEntity.facing = orientation;
         orientableEntity.orientationStartTime = worldAge;
     }  
 
-    if ((activeMovableEntity.playing || everyEntity.recording) && !fastForwarding && !rewinding) {
+    if (activeMovableEntity.playing && !fastForwarding && !rewinding) {
         // play the tape
         const diff = worldAge - activeMovableEntity.playbackStartTime;
+        const index = activeMovableEntity.nextScriptIndex || 0;
         if ((diff / PLAYBACK_INTERVAL | 0) < ((diff + delta)/PLAYBACK_INTERVAL | 0)) {
-            const index = activeMovableEntity.nextScriptIndex || 0;
             if (index < script.length) {
-                if (everyEntity.recording) {
-                    // have we heard anything?
-                    script[index] = everyEntity.instructionsHeard[0];
-                    everyEntity.instructionsHeard = [];
-                } else {
-                    const instruction = script[index];
-                    entityPlaySound(entity, instruction, sounds, worldAge);
-                }
+                const instruction = script[index];
+                entityPlaySound(entity, instruction, sounds, worldAge);
                 activeMovableEntity.nextScriptIndex = index + 1;
             } else {
-                if (everyEntity.autoRewind && !everyEntity.recording) {
+                if (everyEntity.autoRewind) {
                     // wrap around
                     everyEntity.nextScriptIndex = 0;
                 } else {
                     everyEntity.playbackStartTime = 0;
+                    if (setRead(entity, INSTRUCTION_ID_PLAY, worldAge)) {
+                        entityPlaySound(entity, INSTRUCTION_ID_STOP, sounds);
+                    }    
                 }
             }
         }
     }
 
     // sensors
-    roomIterateEntities(room, entity.bounds, e => {
+    roomIterateEntities(room, everyEntity.bounds, e => {
         if (FLAG_CHECK_CIRCULAR_CARRYING && e == entity) {
             console.log('overlapping self!!!');
         } else if (pickingUp) {
-            entityAddPassiveAnimation(
-                entity, 
-                INSTRUCTION_ID_PICK_UP, 
-                sounds, 
-                worldAge, 
-                () => e.collisionGroup == COLLISION_GROUP_ITEMS && activeMovableEntity.holding && !activeMovableEntity.holding[activeMovableEntity.handJointId], 
-                () => {
-                    roomRemoveEntity(room, e);
-                    activeMovableEntity.holding[activeMovableEntity.handJointId] = e as MovableEntity;    
-                }
-            );
-            pickingUp = 0;
+            const check = () => e.collisionGroup == COLLISION_GROUP_ITEMS && activeMovableEntity.holding && !activeMovableEntity.holding[activeMovableEntity.handJointId];
+            if (check()) {
+                entityAddPassiveAnimation(
+                    entity, 
+                    INSTRUCTION_ID_PICK_UP, 
+                    sounds, 
+                    worldAge, 
+                    check, 
+                    () => {
+                        roomRemoveEntity(room, e);
+                        activeMovableEntity.holding[activeMovableEntity.handJointId] = e as MovableEntity;    
+                    }
+                );
+                pickingUp = 0;    
+            }
+        }
+        if (everyEntity.entityType == ENTITY_TYPE_BULLET) {
+            roomRemoveEntity(room, entity);
+            removedSelf = 1;
+            // can will kill the thing we hit?
+            applyCollisionBehaviour(e, entity, worldAge, 0, EDGE_LEFT);
+        } 
+        if (everyEntity.recording && e.entityType == ENTITY_TYPE_SPEECH_BUBBLE) {
+            // save the thing
+            if (tape && tape.hue == e.hue && everyEntity.nextScriptIndex < script.length) {
+                script[everyEntity.nextScriptIndex++] = e.instruction;
+                e.deathAge = worldAge;
+                e.velocity = [0, 0];
+                entityPlaySound(entity, INSTRUCTION_ID_RECORD, sounds);
+            }
         }
     });
 
@@ -971,15 +1166,29 @@ const updateEntity = (
         everyEntity.targetAnimationId = ANIMATION_ID_DEATH;
     }
 
-    roomAddEntityToTiles(room, entity);    
+    if( !removedSelf ) {
+        roomAddEntityToTiles(room, entity);    
+    }
 }
 
 const applyCollisionBehaviour = (entity: Entity, collidedWith: Entity, worldAge: number, dv: number, onEdge: Edge) => {
-    if (collidedWith.entityType == ENTITY_TYPE_LETHAL) {
+    const movableEntity = entity as MovableEntity;
+    const immovableImpact = movableEntity.mass && (!(collidedWith as MovableEntity).mass || movableEntity.mass < (collidedWith as MovableEntity).mass);
+    let crushed: number;
+    if (immovableImpact) {
+        movableEntity.crushedEdges = movableEntity.crushedEdges | (1 << onEdge);
+        crushed = movableEntity.crushedEdges >> ((onEdge + 2)%4) & 1;
+    }
+
+    if (collidedWith.entityType == ENTITY_TYPE_LETHAL || collidedWith.entityType == ENTITY_TYPE_BULLET && ((1 << entity.collisionGroup) & BULLET_MASK) || crushed) {
         // die comically
-        (entity as MovableEntity).velocity = [0, -MAX_VELOCITY];
-        (entity as MortalEntity).deathAge = worldAge;
-        return 0;
-    } 
-    return 1;
+        movableEntity.velocity = [0, -MAX_VELOCITY];
+        movableEntity.gravityMultiplier = 1;
+        (entity as MortalEntity).deathAge = worldAge;        
+    } else if (entity.entityType == ENTITY_TYPE_BULLET) {
+        // die immediately
+        (entity as MortalEntity).deathAge = worldAge - MAX_DEATH_AGE;        
+    } else {
+        return 1;
+    }
 }

@@ -1,12 +1,15 @@
-const robotFactoryFactory = (orientation: Orientation, script?: number[], tapeColor?: HSL) => {
-    const tapeFactory= script && tapeFactoryFactory(script, tapeColor);
-
+const robotFactoryFactory = (orientation: Orientation, hue: number) => {
+    const palette: HSL[] = [
+        [hue, 40, 50], 
+        [hue, 40, 40], 
+        [hue, 40, 20], 
+        [hue, 0, 100], 
+    ]; 
     return (x: number, y: number, id: IdFactory) => {
-        const robotTape = tapeFactory && tapeFactory(x, y, id);
         const robot: Robot = {
             entityType: ENTITY_TYPE_ROBOT, 
             graphic: robotGraphic, 
-            palette: robotPalette, 
+            palette, 
             bounds: rectangleCenterBounds(x, y, .9, .9),
             // only collide with robots on the bottom or top
             // don't collide with items at all
@@ -15,9 +18,7 @@ const robotFactoryFactory = (orientation: Orientation, script?: number[], tapeCo
             gravityMultiplier: 1, 
             id: id(), 
             lastCollisions: [0, 0, 0, 0, 0],
-            mass: 1, 
-            nextScriptInstructionTime: 0, 
-            nextScriptIndex: 0, 
+            mass: 2, 
             velocity: [0, 0], 
             baseVelocity: BASE_VELOCITY/3, 
             boundsWithVelocity: [0, 0, 0, 0], 
@@ -27,23 +28,13 @@ const robotFactoryFactory = (orientation: Orientation, script?: number[], tapeCo
                 reads: {}, 
                 states: {}, 
             }, 
-            holding: {[ROBOT_GRAPHIC_JOINT_ID_TAPE_DECK]: robotTape && robotTape[0]},  
+            holding: {},  
+            hue, 
             handJointId: ROBOT_GRAPHIC_JOINT_ID_LEFT_ARM, 
             insertionJointId: ROBOT_GRAPHIC_JOINT_ID_TAPE_DECK, 
             instructionsHeard: [],             
             strong: 1, 
             capabilities: [
-                INSTRUCTION_ID_COUNT_0,
-                INSTRUCTION_ID_COUNT_1,
-                INSTRUCTION_ID_COUNT_2,
-                INSTRUCTION_ID_COUNT_3,
-                INSTRUCTION_ID_COUNT_4,
-                INSTRUCTION_ID_COUNT_5,
-                INSTRUCTION_ID_COUNT_6,
-                INSTRUCTION_ID_COUNT_7,
-                INSTRUCTION_ID_COUNT_8,
-                INSTRUCTION_ID_COUNT_9,
-                INSTRUCTION_ID_DO_NOTHING,
                 INSTRUCTION_ID_UP,
                 INSTRUCTION_ID_DOWN,
                 INSTRUCTION_ID_LEFT,
@@ -55,6 +46,7 @@ const robotFactoryFactory = (orientation: Orientation, script?: number[], tapeCo
                 INSTRUCTION_ID_DROP,
                 INSTRUCTION_ID_EJECT,
                 INSTRUCTION_ID_PLAY,
+                INSTRUCTION_ID_SHOOT, 
             ], 
         };
         return [robot];

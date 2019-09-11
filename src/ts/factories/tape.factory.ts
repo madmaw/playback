@@ -1,11 +1,10 @@
-const tapeFactoryFactory = (script: number[], hsl: HSL) => {
+const tapeFactoryFactory = (script: number[], hue: number, into?: EntityFactory) => {
     const palette: HSL[] = [
-        hsl, 
+        [hue, 80, 80], 
         [0, 0, 25],
         [0, 0, 100],
     ];
-    return (x: number, y: number, id: IdFactory) => {
-        
+    return (x: number, y: number, id: IdFactory) => {        
         const tape: Tape = {
             entityType: ENTITY_TYPE_TAPE, 
             graphic: tapeGraphic, 
@@ -24,7 +23,15 @@ const tapeFactoryFactory = (script: number[], hsl: HSL) => {
             facing: 0,
             orientationStartTime: 0, 
             script: [...script], 
+            hue, 
         }
-        return [tape];
+        if (into) {
+            const entities = into(x, y, id);
+            const ee = entities[0] as EveryEntity;
+            ee.holding[ee.insertionJointId] = tape;
+            return entities;
+        } else {
+            return [tape];
+        }
     }    
 };

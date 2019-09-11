@@ -1,7 +1,13 @@
-const repeaterFactoryFactory = (script?: number[], tapeColour?: HSL) => {
-    const tapeGenerator = script && tapeFactoryFactory(script, tapeColour);
+const repeaterFactoryFactory = (hue: number) => {
+    const palette: HSL[] = [
+        [hue, 30, 70], 
+        [hue, 20, 60],
+        [hue, 30, 50],
+        [0, 0, 30], 
+        [hue, 30, 30], 
+        [0, 0, 100],     
+    ];
     return (x: number, y: number, id: IdFactory) => { 
-        const tape = tapeGenerator && tapeGenerator(x, y, id);
         const repeater: Repeater = {
             graphic: repeaterGraphic, 
             autoRewind: 1, 
@@ -11,7 +17,7 @@ const repeaterFactoryFactory = (script?: number[], tapeColour?: HSL) => {
             collisionGroup: COLLISION_GROUP_BACKGROUNDED, 
             collisionMask: COLLISION_MASK_BACKGROUNDED, 
             gravityMultiplier: 0, 
-            holding: {[REPEATER_GRAPHIC_JOINT_ID_TAPE_DECK]: tape && tape[0]},
+            holding: {},
             id: id(), 
             activeInputs: {
                 reads: {}, 
@@ -22,11 +28,14 @@ const repeaterFactoryFactory = (script?: number[], tapeColour?: HSL) => {
             handJointId: 0, 
             insertionJointId: REPEATER_GRAPHIC_JOINT_ID_TAPE_DECK, 
             mass: 0, 
-            palette: repeaterPaletteCyan,
+            palette,
             velocity: [0, 0], 
             playing: 1, 
             playbackStartTime: 0, 
-            toSpeak: [],               
+            toSpeak: [],         
+            hue, 
+            // start playing immediately
+            instructionsHeard: [INSTRUCTION_ID_PLAY],
             capabilities: [INSTRUCTION_ID_PLAY, INSTRUCTION_ID_REWIND, INSTRUCTION_ID_FAST_FORWARD, INSTRUCTION_ID_INSERT, INSTRUCTION_ID_EJECT], 
         };
         return [repeater];        

@@ -1,5 +1,5 @@
 ///<reference path="flags.ts"/>
-///<reference path="common/constants.ts"/>
+///<reference path="constants.ts"/>
 ///<reference path="common/graphics.ts"/>
 ///<reference path="common/inputs.ts"/>
 ///<reference path="game/entities.ts"/>
@@ -8,8 +8,8 @@ onload = () => {
     const audioContext = new AudioContext();
     const {
         factory, 
-        roomHeight: height, 
-        roomWidth: width, 
+        worldHeight: height, 
+        worldWidth: width, 
     } = roomFactoryFactory();
     let world: World;
     const recreateWorld = () => {
@@ -29,6 +29,10 @@ onload = () => {
         scale = Math.floor((aspectRatio < targetWidth/targetHeight
             ? innerWidth/targetWidth
             : innerHeight/targetHeight)/SCALING_JUMP) * SCALING_JUMP;
+        // for some reason, fonts don't render when scale is a multiple of 5!?
+        if (FLAG_CHROME_FONT_HACK && !(scale % 5)) {
+            scale--;
+        }
         clientWidth = targetWidth * scale;
         clientHeight = targetHeight * scale;
         c.width = clientWidth;
@@ -65,7 +69,7 @@ onload = () => {
     let then: number | undefined;
     let remainder = 0;
     const update = (now?: number) => {
-        let delta = Math.min((now||0) - (then||0), MAX_DELTA * 2) + remainder;
+        let delta = Math.min((now||0) - (then||0), MAX_DELTA * 3) + remainder;
         const inputs = world.player.activeInputs;
         inputs.states = {};
         for (let keyCode in INPUT_KEY_CODE_MAPPINGS) {
@@ -73,7 +77,7 @@ onload = () => {
             inputs.states[input] = Math.max(inputs.states[input] || 0, activeKeyCodes[keyCode] || 0);
         }
         for(;;) {
-            //const d = Math.max(Math.min(MAX_DELTA, delta), MIN_DELTA);
+            // const d = Math.max(Math.min(MAX_DELTA, delta), MIN_DELTA);
             let d = MAX_DELTA;
             if(delta < d) {
                 break;
