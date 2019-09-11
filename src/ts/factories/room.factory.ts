@@ -119,14 +119,14 @@ const roomFactoryFactory = () => {
                 'zzzzzzz    zzzzzzz' + 
                 'z                z' +
                 'z                z' +
+                'z                z' +
                 'z     zzzzzz     z' +
                 'z                z' +
                 'z                z' +
                 'z                z' +
                 'z                z' +
+                'z       zz       z' +
                 'z                z' +
-                'z                z' +
-                'z     P          z' +
                 'z     z    z     z' +
                 'zzzzzzz    zzzzzzz',
                 MAX_TILES_ACROSS, 
@@ -171,7 +171,7 @@ const roomFactoryFactory = () => {
                     't': tapeFactoryFactory([INSTRUCTION_ID_UP, INSTRUCTION_ID_DOWN, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_RIGHT], HUE_TAPE_SET_4), 
                 }, 
                 'oo                ' + 
-                'oo           O    ' +
+                'oo P         O    ' +
                 'oo                ' + 
                 'oo    O           ' + 
                 'oo          aT  T ' +
