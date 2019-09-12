@@ -7,8 +7,13 @@ const FLAG_CARRIER_TURNS_CARRIED = false;
 const FLAG_MINIMAL_AUDIO_CLEANUP = true;
 const FLAG_AUDIO_CONTEXT_RESUME = true;
 const FLAG_EMOJIS = false;
-const FLAG_SPEECH_SYNTHESIS = false;
+const FLAG_NATIVE_SPEECH_SYNTHESIS = false;
 const FLAG_LOCAL_SPEECH_SYNTHESIS = true;
+const FLAG_TONAL_SPEECH_SYNTHESIS = true;
 const FLAG_CHECK_OVERLAP_SELF = false;
 const FLAG_HELP = false;
-const FLAG_CHROME_FONT_HACK = false;
+const FLAG_CHROME_FONT_HACK = false; 
+const FLAG_RANDOMIZE_BLOCK_COLORS = true;
+// don't do this
+const FLAG_RANDOMIZE_PHENOMES = false;
+const FLAG_SHAKE = false;

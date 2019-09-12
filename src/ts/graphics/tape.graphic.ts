@@ -7,24 +7,6 @@ const TAPE_GRAPHIC_IMAGE_INDEX_EYE = 1;
 
 const TAPE_GRAPHIC_JOINT_ID_BODY = 0;
 
-const tapePaletteRed: HSL[] = [
-    [0, 80, 70], 
-    [0, 0, 25],
-    [0, 0, 100],
-];
-
-const tapePaletteBlue: HSL[] = [
-    [240, 80, 70], 
-    [240, 0, 25],
-    [240, 0, 100],
-];
-
-const tapePaletteGreen: HSL[] = [
-    [120, 80, 70], 
-    [120, 0, 25],
-    [120, 0, 100],
-];
-
 const tapeGraphic: Graphic = {
     imageryWidth: 18, 
     imageryHeight: 12, 

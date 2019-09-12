@@ -18,7 +18,7 @@ const repeaterPaletteCyan: HSL[] = [
     [210, 30, 50],
     [0, 0, 30], 
     [210, 30, 30], 
-    [0, 0, 100], 
+    [0, 0, 99], 
 ];
 
 const repeaterGraphic: Graphic = {

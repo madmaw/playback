@@ -68,8 +68,8 @@ let rectangleIterateBounds = (bounds: Rectangle | undefined, roomBounds: Rectang
 const axisFilter1 = (_: any, i: number) => i % 2 == 0;
 const axisFilter2 = (_: any, i: number) => i % 2 > 0;
 
-let axisMap = <T>(r1: number[], r2: number[], t: (values: number[], values2: number[]) => T, into: T[] = [], intoOffset = 0): T[] => {
-    into[intoOffset] = t(r1.filter(axisFilter1), r2.filter(axisFilter1));
-    into[intoOffset+1] = t(r1.filter(axisFilter2), r2.filter(axisFilter2));
+let axisMap = <T>(r1: number[], r2: number[], t: (values: number[], values2: number[], i: number) => T, into: T[] = [], intoOffset = 0): T[] => {
+    into[intoOffset] = t(r1.filter(axisFilter1), r2.filter(axisFilter1), 0);
+    into[intoOffset+1] = t(r1.filter(axisFilter2), r2.filter(axisFilter2), 1);
     return into as [T, T];
 }

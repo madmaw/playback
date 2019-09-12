@@ -12,7 +12,7 @@ type Room = {
     gravity: Vector;
     recorder?: RecordingEntity;
     soundWaves: SoundWave[];
-    background: HSL[], 
+    bg: HSL[], 
 }
 
 type IdFactory = () => number;

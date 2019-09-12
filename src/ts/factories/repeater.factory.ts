@@ -5,7 +5,7 @@ const repeaterFactoryFactory = (hue: number) => {
         [hue, 30, 50],
         [0, 0, 30], 
         [hue, 30, 30], 
-        [0, 0, 100],     
+        [0, 0, 99],     
     ];
     return (x: number, y: number, id: IdFactory) => { 
         const repeater: Repeater = {

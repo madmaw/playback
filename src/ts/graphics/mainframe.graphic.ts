@@ -59,7 +59,7 @@ const mainframeGraphic: Graphic = {
                 dy: 13, 
             }, {
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: Math.PI/6, 
+                rAngle: LOW_P_MATH_PI/6, 
             }],
             renderAfter: [{
                 imageIndex: MAINFRAME_GRAPHIC_IMAGE_INDEX_TAPE_SPINNER_HOLE, 
@@ -67,13 +67,13 @@ const mainframeGraphic: Graphic = {
                 imageIndex: MAINFRAME_GRAPHIC_IMAGE_INDEX_TAPE_SPINNER_HOLE, 
                 transformations: [{
                     transformType: TRANSFORM_TYPE_ROTATE, 
-                    rAngle: Math.PI*2/3
+                    rAngle: LOW_P_MATH_PI_2/3
                 }]
             }, {
                 imageIndex: MAINFRAME_GRAPHIC_IMAGE_INDEX_TAPE_SPINNER_HOLE, 
                 transformations: [{
                     transformType: TRANSFORM_TYPE_ROTATE, 
-                    rAngle: Math.PI*4/3
+                    rAngle: LOW_P_MATH_PI*4/3
                 }]
             }]
         },{
@@ -85,7 +85,7 @@ const mainframeGraphic: Graphic = {
                 dy: 13, 
             }, {
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: Math.PI/6, 
+                rAngle: LOW_P_MATH_PI/6, 
             }],
             renderAfter: [{
                 imageIndex: MAINFRAME_GRAPHIC_IMAGE_INDEX_TAPE_SPINNER_HOLE, 
@@ -93,13 +93,13 @@ const mainframeGraphic: Graphic = {
                 imageIndex: MAINFRAME_GRAPHIC_IMAGE_INDEX_TAPE_SPINNER_HOLE, 
                 transformations: [{
                     transformType: TRANSFORM_TYPE_ROTATE, 
-                    rAngle: Math.PI*2/3
+                    rAngle: LOW_P_MATH_PI_2/3
                 }]
             }, {
                 imageIndex: MAINFRAME_GRAPHIC_IMAGE_INDEX_TAPE_SPINNER_HOLE, 
                 transformations: [{
                     transformType: TRANSFORM_TYPE_ROTATE, 
-                    rAngle: Math.PI*4/3
+                    rAngle: LOW_P_MATH_PI*4/3
                 }]
             }]
         }]
@@ -107,7 +107,7 @@ const mainframeGraphic: Graphic = {
     poses: [{ // MAINFRAME_GRAPHIC_POSE_ID_SHAKE_LEFT
         [MAINFRAME_GRAPHIC_JOINT_ID_BODY]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rAngle: -Math.PI/30, 
+            rAngle: -LOW_P_MATH_PI/30, 
             aroundX: 16, 
             aroundY: 48, 
         }, {
@@ -117,26 +117,26 @@ const mainframeGraphic: Graphic = {
         }],
         [MAINFRAME_GRAPHIC_JOINT_ID_LEFT_SPINNER]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rAngle: Math.PI * 2, 
+            rAngle: MATH_PI_2, 
         }],
         [MAINFRAME_GRAPHIC_JOINT_ID_RIGHT_SPINNER]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rAngle: Math.PI * 2, 
+            rAngle: MATH_PI_2, 
         }],
     }, { // MAINFRAME_GRAPHIC_POSE_ID_SHAKE_RIGHT
         [MAINFRAME_GRAPHIC_JOINT_ID_BODY]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rAngle: Math.PI/30, 
+            rAngle: LOW_P_MATH_PI/30, 
             aroundX: 0, 
             aroundY: 48, 
         }],
         [MAINFRAME_GRAPHIC_JOINT_ID_LEFT_SPINNER]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rAngle: Math.PI * 4, 
+            rAngle: LOW_P_MATH_PI * 4, 
         }],
         [MAINFRAME_GRAPHIC_JOINT_ID_RIGHT_SPINNER]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rAngle: Math.PI * 4, 
+            rAngle: LOW_P_MATH_PI * 4, 
         }],
     }], 
     animations: {

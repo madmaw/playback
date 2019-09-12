@@ -109,6 +109,9 @@ module.exports = function (grunt) {
                     from: "\n", 
                     to: ""
                 }, {
+                    from: "void 0", 
+                    to: "null"
+                }, {
                     from: "const ", 
                     to: "var "
                 }/*, {

@@ -4,17 +4,6 @@ const BLOCK_GRAPHIC_PALETTE_INDEX_DARK = 2;
 
 const BLOCK_GRAPHIC_IMAGE_INDEX_BODY = 0;
 
-const blockPaletteCyan: HSL[] = [
-    [210, 30, 60], 
-    [210, 20, 50],
-    [210, 30, 40],
-];
-
-const blockPaletteRed: HSL[] = [
-    [0, 30, 60], 
-    [0, 20, 50],
-    [0, 30, 40],    
-]
 const blockGraphicFactory = (width: number, height: number, rounding: number = 4) => {
     const blockGraphic: Graphic = {
         imageryWidth: width, 

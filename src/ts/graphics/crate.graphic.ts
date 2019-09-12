@@ -7,9 +7,9 @@ const CRATE_GRAPHIC_IMAGE_INDEX_BOARD = 0;
 const CRATE_GRAPHIC_JOINT_ID_BODY = 0;
 
 const cratePalette: HSL[] = [
-    [30, 30, 60], 
-    [30, 30, 50],
-    [30, 30, 40],
+    [30, 40, 40],  
+    [30, 50, 30],
+    [30, 50, 20],
 ];
 
 const crateGraphic: Graphic = {
@@ -58,7 +58,7 @@ const crateGraphic: Graphic = {
                 scaleY:-1, 
             }, {
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: -Math.PI/2, 
+                rAngle: -MATH_PI_ON_2, 
             }], 
         }, {
             imageIndex: CRATE_GRAPHIC_IMAGE_INDEX_BOARD, 
@@ -72,7 +72,7 @@ const crateGraphic: Graphic = {
                 scaleY:-1, 
             }, {
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: -Math.PI/2, 
+                rAngle: -MATH_PI_ON_2, 
             }], 
         }, {
             imageIndex: CRATE_GRAPHIC_IMAGE_INDEX_BOARD, 

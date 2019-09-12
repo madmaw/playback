@@ -11,10 +11,10 @@
 // ---------------------------------------------------------------------------
 
 const Sawtooth = ( x: number ) => {
-	return ( 0.5 - ( x - Math.floor ( x / (Math.PI * 2) ) * Math.PI * 2 ) / (Math.PI * 2) );
+	return ( .5 - ( x - Math.floor ( x / MATH_PI_2 ) * MATH_PI_2 ) / MATH_PI_2 );
 }
 
-type Phenome = [number, number, number, number, number, number, number, number, number?, number?];
+type Phenome = [number, number, number, number, number?, number?, number?, number?, number?, number?];
 
 /*var g_phonemes = {
 	'o': { f:[12,  15,  0], w:[ 10,  10,  0], len:3, amp: 6, osc:0, plosive:0 },
@@ -45,90 +45,108 @@ type Phenome = [number, number, number, number, number, number, number, number, 
 	'k': { f:[20,  80,  0], w:[ 10,  10,  0], len:1, amp: 3, osc:1, plosive:1 }
 };
 */
-var g_phonemes: {[_:string]: Phenome} = {
-	'o': [12,  15,  0, 10,  10,  0, 3, 6],
-	'i': [ 5,  56,  0, 10,  10,  0, 3, 3],
-	'j': [ 5,  56,  0, 10,  10,  0, 1, 3],
-	'u': [ 5,  14,  0, 10,  10,  0, 3, 3],
-	'a': [18,  30,  0, 10,  10,  0, 3, 5],
-	'e': [14,  50,  0, 10,  10,  0, 3, 15],
-	//'E': [20,  40,  0, 10,  10,  0, 3, 12],
-	'w': [ 3,  14,  0, 10,  10,  0, 3, 1],
-	'v': [ 2,  20,  0, 20,  10,  0, 3, 3],
-	//'T': [ 2,  20,  0, 40,   1,  0, 3, 5],
-	'z': [ 5,  28, 80, 10,   5, 10, 3, 3],
-	//'Z': [ 4,  30, 60, 50,   1,  5, 3, 5],
-	'b': [ 4,   0,  0, 10,   0,  0, 1, 2],
-	'd': [ 4,  40, 80, 10,  10, 10, 1, 2],
-	'm': [ 4,  20,  0, 10,  10,  0, 3, 2],
-	'n': [ 4,  40,  0, 10,  10,  0, 3, 2],
-	'r': [ 3,  10, 20, 30,   8,  1, 3, 3],
-	'l': [ 8,  20,  0, 10,  10,  0, 3, 5],
-	'g': [ 2,  10, 26, 15,   5,  2, 2, 1],
-	'f': [ 8,  20, 34, 10,  10, 10, 3, 4, 1],
-	'h': [22,  26, 32, 30,  10, 30, 1, 10, 1],
-	's': [80, 110,  0, 80,  40,  0, 3, 5, 1],
-	//'S': [20,  30,  0, 100, 100,  0, 3, 10, 1],
-	'p': [ 4,  10, 20,   5,  10, 10, 1,  2, 1, 1 ],
-	't': [ 4,  20, 40,  10,  20,  5, 1, 3, 1, 1 ],
-	'k': [20,  80,  0, 10,  10,  0, 1, 3, 1, 1 ], 
-};
+var g_phonemes: Phenome[];
+if (FLAG_RANDOMIZE_PHENOMES) {
+	g_phonemes = [];
+	for (let i=0; i<26; i++) {
+		const a = Math.random();
+		const b = Math.random();
+		const c = Math.random();
+		const d = Math.random();
+		const e = Math.random();
+
+		g_phonemes[i] = [a * a * 20, b, c, d, e].map(v => v | 0) as Phenome;
+	}
+} else {
+	g_phonemes = [
+		[10,  10,  0, 18,  30], // 'a': 
+		[10,   0,  0, 4], // 'b': 
+		, // c
+		[10,  10, 10, 4,  40, 80], // 'd': 
+		[10,  10,  0, 14,  50], // 'e': 
+		[10,  10, 10, 8,  20, 34], // 'f': 
+		[15,   5,  2,  2,  10, 26], // 'g': 
+		[30,  10, 30, 22,  26, 32], // 'h': 
+		[10,  10,  0,  5,  56], // 'i': 
+		[10,  10,  0,  5,  56], // 'j': 
+		[10,  10,  0, 20,  80], //'k': 
+		[10,  10,  0,  8,  20], // 'l': 
+		[10,  10,  0,  4,  20], // 'm': 
+		[10,  10,  0,  4,  40], //'n': 
+		[10,  10,  0, 12,  15], // 'o': 
+		[ 5,  10, 10,  4,  10, 20], // 'p': 
+		// q
+		[30,   8,  1,  3,  10, 20], // 'r': 
+		[80,  40,  0, 80, 110], // 's': 
+		[10,  20,  5,  4,  20, 40], // 't': 
+		[10,  10,  0,  5,  14], // 'u': 
+		[20,  10,  0,  2,  20], // 'v': 
+		//[ 3,  14,  0, 10,  10,  0, 3, 1], // 'w': // unused?
+		//, // x
+		//, // y
+		//[ 5,  28, 80, 10,   5, 10, 3, 3], // 'z': // unused?
+	];	
+}
 
 
-const OFFSET_W = 3;
-const INDEX_LEN = 6;
-const INDEX_AMP = 7;
-const INDEX_OSC = 8;
-const INDEX_PLOSIVE = 9;
+const OFFSET_F = 3;
+// const INDEX_LEN = 6;
+// const INDEX_AMP = 7;
+// const INDEX_OSC = 8;
+// const INDEX_PLOSIVE = 9;
 
 
 // Synthesizes speech and adds it to specified buffer
-const SynthSpeech = ( buf: Float32Array, text: string, f0: number, speed: number, bufPos: number, sampleFrequency: number ) => {
+const SynthSpeech = ( buf: Float32Array, text: string, sampleFrequency: number ) => {
+	let bufPos = 0;
 	// Loop through all phonemes
-	for (var textPos=0; textPos<text.length; textPos++) {
-		var l = text.charAt(textPos);
+	text.split('').forEach((c, textPos) => {
+		var l = text.charCodeAt(textPos) - 97; // (a is 97)
 		// Find phoneme description
 		var p = g_phonemes[l];
 		if (!p) {
-			if (l == " ") {
-				bufPos += (sampleFrequency * 0.2 * speed) | 0;
+			// space
+			if (l == 32) {
+				bufPos += (sampleFrequency * .2) | 0;
 			}
-			continue;
-		}
-		var v = p[INDEX_AMP];
+		} else {
+		//var v = p[INDEX_AMP];
+		var v = 3;
 		// Generate sound
-		var sl = p[INDEX_LEN] * (sampleFrequency / 15) * speed;
+		//var sl = p[INDEX_LEN] * (sampleFrequency / 15);
+		var sl = (2+l/9) * (sampleFrequency / 15);
 		for ( var f = 0; f < 3; f++ ) {
-			var ff = p[f];
-			var freq = ff*(50/sampleFrequency);
-			if ( !ff )
-				continue;
-			var buf1Res = 0, buf2Res = 0;
-			var q = 1.0 - p[f + OFFSET_W] * (Math.PI * 10 / sampleFrequency);
-			//var b = buf; <-- store current bufPos?
-			var thisBufPos = bufPos;
-			var xp = 0;
-			for ( var s = 0; s < sl; s++ ) {
-				var n = Math.random()-0.5;
-				var x = n;
-				if ( !p[INDEX_OSC] ) {
-					x = Sawtooth ( s * (f0 * Math.PI * 2 / sampleFrequency) );
-					xp = 0;
-				}
-				// Apply formant filter
-				x = x + 2 * Math.cos ( Math.PI * 2 * freq ) * buf1Res * q - buf2Res * q * q;
-				buf2Res = buf1Res;
-				buf1Res = x;
-				x = 0.75 * xp + x * v;
-				xp = x;
-                x = x/128 - 1;
-				buf[thisBufPos++] = buf[thisBufPos]/2+x;
-				buf[thisBufPos++] = buf[thisBufPos]/2+x;
+			var ff = p[f + OFFSET_F];
+			if ( ff ) {
+				var freq = ff*(30/sampleFrequency);
+				var buf1Res = 0, buf2Res = 0;
+				var q = 1 - p[f] * (MATH_PI_2 * 5 / sampleFrequency);
+				//var b = buf; <-- store current bufPos?
+				var thisBufPos = bufPos;
+				var xp = 0;
+				for ( var s = 0; s < sl; s++ ) { 
+					// var n = Math.random()-.5;
+					// var x = n;
+					// if ( !p[INDEX_OSC] ) {
+						var x = Sawtooth ( s * (60 * MATH_PI_2 / sampleFrequency) );
+						// xp = 0;
+					// }
+					// Apply formant filter
+					x += 2 * Math.cos ( MATH_PI_2 * freq ) * buf1Res * q - buf2Res * q * q;
+					buf2Res = buf1Res;
+					buf1Res = x;
+					x = .75 * xp + x * v;
+					xp = x;
+					x = x/128 - 1;
+					buf[thisBufPos++] = buf[thisBufPos]/2+x;
+					buf[thisBufPos++] = buf[thisBufPos]/2+x;
+				}	
 			}
 		}
 		// Overlap neighbour phonemes
 		bufPos += ((3*sl/4)<<1);
-		if ( p[INDEX_PLOSIVE] )
-			bufPos += (sl&0xfffffe);
-	}
+		// if ( p[INDEX_PLOSIVE] )
+		// 	bufPos += (sl&0xfffffe);
+		}
+	});
 }

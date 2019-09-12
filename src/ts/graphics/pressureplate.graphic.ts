@@ -21,7 +21,7 @@ const PRESSURE_PLATE_STRUT_WIDTH = 4;
 const PRESSURE_PLATE_POSE_ID_TRIGGER = 0;
 
 const pressurePlateGraphicFactory = (width: number, height: number, edge: Edge) => {
-    const rAngle = (edge - 1) * Math.PI/2;
+    const rAngle = (edge - 1) * MATH_PI_ON_2;
     const imageryWidth = width;
     const imageryHeight = height;
     if (!(edge % 2)) {
@@ -120,7 +120,7 @@ const pressurePlateGraphicFactory = (width: number, height: number, edge: Edge) 
             transformations: [{
                 transformType: TRANSFORM_TYPE_TRANSLATE, 
                 dx: 16 - width/2, 
-                dy: PRESSURE_PLATE_PLATE_HEIGHT + 6, 
+                dy: PRESSURE_PLATE_PLATE_HEIGHT + 4, 
             }], 
         }], 
         poses: [
@@ -135,7 +135,7 @@ const pressurePlateGraphicFactory = (width: number, height: number, edge: Edge) 
         ], 
         animations: {
             [ANIMATION_ID_PRESSING_BUTTON]: {
-                poseDuration: 100, 
+                poseDuration: 99, 
                 poseIds: [PRESSURE_PLATE_POSE_ID_TRIGGER], 
                 repeatCount: 1, 
             }

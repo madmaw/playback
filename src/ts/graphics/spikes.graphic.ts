@@ -4,7 +4,7 @@ const SPIKES_GRAPHIC_PALETTE_INDEX_DARK = 1;
 const SPIKES_GRAPHIC_IMAGE_INDEX_SPIKE = 0;
 
 const spikesPalette: HSL[] = [
-    [0, 0, 100], 
+    [0, 0, 99], 
     [0, 0, 40], 
 ]
 
@@ -27,7 +27,7 @@ const randomSpikeGraphic = () => {
                 scaleY: (Math.random() + 2.5 - Math.abs(p)) / 2, 
             }, {
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: Math.PI * (Math.random() - .5)/9 + p * Math.PI/9, 
+                rAngle: LOW_P_MATH_PI * (Math.random() - .5)/9 + p * LOW_P_MATH_PI/9, 
             }]
         });
     }

@@ -3,7 +3,7 @@ const robotFactoryFactory = (orientation: Orientation, hue: number) => {
         [hue, 40, 50], 
         [hue, 40, 40], 
         [hue, 40, 20], 
-        [hue, 0, 100], 
+        [hue, 0, 99], 
     ]; 
     return (x: number, y: number, id: IdFactory) => {
         const robot: Robot = {
@@ -32,8 +32,8 @@ const robotFactoryFactory = (orientation: Orientation, hue: number) => {
             hue, 
             handJointId: ROBOT_GRAPHIC_JOINT_ID_LEFT_ARM, 
             insertionJointId: ROBOT_GRAPHIC_JOINT_ID_TAPE_DECK, 
-            instructionsHeard: [],             
-            strong: 1, 
+            instructionsHeard: [],       
+            nextScriptIndex: 0,       
             capabilities: [
                 INSTRUCTION_ID_UP,
                 INSTRUCTION_ID_DOWN,

@@ -9,7 +9,7 @@ const pressurePlateFactoryFactory = (
         [hue, baseSaturation - 9, baseLighting],
         [hue, baseSaturation, baseLighting - 9],    
         [hue, baseSaturation, baseLighting - 19], 
-        [0, 0, 100], 
+        [0, 0, 99], 
     ];
     const graphic = pressurePlateGraphicFactory(width * 32, height * 32, edge);
     return (x: number, y: number, id: IdFactory) => {

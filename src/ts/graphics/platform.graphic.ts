@@ -38,7 +38,7 @@ const platformGraphicFactory = (width: number, height: number, edge: Edge) => {
                     dy: vertical ? height - 4 : height/2,  
                 }, {
                     transformType: TRANSFORM_TYPE_ROTATE, 
-                    rAngle: vertical ? Math.PI/2 : 0, 
+                    rAngle: vertical ? MATH_PI_ON_2 : 0, 
                 }]
             }, {
                 imageIndex: PLATFORM_GRAPHIC_IMAGE_INDEX_ARROW, 
@@ -48,7 +48,7 @@ const platformGraphicFactory = (width: number, height: number, edge: Edge) => {
                     dy: vertical ? 4 : height/2,  
                 }, {
                     transformType: TRANSFORM_TYPE_ROTATE, 
-                    rAngle: vertical ? -Math.PI/2 : Math.PI, 
+                    rAngle: vertical ? -MATH_PI_ON_2 : MATH_PI, 
                 }]
             }]
         }]

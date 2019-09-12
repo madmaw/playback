@@ -23,13 +23,6 @@ const ROBOT_GRAPHIC_POSE_ID_STEP_LEFT = 0;
 const ROBOT_GRAPHIC_POSE_ID_STEP_RIGHT = 1;
 const ROBOT_GRAPHIC_POSE_ID_SHOOT = 2;
 
-const robotPalette: HSL[] = [
-    [0, 40, 50], 
-    [0, 40, 40], 
-    [0, 40, 20], 
-    [0, 0, 100], 
-];
-
 const robotGraphic: Graphic = {
     imageryWidth: 32, 
     imageryHeight: 32, 
@@ -144,7 +137,7 @@ const robotGraphic: Graphic = {
     poses: [{ // ROBOT_GRAPHIC_POSE_ID_STEP_LEFT
         [ROBOT_GRAPHIC_JOINT_ID_BODY]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rAngle: -Math.PI/20, 
+            rAngle: -LOW_P_MATH_PI/20, 
         }],
         [ROBOT_GRAPHIC_JOINT_ID_LEFT_LEG]: [{
             transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -153,12 +146,12 @@ const robotGraphic: Graphic = {
         }], 
         [ROBOT_GRAPHIC_JOINT_ID_HEAD]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rAngle: Math.PI/20, 
+            rAngle: LOW_P_MATH_PI/20, 
         }], 
     }, { // ROBOT_GRAPHIC_POSE_ID_STEP_RIGHT
         [ROBOT_GRAPHIC_JOINT_ID_BODY]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rAngle: Math.PI/20, 
+            rAngle: LOW_P_MATH_PI/20, 
         }], 
         [ROBOT_GRAPHIC_JOINT_ID_RIGHT_LEG]: [{
             transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -167,17 +160,17 @@ const robotGraphic: Graphic = {
         }], 
         [ROBOT_GRAPHIC_JOINT_ID_HEAD]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rAngle: -Math.PI/20, 
+            rAngle: -LOW_P_MATH_PI/20, 
         }], 
     }, { // ROBOT_GRAPHIC_POSE_ID_SHOOT
         [ROBOT_GRAPHIC_JOINT_ID_BODY]: [{
             transformType: TRANSFORM_TYPE_ROTATE, 
-            rAngle: -Math.PI/8, 
+            rAngle: -LOW_P_MATH_PI/8, 
         }], 
     }], 
     animations: {
         [ANIMATION_ID_WALKING]: {
-            poseDuration: 300, 
+            poseDuration: 299, 
             poseIds: [ROBOT_GRAPHIC_POSE_ID_STEP_LEFT, ROBOT_GRAPHIC_POSE_ID_STEP_RIGHT], 
         }, 
         [ANIMATION_ID_SHOOTING]: {

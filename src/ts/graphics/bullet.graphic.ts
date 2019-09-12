@@ -5,9 +5,9 @@ const BULLET_GRAPHIC_PALETTE_INDEX_END = 2;
 const BULLET_GRAPHIC_IMAGE_INDEX_BODY = 0;
 
 const bulletPalette: HSL[] = [
-    [60, 100, 80],
-    [30, 100, 70],
-    [0, 100, 60],
+    [60, 99, 80],
+    [30, 99, 70],
+    [0, 99, 60],
 ];
 
 const bulletGraphic: Graphic = {

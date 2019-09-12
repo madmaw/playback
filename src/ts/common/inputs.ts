@@ -30,6 +30,7 @@ const INSTRUCTION_ID_RECORD = 25;
 const INSTRUCTION_ID_SAVE = 26;
 const INSTRUCTION_ID_SHOOT = 27;
 const INSTRUCTION_ID_WAIT = 28;
+const INSTRUCTION_ID_ASSPULL = 29;
 const TOTAL_INSTRUCTION_COUNT = 29;
 
 type Instruction = {
@@ -55,19 +56,19 @@ const INSTRUCTIONS: Instruction[] = [{
 }, {
     // count 2
     keyCodes: [50], // 2, 
-    phoneticName: 'too', 
+    phoneticName: 'to', 
 }, {
     // count 3
     keyCodes: [51], // 3
-    phoneticName: 'three', 
+    phoneticName: 'tre', 
 }, {
     // count 4
     keyCodes: [52], // 4
-    phoneticName: 'foor', 
+    phoneticName: 'for', 
 }, {
     // count 5
     keyCodes: [53], // 5
-    phoneticName: 'five', 
+    phoneticName: 'fiv', 
 }, {
     // count 6
     keyCodes: [54], // 6
@@ -75,7 +76,7 @@ const INSTRUCTIONS: Instruction[] = [{
 }, {
     // count 7
     keyCodes: [55], // 7
-    phoneticName: 'seven', 
+    phoneticName: 'svn', 
 }, {
     // count 8
     keyCodes: [56], // 8
@@ -83,7 +84,7 @@ const INSTRUCTIONS: Instruction[] = [{
 }, {
     // count 9
     keyCodes: [57], // 9
-    phoneticName: 'nine', 
+    phoneticName: 'nie', 
 }, {
     // noop / do nothing
 }, {
@@ -111,11 +112,11 @@ const INSTRUCTIONS: Instruction[] = [{
 }, {
     // jump
     keyCodes: [74, 32], // j, space
-    readableName: FLAG_EMOJIS ? '🐇' : 'jump', 
+    //readableName: FLAG_EMOJIS ? '🐇' : 'jump', 
 }, {
     // rewind
     keyCodes: [219], // [
-    keyChar: '[', 
+    //keyChar: '[', 
     //readableName: FLAG_EMOJIS ? '⏪' : 'rewind',
     animationId: ANIMATION_ID_PRESSING_BUTTON,  
     hold: 1, 
@@ -123,7 +124,7 @@ const INSTRUCTIONS: Instruction[] = [{
 }, {
     // fast forward
     keyCodes: [221], // ]
-    keyChar: ']', 
+    //keyChar: ']', 
     //readableName: FLAG_EMOJIS ? '⏩' : 'fast forward', 
     animationId: ANIMATION_ID_PRESSING_BUTTON,  
     hold: 1, 
@@ -139,17 +140,17 @@ const INSTRUCTIONS: Instruction[] = [{
 }, {
     // drop
     keyCodes: [66], // b
-    //readableName: FLAG_EMOJIS ? '⇣' : 'drop', 
+    readableName: FLAG_EMOJIS ? '⇣' : 'drop', 
     animationId: ANIMATION_ID_DROPPING,  
 }, {
     // throw
     keyCodes: [84], // t
-    readableName: FLAG_EMOJIS ? '🏹' : 'throw', 
+    //readableName: FLAG_EMOJIS ? '🏹' : 'throw', 
     animationId: ANIMATION_ID_THROWING,  
 }, {
     // insert
     keyCodes: [73], // i
-    //readableName: FLAG_EMOJIS ? '📩' : 'insert', 
+    readableName: FLAG_EMOJIS ? '📩' : 'insert', 
     animationId: ANIMATION_ID_INSERTING, 
 }, {
     // eject
@@ -181,8 +182,10 @@ const INSTRUCTIONS: Instruction[] = [{
     automatedDuration: BULLET_INTERVAL, 
 }, {
     // wait
-    readableName: FLAG_EMOJIS ? '⌛' : 'wait',
-    automatedDuration: 1000, 
+    //readableName: FLAG_EMOJIS ? '⌛' : 'wait',
+    automatedDuration: 999, 
+}, {
+    // ass pull    
 }/*, {
     // help
     keyCodes: [72], // h
@@ -195,7 +198,7 @@ const initInstructions = (audioContext: AudioContext, sounds: {[_:number]: Sound
     INSTRUCTIONS.forEach((instruction, id) => {
         instruction.keyCodes && instruction.keyCodes.forEach(keyCode => INPUT_KEY_CODE_MAPPINGS[keyCode] = id);
         INSTRUCTION_TO_ANIMATION_IDS[id] = instruction.animationId;
-        if (FLAG_SPEECH_SYNTHESIS && window.speechSynthesis) {
+        if (FLAG_NATIVE_SPEECH_SYNTHESIS && window.speechSynthesis) {
             const utterance = new SpeechSynthesisUtterance(instructionToName(id))
             utterance.volume = .2;
             instruction.spoken = () => {
@@ -203,7 +206,13 @@ const initInstructions = (audioContext: AudioContext, sounds: {[_:number]: Sound
             };
         } else if (FLAG_LOCAL_SPEECH_SYNTHESIS) {
             const name = INSTRUCTIONS[id].phoneticName || instructionToName(id);
-            instruction.spoken = name && synthesizeSpeech(audioContext, name, .1) || sounds[id];
+            instruction.spoken = name && synthesizeSpeech(audioContext, name, .01) || sounds[id];
+        } else if (FLAG_TONAL_SPEECH_SYNTHESIS) {
+            instruction.spoken = dtmfSoundFactory(audioContext, 
+                DTMF_FREQUENCIES_1[id % DTMF_FREQUENCIES_1.length], 
+                DTMF_FREQUENCIES_2[(id / DTMF_FREQUENCIES_1.length | 0) % DTMF_FREQUENCIES_2.length], 
+                INSTRUCTION_DURATION, 
+            );
         } else {
             instruction.spoken = sounds[id] || (() => 0);
         }    

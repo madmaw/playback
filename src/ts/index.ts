@@ -21,11 +21,11 @@ onload = () => {
     let scale: number;
     let clientWidth: number; 
     let clientHeight: number;
-    const elements = [c, o, s];
+    const elements = [c, o];
     const resize = () => {
         const aspectRatio = innerWidth/innerHeight;
-        const targetWidth = MAX_TILES_ACROSS - EDGE_HIDE_PROPORTION*2;
-        const targetHeight = MAX_TILES_DOWN - EDGE_HIDE_PROPORTION*2;
+        const targetWidth = MAX_TILES_ACROSS;
+        const targetHeight = MAX_TILES_DOWN;
         scale = (((aspectRatio < targetWidth/targetHeight
             ? innerWidth/targetWidth
             : innerHeight/targetHeight)/SCALING_JUMP)|0) * SCALING_JUMP;
@@ -85,10 +85,14 @@ onload = () => {
             delta -= d;
             const render = delta < MAX_DELTA;
             if (render) {
-                context.clearRect(0, 0, clientWidth, clientHeight);
+                //context.clearRect(0, 0, clientWidth, clientHeight);
                 context.save();
+                if (FLAG_SHAKE) {
+                    const shake = Math.sqrt(Math.max(0, world.lastShaken - world.age));
+                    context.translate(shake * (Math.random() - .5), shake * (Math.random() - .5));    
+                }
+
                 context.scale(scale, scale); 
-                context.translate(-EDGE_HIDE_PROPORTION, -EDGE_HIDE_PROPORTION);
             }
             updateAndRenderWorld(context, world, d, render);
             if (render) {
@@ -108,12 +112,17 @@ onload = () => {
 };
 
 const renderPlayer = (player: Player, world: World) => {
-    o.style.opacity = player.deathAge ? '1' : '0';
-    if (world.lastSaved > world.age - MESSAGE_DISPLAY_TIME) {
-        s.style.opacity = '1';
-    } else {
-        s.style.opacity = '0';
+    let message: string;
+    if (player.deathAge) {
+        message = 'Space to Retry';
+    } else if (world.lastSaved > world.age - MESSAGE_DISPLAY_TIME){
+        message = 'Game Saved';
     }
+    if (message) {
+        o.innerText = message;
+    }
+    // can also accept numeric values
+    o.style.opacity = (message ? 1: 0) as any;
     if (FLAG_HELP) {
         if (player.commandsVisible) {
             h.style.opacity = '1';

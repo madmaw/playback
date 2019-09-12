@@ -1,5 +1,5 @@
 interface Sound {
-    (emphasis: number, say?: boolean | number, speedMultiplier?: number): void;
+    (): void;
 }
 
 const dtmfSoundFactory = (
@@ -8,20 +8,20 @@ const dtmfSoundFactory = (
     frequency2: number, 
     durationSeconds: number, 
 ) => {
-    return (emphasis: number, say?: boolean | number, speedMultiplier: number = 1) => {
+    return () => {
         const now = audioContext.currentTime;
-        const end = now + durationSeconds * speedMultiplier;
+        const end = now + durationSeconds;
         const osc1 = audioContext.createOscillator();
         const osc2 = audioContext.createOscillator();
-        osc1.frequency.value = frequency1/(speedMultiplier*emphasis);
-        osc2.frequency.value = frequency2/(speedMultiplier*emphasis);
+        osc1.frequency.value = frequency1;
+        osc2.frequency.value = frequency2;
 
         const gain = audioContext.createGain();
-        gain.gain.value = emphasis/9;
+        gain.gain.value = .1;
 
         const filter = audioContext.createBiquadFilter();
         filter.type = 'lowpass';
-        filter.frequency.value = 8000/speedMultiplier;
+        filter.frequency.value = 8000;
 
         osc1.connect(gain);
         osc2.connect(gain);
@@ -56,22 +56,22 @@ let vibratoSoundFactory = (
     vibratoType?: OscillatorType,
     vibratoFrequency?: number
 ) => {
-    return (emphasis: number, say?: boolean | number, speedMultiplier: number = 1) => {
+    return () => {
         let now = audioContext.currentTime;
         let oscillator = audioContext.createOscillator();
-        oscillator.frequency.setValueAtTime(oscillatorStartFrequency/speedMultiplier, now);
-        oscillator.frequency.linearRampToValueAtTime(oscillatorEndFrequency/speedMultiplier, now + durationSeconds * speedMultiplier);
+        oscillator.frequency.setValueAtTime(oscillatorStartFrequency, now);
+        oscillator.frequency.linearRampToValueAtTime(oscillatorEndFrequency, now + durationSeconds);
         oscillator.type = oscillatorType;
 
         let gain = audioContext.createGain();
-        var decay = durationSeconds * .2 * speedMultiplier;
-        linearRampGain(gain, now, attackVolume * emphasis, sustainVolume * emphasis, attackSeconds * speedMultiplier, decay, null, durationSeconds * speedMultiplier);
+        var decay = durationSeconds * .2;
+        linearRampGain(gain, now, attackVolume, sustainVolume, attackSeconds, decay, null, durationSeconds);
 
         let vibrato: OscillatorNode;
         let vibratoGain: GainNode;
         if( vibratoType ) {
             vibrato = audioContext.createOscillator();
-            vibrato.frequency.value = vibratoFrequency / speedMultiplier;
+            vibrato.frequency.value = vibratoFrequency;
             vibrato.type = vibratoType;
     
             vibratoGain = audioContext.createGain();
@@ -90,7 +90,7 @@ let vibratoSoundFactory = (
                 ? 'highpass'
                 : 'lowpass';
             filter.Q.value = 0;
-            filter.frequency.value = filterFrequency/speedMultiplier;    
+            filter.frequency.value = filterFrequency;    
             oscillator.connect(filter);
             filter.connect(gain);
         } else {
@@ -148,7 +148,7 @@ const boomSoundFactory =(
         data[frameCount] = Math.random() * 2 - 1;
     }
 
-    return (volume: number, say?: boolean | number, speedMultiplier: number = 1) => {
+    return () => {
 
 		var staticNode = audioContext.createBufferSource();
 		staticNode.buffer = buffer;
@@ -162,7 +162,7 @@ const boomSoundFactory =(
 		//decay
 		var gain = audioContext.createGain();
 		var decay = durationSeconds * .2;
-		linearRampGain(gain, audioContext.currentTime, attackVolume * volume, sustainVolume * volume, attackSeconds, decay, null, durationSeconds);
+		linearRampGain(gain, audioContext.currentTime, attackVolume, sustainVolume, attackSeconds, decay, null, durationSeconds);
 
 		staticNode.connect(filter);
 		filter.connect(gain);
@@ -180,7 +180,6 @@ const boomSoundFactory =(
     }
 }
 
-const PHENOMES: {[_:string]: [number, number, number, number, number, number?]} = {o:[52,55,10,10,6],i:[45,96,10,10,3],j:[45,96,10,10,3],u:[45,54,10,10,3],a:[58,70,10,10,15],e:[54,90,10,10,15],E:[60,80,10,10,12],w:[43,54,10,10,1],v:[42,60,20,10,3],T:[42,60,40,1,5],z:[45,68,10,5,3],Z:[44,70,50,1,5],b:[44,44,10,10,2],d:[44,99,10,10,2],m:[44,60,10,10,2],n:[44,99,10,10,2],r:[43,50,30,8,3],l:[48,60,10,10,5],g:[42,50,15,5,1],f:[48,60,10,10,4,1],h:[62,66,30,10,10,1],s:[120,150,80,40,5,1],S:[20,70,99,99,10,1],p:[44,50,5,10,2,1],t:[44,60,10,20,3,1],k:[60,99,10,10,6,1]};
 const SECONDS_PER_LETTER = .2;
 const synthesizeSpeech = (
     audioContext: AudioContext, 
@@ -191,17 +190,17 @@ const synthesizeSpeech = (
     let durationSeconds = word.length * SECONDS_PER_LETTER;
 	let sampleRate = audioContext.sampleRate;
     var frameCount = durationSeconds * sampleRate | 0;
-    var buffer = audioContext.createBuffer(1, frameCount, sampleRate);
+    var buffer = audioContext.createBuffer(1, frameCount, sampleRate * 2);
     var data = buffer.getChannelData(0);
     
-    SynthSpeech(data, word, 60, 1, 0, sampleRate);
+    SynthSpeech(data, word, sampleRate);
 
-    return (volume: number) => {
+    return () => {
 		var staticNode = audioContext.createBufferSource();
         staticNode.buffer = buffer;
         
         var gain = audioContext.createGain();
-        gain.gain.value = volume * baseVolume;
+        gain.gain.value = baseVolume;
 
         staticNode.connect(gain);
         gain.connect(audioContext.destination);

@@ -29,5 +29,5 @@ let objectIterate = <T>(o: {[_: number]: T}, f: (t: T, k: number) => void) => {
     for(let k in o) {
         let v = o[k];
         f(v, k as any);
-    }
+    }    
 }

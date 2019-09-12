@@ -30,9 +30,9 @@ const updateAndRenderWorld = (c: CanvasRenderingContext2D, world: World, delta: 
                                 world.currentRoom = [roomX, roomY];
                                 adjust = 0;
                             }
-                            const deltas = axisMap([...offset, ...room.bounds], ee.bounds, ([o, _, l], [p, d]) => {
+                            const deltas = axisMap([...offset, ...room.bounds], ee.bounds, ([o, _, l], [p, d], i) => {
                                 if (o > 0) {
-                                    return (adjust - (d - GRAB_DIMENSION)) - p;
+                                    return (adjust - (d - GRAB_DIMENSION)) - p + 1 - i;
                                 } else if (o < 0) {
                                     return ((l - GRAB_DIMENSION) - adjust) - p;
                                 } else {
@@ -195,6 +195,7 @@ const updateAndRenderRoom = (
         }
         let mass1 = calculatedMass2 && !ignoreMass1 ? calculatedMass1 || 1 : 0;
         let mass2 = calculatedMass1 && !ignoreMass2 ? calculatedMass2 || 1 : 0;
+        const previousCollisionTime = minCollisionEntity1.lastCollisions[minCollisionEdge1];
         minCollisionEntity1.lastCollisions[minCollisionEdge1] = worldAge + remainingTime;
         const dv = velocity1[axis] - velocity2[axis];
 
@@ -207,7 +208,6 @@ const updateAndRenderRoom = (
                 && (dv < 0 && minCollisionEdge1 == EDGE_RIGHT || dv > 0 && minCollisionEdge1 == EDGE_LEFT || movableEntity2.carrier == minCollisionEntity1)
                 && entitySetCarrying(movableEntity2.carrier, movableEntity2);    
         }   
-
         const collisionBehaviour1 = applyCollisionBehaviour(minCollisionEntity1 as Entity, minCollisionEntity2 as Entity, worldAge + minCollisionTime, dv, minCollisionEdge1);
         const collisionBehaviour2 = applyCollisionBehaviour(minCollisionEntity2 as Entity, minCollisionEntity1 as Entity, worldAge + minCollisionTime, dv, minCollisionEdge2);
 
@@ -244,6 +244,14 @@ const updateAndRenderRoom = (
                 // attach the other way around
                 entitySetCarrying(minCollisionEntity1, minCollisionEntity2, 1);
             }
+            // screen shake
+            if (render && FLAG_SHAKE) {
+                const t = Math.abs(dv * Math.min((calculatedMass1 || 99), (calculatedMass2 || 99)) *  599) - 99;
+                if (world.lastShaken < worldAge + t && t > 0 && previousCollisionTime < worldAge - MAX_DELTA) {
+                    world.lastShaken = worldAge + t;    
+                    world.shakeSound();
+                }
+            }
         }        
 
         movableEntity2.remainingTime = minCollisionEntity1.remainingTime = remainingTime;
@@ -264,13 +272,13 @@ const updateAndRenderRoom = (
     // render
     if (render) {
         const gradient = c.createLinearGradient(0, 0, 0, room.bounds[3]);
-        room.background.forEach((hsl, i) => gradient.addColorStop(i/Math.max(1, room.background.length-1), hslToStyle(hsl)));
+        room.bg.forEach((hsl, i) => gradient.addColorStop(i/Math.max(1, room.bg.length-1), hslToStyle(hsl)));
         c.fillStyle = gradient;
         c.fillRect(0, 0, room.bounds[2], room.bounds[3]);
         // fill in any sound waves
         c.save();
         room.soundWaves = room.soundWaves.filter(soundWave => {
-            c.fillStyle = hslToStyle([soundWave.hue, 100, 80])
+            c.fillStyle = hslToStyle([soundWave.hue, 99, 80])
             soundWave.tileReachability.forEach((col, y) => {
                 col.forEach((v, x) => {
                     if (v < 0) {
@@ -278,7 +286,7 @@ const updateAndRenderRoom = (
                         const alpha = 1 - Math.abs(worldAge - displayTime) / SOUND_WAVE_DISPLAY_TIME;
                         if (alpha > 0) {
                             c.globalAlpha = alpha/-v;
-                            c.fillRect(x, y, 1, 1);
+                            c.fillRect(x - 1, y - 1, 1, 1);
                         }
                     }
                 });
@@ -314,7 +322,7 @@ const updateAndRenderRoom = (
         const newRoomPosition = axisMap(everyEntity.bounds, room.bounds, 
             ([s, l]: [number, number], [p, d]: [number, number]) => {
                 //retrn p + Math.floor((s+l/2)/d)
-                if (s + l < GRAB_DIMENSION) {
+                if (s + l < GRAB_DIMENSION + 1) {
                     return p - 1;
                 } else if (s > d - GRAB_DIMENSION) {
                     return p + 1;
@@ -345,7 +353,7 @@ const updateAndRenderRoom = (
         if (render) {
             c.save();
             const [x, y, w, h] = everyEntity.bounds;
-            c.translate(x + w/2, y);
+            c.translate(x + w/2 - 1, y - 1);
             drawEntity(c, entity, worldAge + delta);
             c.restore();
         }
@@ -369,7 +377,7 @@ const drawEntity = (c: CanvasRenderingContext2D, entity: Entity, worldAge: numbe
         }
         const orientableEntity = entity as OrientableEntity;
         let orientationXScale = 1;
-        if (orientableEntity.entityOrientation != null) {
+        if (orientableEntity.orientationStartTime != null) {
             let turnProgress = Math.min(1, (worldAge - orientableEntity.orientationStartTime)/TURN_DURATION) * 2 - 1;
             // TODO there's got to be a better way to do this
             if (turnProgress > 0) {
@@ -545,10 +553,11 @@ const updateEntity = (
             const [rx, ry, roomWidth, roomHeight] = room.bounds;
             // note we reverse the axis so we can easily read this in debug mode
             const tileReachability = array2DCreate(roomHeight, roomWidth, () => 0);
-            const uncheckedTiles: [number, number, number][] = [[everyEntity.bounds[0]| 0, everyEntity.bounds[1] | 0, -1]];
+            const uncheckedTiles: [number, number, number][] = [[everyEntity.bounds[0]| 0, Math.max(1, everyEntity.bounds[1] | 0), -1]];
             while (uncheckedTiles.length) {
                 const [tx, ty, cost] = uncheckedTiles.pop();
-                if (tx >= 0 && ty >= 0 && tx < roomWidth && ty < roomHeight) {
+                // note we intentionally don't look at tiles where x or y is 0
+                if (tx > 0 && ty > 0 && tx < roomWidth && ty < roomHeight) {
                     const reachability = tileReachability[ty][tx];
                     if (!reachability || cost > reachability) {
                         const tileBounds = [tx, ty, 1, 1] as Rectangle;
@@ -596,7 +605,7 @@ const updateEntity = (
                     velocity: [0, 0], 
                 };
                 roomAddEntity(room, speechBubble);
-                utterance(everyEntity.mass || 1, 1);
+                utterance();
                 room.soundWaves.push({
                     hue, 
                     tileReachability, 
@@ -677,7 +686,12 @@ const updateEntity = (
                     let nextInstructionDelta = 0;
                     let nextScriptIndex = entity.nextScriptIndex;
                     inputs.states = {};
-                    let instructionId = everyEntity.instructionsHeard && everyEntity.instructionsHeard.pop();
+                    let instructionId;
+                    if(entity.entityType == ENTITY_TYPE_ROBOT && script && nextScriptIndex < script.length) {
+                        instructionId = script[nextScriptIndex++]
+                    } else {
+                        instructionId = everyEntity.instructionsHeard && everyEntity.instructionsHeard.pop();
+                    } 
                     if (instructionId == null) {
                         instructionId = everyEntity.rememberedInstruction;             
                     }
@@ -764,9 +778,6 @@ const updateEntity = (
         const mass = entityCalculateMass(activeMovableEntity) || 1;
         const canJump = mass < activeMovableEntity.mass * 2;
         const baseVelocity = activeMovableEntity.adjustedBaseVelocity || activeMovableEntity.baseVelocity;
-        const effectiveBaseVelocity = activeMovableEntity.strong 
-            ? baseVelocity
-            : baseVelocity / mass;
 
         if (groundAge < MAX_DELTA) {
             animationId = ANIMATION_ID_RESTING;
@@ -782,47 +793,55 @@ const updateEntity = (
         const pressingPlay = readInput(entity, INSTRUCTION_ID_PLAY, worldAge);
         const shooting = readInput(entity, INSTRUCTION_ID_SHOOT, worldAge);
         const saving = readInput(entity, INSTRUCTION_ID_SAVE, worldAge);
+        const asspulling = readInput(entity, INSTRUCTION_ID_ASSPULL, worldAge);
 
         recording = readInput(entity, INSTRUCTION_ID_RECORD, worldAge);
         rewinding = readInput(entity, INSTRUCTION_ID_REWIND, worldAge);
         fastForwarding = readInput(entity, INSTRUCTION_ID_FAST_FORWARD, worldAge);
 
         if (saving) {
-            entityAddPassiveAnimation(entity, INSTRUCTION_ID_SAVE, sounds, worldAge, () => 1, () => {
-                // write every persistent entity in the world to local storage
-                world.rooms.forEach((rooms, x) => 
-                    rooms.forEach((room, y) => 
-                        room && room.updatableEntities.forEach(e => {
-                            if (e.persistentId) {
-                                const bounds = e.entityType == ENTITY_TYPE_PLAYER  
-                                    ? [entity.bounds[0], entity.bounds[1], e.bounds[2], e.bounds[3]] as Rectangle
-                                    : (e as MovableEntity).bounds;
-                                const cleanEntity = {
-                                    ...e, 
-                                    bounds, 
-                                    carryingPreviously: [], 
-                                    carrying: [], 
-                                    carrier: undefined, 
-                                    grabbing: undefined, 
-                                    holding: {},  
-                                    activeInputs: {
-                                        states: {}, 
-                                        reads: {}, 
-                                    }, 
-                                    orientationStartTime: 0, 
-                                };
-                                const roomAndEntity: RoomAndEntity = [x, y, cleanEntity];
-                                localStorage.setItem(e.persistentId as any, JSON.stringify(roomAndEntity));
-                            }
-                        })
-                    )
-                );
-                localStorage.setItem(0 as any, worldAge as any);
-                world.lastSaved = worldAge;
-            });
+            entityAddPassiveAnimation(
+                entity, 
+                INSTRUCTION_ID_SAVE, 
+                sounds, 
+                worldAge, 
+                () => world.rooms[world.currentRoom[0]][world.currentRoom[1]] == room, 
+                () => {
+                    // write every persistent entity in the world to local storage
+                    world.rooms.forEach((rooms, x) => 
+                        rooms.forEach((room, y) => 
+                            room && room.updatableEntities.forEach(e => {
+                                if (e.persistentId) {
+                                    const bounds = e.entityType == ENTITY_TYPE_PLAYER  
+                                        ? [entity.bounds[0], entity.bounds[1], e.bounds[2], e.bounds[3]] as Rectangle
+                                        : (e as MovableEntity).bounds;
+                                    const cleanEntity = {
+                                        ...e, 
+                                        bounds, 
+                                        carryingPreviously: [], 
+                                        carrying: [], 
+                                        carrier: undefined, 
+                                        grabbing: undefined, 
+                                        holding: {},  
+                                        activeInputs: {
+                                            states: {}, 
+                                            reads: {}, 
+                                        }, 
+                                        orientationStartTime: 0, 
+                                    };
+                                    const roomAndEntity: RoomAndEntity = [x, y, cleanEntity];
+                                    localStorage.setItem(e.persistentId as any, JSON.stringify(roomAndEntity));
+                                }
+                            })
+                        )
+                    );
+                    localStorage.setItem(0 as any, worldAge as any);
+                    world.lastSaved = worldAge;
+                }
+            );
         }
 
-        if (activeMovableEntity.holding[activeMovableEntity.insertionJointId] && script) {
+        if (script) {
             if (rewinding) {
                 animationId = ANIMATION_ID_PRESSING_BUTTON;
                 if (doRepeatingInput(entity, INSTRUCTION_ID_REWIND, worldAge, delta, REWIND_INTERVAL)) {
@@ -844,8 +863,8 @@ const updateEntity = (
                     }    
                 }
             } else if (recording) {
-                animationId = ANIMATION_ID_PRESSING_BUTTON;
                 if (everyEntity.nextScriptIndex < script.length || !everyEntity.recording) {
+                    animationId = ANIMATION_ID_PRESSING_BUTTON;
                     if (!everyEntity.recording) {
                         if (!everyEntity.playbackStartTime) {
                             everyEntity.playbackStartTime = worldAge;
@@ -885,13 +904,13 @@ const updateEntity = (
             groundAge = MAX_DELTA+1;
         }
         if (up && (grabAge <= delta || !everyEntity.mass)) {
-            activeMovableEntity.velocity[1] = everyEntity.mass ? -CLIMB_VELOCITY : -effectiveBaseVelocity;
+            activeMovableEntity.velocity[1] = everyEntity.mass ? -CLIMB_VELOCITY : -baseVelocity;
             activeMovableEntity.lastCollisions[EDGE_GRAB] = 0;
             groundAge = MAX_DELTA+1;
         }
         if (!everyEntity.mass) {
             if (down) {
-                activeMovableEntity.velocity[1] = effectiveBaseVelocity;
+                activeMovableEntity.velocity[1] = baseVelocity;
             } else if (!up) {
                 // reset velocity to zero 
                 activeMovableEntity.velocity[1] = 0;
@@ -907,7 +926,7 @@ const updateEntity = (
                 held => {
                     held.velocity = [0, 0];
                     delete activeMovableEntity.holding[activeMovableEntity.handJointId];
-                    axisMap(activeMovableEntity.bounds, held.bounds, ([p1, l1], [_, l2]) => p1 + (l1 - l2)/2, held.bounds);
+                    axisMap(activeMovableEntity.bounds, held.bounds, ([p1, l1], [_, l2], i) => p1 + l1 * everyEntity.entityOrientation * (1-i) + (l1 * i - l2)/2, held.bounds);
                     roomAddEntity(room, held as Entity);            
                 }
             );
@@ -936,28 +955,37 @@ const updateEntity = (
                         -EJECT_VELOCITY
                     ];
                 delete activeMovableEntity.holding[activeMovableEntity.insertionJointId];
+                // wipe any outstanding instructions
+                activeMovableEntity.instructionsHeard = [];
                 axisMap(activeMovableEntity.bounds, inserted.bounds, ([p1, l1], [_, l2]) => p1 + (l1 - l2)/2, inserted.bounds);
                 (inserted as any as OrientableEntity).entityOrientation = orientableEntity.entityOrientation;
                 roomAddEntity(room, inserted as Entity);
                 entityPlaySound(entity, INSTRUCTION_ID_EJECT, sounds);
             }
         }
+        if (asspulling) {
+            entityAddPassiveAnimation(
+                entity, 
+                INSTRUCTION_ID_ASSPULL, 
+                sounds, 
+                worldAge, 
+                () => !everyEntity.holding[everyEntity.handJointId] && everyEntity.asspull, 
+                () => everyEntity.holding[everyEntity.handJointId] = everyEntity.asspull(ox, oy, world.idFactory)[0] as MovableEntity,
+            )
+        }    
         if (throwing) {
             entityAddPassiveAnimation(
                 entity, 
                 INSTRUCTION_ID_THROW, 
                 sounds, 
                 worldAge, 
-                () => activeMovableEntity.carryingPreviously[0] || activeMovableEntity.carrying[0] || activeMovableEntity.holding && activeMovableEntity.holding[activeMovableEntity.handJointId], 
+                () => activeMovableEntity.holding && activeMovableEntity.holding[activeMovableEntity.handJointId], 
                 (toThrow: MovableEntity) => {
-                    toThrow.velocity = [((orientation * 2) - 1)*THROW_POWER, -THROW_POWER];
-                    if (activeMovableEntity.holding[activeMovableEntity.handJointId] == toThrow) {
-                        delete activeMovableEntity.holding[activeMovableEntity.handJointId];
-                        axisMap(activeMovableEntity.bounds, toThrow.bounds, ([p1, l1], [_, l2]) => p1 + (l1 - l2)/2, toThrow.bounds);
-                        (toThrow as any as OrientableEntity).entityOrientation = orientableEntity.entityOrientation;
-                        roomAddEntity(room, toThrow as Entity);
-                    }
-                    entitySetCarrying(activeMovableEntity, toThrow); 
+                    toThrow.velocity = [((orientation * 2) - 1)*THROW_POWER, -THROW_POWER/4];
+                    delete activeMovableEntity.holding[activeMovableEntity.handJointId];
+                    axisMap(activeMovableEntity.bounds, toThrow.bounds, ([p1, l1], [_, l2]) => p1 + (l1 - l2)/2, toThrow.bounds);
+                    (toThrow as any as OrientableEntity).entityOrientation = orientableEntity.entityOrientation;
+                    roomAddEntity(room, toThrow as Entity);
                 }
             );
         }
@@ -1046,7 +1074,7 @@ const updateEntity = (
         }
 
         if (activeMovableEntity.airTurn || attached) {
-            let targetVelocity = (right - left) * effectiveBaseVelocity + carrierVelocity[0];
+            let targetVelocity = (right - left) * baseVelocity + carrierVelocity[0];
             activeMovableEntity.velocity[0] = targetVelocity;
             if (left) {
                 if ((attached || !activeMovableEntity.mass) && !grabbed) {
@@ -1074,16 +1102,13 @@ const updateEntity = (
             // find anyone recording and head toward that
             entity.velocity = [0, 0];
             const recorder = room.recorder as EveryEntity;
-            if (recorder && recorder.recording && recorder.holding) {
-                const tape = recorder.holding[recorder.insertionJointId] as Tape;
-                if (tape && tape.hue == entity.hue) {
-                    const [dx, dy] = axisMap(room.recorder.bounds, entity.bounds, ([rp, rl], [ep, el]) => rp - ep + (rl - el)/2);
-                    const a = Math.atan2(dy, dx);
-                    entity.velocity = [
-                        Math.cos(a) * MAX_VELOCITY, 
-                        Math.sin(a) * MAX_VELOCITY, 
-                    ];    
-                }
+            if (recorder && recorder.recording) {
+                const [dx, dy] = axisMap(room.recorder.bounds, entity.bounds, ([rp, rl], [ep, el]) => rp - ep + (rl - el)/2);
+                const a = Math.atan2(dy, dx);
+                entity.velocity = [
+                    Math.cos(a) * MAX_VELOCITY, 
+                    Math.sin(a) * MAX_VELOCITY, 
+                ];    
             }
             if (entity.spokenAge + SPEECH_FADE_INTERVAL < worldAge) {
                 roomRemoveEntity(room, entity);
@@ -1153,7 +1178,7 @@ const updateEntity = (
         } 
         if (everyEntity.recording && e.entityType == ENTITY_TYPE_SPEECH_BUBBLE) {
             // save the thing
-            if (tape && tape.hue == e.hue && everyEntity.nextScriptIndex < script.length) {
+            if (everyEntity.nextScriptIndex < script.length) {
                 script[everyEntity.nextScriptIndex++] = e.instruction;
                 e.deathAge = worldAge;
                 e.velocity = [0, 0];

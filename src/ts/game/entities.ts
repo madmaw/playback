@@ -18,9 +18,9 @@ const COLLISION_MASK_SPIKES = 0x22000F;
 const COLLISION_MASK_PUSHABLES = 0xFFFF0FF;
 // collides with terrain and pushables
 const COLLISION_MASK_ITEMS = 0xF00F;
-// collides with terrain and pushables
-const COLLISION_MASK_PLAYER = 0x80F80F;
-// collides with terrain, spikes on the bottom, pushables, other enemies and the player on the top/bottom
+// collides with terrain and pushables and other players and the bottom of enemies
+const COLLISION_MASK_PLAYER = 0x8FF80F;
+// collides with terrain, spikes on the bottom, pushables, other enemies on the top and bottom and the player on the top
 const COLLISION_MASK_ENEMIES = 0xA2F80F;
 const COLLISION_MASK_BACKGROUNDED = 0;
 const COLLISION_MASK_BULLETS = 0xF;
@@ -77,7 +77,6 @@ type MovableEntity = {
     carrying?: MovableEntity[];
     carryingPreviously?: MovableEntity[];
     restitution?: number;
-    strong?: boolean | number;
     airTurn?: number | boolean;
     crushedEdges?: number;
 } & SpatialEntity;
@@ -134,6 +133,12 @@ type MortalEntity = {
     deathAge?: number;
 };
 
+type Asspull = (x: number, y: number, id: () => number) => [Entity];
+
+type AsspullEntity = {
+    asspull?: Asspull, 
+}
+
 type EveryEntity = CommonEntity 
     & GraphicalEntity 
     & ActiveGraphicalEntity 
@@ -147,7 +152,8 @@ type EveryEntity = CommonEntity
     & SpeakingEntity
     & ListeningEntity
     & RecordingEntity
-    & MortalEntity;
+    & MortalEntity
+    & AsspullEntity;
 
 const ENTITY_TYPE_PLAYER = 0; 
 type Player = {
@@ -158,7 +164,7 @@ type Player = {
 const ENTITY_TYPE_ROBOT = 1; 
 type Robot = {
     entityType: 1, 
-} & CommonEntity & ActiveMovableEntity & InstructableEntity & OrientableEntity & ActiveGraphicalEntity & ListeningEntity & MortalEntity;
+} & CommonEntity & ActiveMovableEntity & InstructableEntity & OrientableEntity & ActiveGraphicalEntity & ListeningEntity & MortalEntity & AsspullEntity;
 
 const ENTITY_TYPE_BLOCK = 2; 
 type Block = {
@@ -345,7 +351,7 @@ let entityPlaySound = (entity: Entity, instruction: number, sounds: {[_: number]
     } else {
         const sound = sounds[instruction];
         if (sound) {
-            sound((entity as MovableEntity).mass || 1);
+            sound();
         }
     }    
 }
