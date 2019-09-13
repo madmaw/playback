@@ -1,15 +1,16 @@
 const platformFactoryFactory = (w: number, h: number, direction: Edge, hue: number) => {
-    const palette: HSL[] = [
-        [hue, 30, 60], 
-        [hue, 20, 50],
-        [hue, 30, 40],
-        [hue, 40, 80], 
-        [hue, 30, 30], 
-    ];
     const capabilities: number[] = direction % 2
         ? [INSTRUCTION_ID_UP, INSTRUCTION_ID_DOWN]
         : [INSTRUCTION_ID_LEFT, INSTRUCTION_ID_RIGHT];
-    return (x: number, y: number, id: IdFactory) => {
+    return (x: number, y: number, id: IdFactory, pid?: number) => {
+        const lightingBoost = pid ? 30 : -30;
+        const palette: HSL[] = [
+            [hue, 60, 60], 
+            [hue, 40, 50],
+            [hue, 60, 40],
+            [hue, 40, 50 - lightingBoost], 
+            [hue, 40, 50 + lightingBoost], 
+        ];    
         const graphic = platformGraphicFactory(w * 32, h * 32, direction);
         const platform: Platform = {
             entityType: ENTITY_TYPE_PLATFORM, 
@@ -21,22 +22,15 @@ const platformFactoryFactory = (w: number, h: number, direction: Edge, hue: numb
             collisionGroup: COLLISION_GROUP_TERRAIN, 
             gravityMultiplier: 0, 
             id: id(), 
-            lastCollisions: [0, 0, 0, 0, 0],
-            mass: 0, 
             velocity: [0, 0], 
-            baseVelocity: BASE_VELOCITY/2, 
-            boundsWithVelocity: [0, 0, 0, 0], 
+            // can't be too fast or we outpace gravity and downward room transitions don't work while riding platforms
+            baseVelocity: .0028, 
             activeInputs: {
-                reads: {}, 
-                states: {}, 
             }, 
             holding: {},  
-            handJointId: 0, 
-            instructionsHeard: [],      
             capabilities: [...capabilities, INSTRUCTION_ID_DO_NOTHING], 
             airTurn: 1, 
             direction, 
-            home: [x, y], 
         };
         return [platform];        
     };

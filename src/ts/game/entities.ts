@@ -67,13 +67,14 @@ type SpatialEntity = {
 
 type MovableEntity = {
     velocity: Vector;
-    mass: number;
+    mass?: number;
     ignoreMass?: number | boolean;
     gravityMultiplier: number;
-    lastCollisions: [number, number, number, number, number];
-    boundsWithVelocity: Rectangle;
+    lastCollisions?: [number, number, number, number, number];
+    boundsWithVelocity?: Rectangle;
     remainingTime?: number;
     carrier?: MovableEntity;
+    lastCarried?: number;
     carrying?: MovableEntity[];
     carryingPreviously?: MovableEntity[];
     restitution?: number;
@@ -86,7 +87,7 @@ type ActiveMovableEntity = {
     adjustedBaseVelocity?: number;    
     activeInputs: Inputs;
     holding: {[_:number]: MovableEntity};
-    handJointId: number;
+    handJointId?: number;
     insertionJointId?: number;
 } & MovableEntity;
 
@@ -120,7 +121,7 @@ type SpeakingEntity = {
 };
 
 type ListeningEntity = {
-    instructionsHeard: number[];
+    instructionsHeard?: number[];
     lastHeard?: number;
     hue?: number;
 };
@@ -159,7 +160,7 @@ const ENTITY_TYPE_PLAYER = 0;
 type Player = {
     entityType: 0,
     commandsVisible?: boolean | number,
-} & CommonEntity & GrabbingEntity & ActiveGraphicalEntity & PlaybackEntity & SpeakingEntity & ListeningEntity & MortalEntity;
+} & CommonEntity & GrabbingEntity & ActiveGraphicalEntity & PlaybackEntity & ListeningEntity & MortalEntity;
 
 const ENTITY_TYPE_ROBOT = 1; 
 type Robot = {
@@ -207,7 +208,6 @@ type PressurePlate = {
 const ENTITY_TYPE_PLATFORM = 9;
 type Platform = {
     entityType: 9, 
-    home: Vector, 
     direction: Edge, 
 } & CommonEntity & ActiveMovableEntity & InstructableEntity & ActiveGraphicalEntity & ListeningEntity;
 
@@ -272,16 +272,17 @@ let entityCalculateBoundsWithVelocity = (entity: Entity) => {
     }
 }
 
-let entitySetCarrying = (carrier?: SpatialEntity, carrying?: SpatialEntity, isCarrying?: boolean | number) => {
+let entitySetCarrying = (carrier?: SpatialEntity, carrying?: SpatialEntity, isCarryingAndWorldAge?: number) => {
     const movableCarrier = carrier as MovableEntity;
     const movableCarrying = carrying as MovableEntity;
     if (carrier && carrying && movableCarrier.velocity && movableCarrying.velocity) {
         //movableCarrying.velocity[0] = movableCarrier.velocity[0];
         arrayRemoveElement(movableCarrier.carryingPreviously, movableCarrying);
         arrayRemoveElement(movableCarrier.carrying, movableCarrying);
-        if (isCarrying) {
+        if (isCarryingAndWorldAge) {
             movableCarrier.carrying.push(movableCarrying);
             movableCarrying.carrier = movableCarrier;
+            movableCarrying.lastCarried = isCarryingAndWorldAge;
             if (FLAG_CHECK_CIRCULAR_CARRYING) {
                 let c = carrier;
                 while (c) {

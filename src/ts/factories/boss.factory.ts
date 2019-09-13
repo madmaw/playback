@@ -1,4 +1,4 @@
-const bossFactoryFactory = (hue: number, entityFactory?: EntityFactory, asspull?: Asspull) => {
+const bossFactoryFactory = (hue: number, entityFactory?: EntityFactory, asspullFactory?: () => Asspull) => {
     return (x: number, y: number, id: IdFactory) => {
         const boss: Robot = {
             graphic: playerGraphic, 
@@ -13,13 +13,9 @@ const bossFactoryFactory = (hue: number, entityFactory?: EntityFactory, asspull?
             id: id(),
             mass: 49, 
             velocity: [0, 0], 
-            lastCollisions: [0, 0, 0, 0, 0],
             baseVelocity: BASE_VELOCITY, 
-            boundsWithVelocity: [0, 0, 0, 0], 
             airTurn: 1, 
             activeInputs: {
-                reads: {}, 
-                states: {}, 
             }, 
             holding: {
                 [PLAYER_GRAPHIC_JOINT_ID_RIGHT_HAND]: entityFactory && entityFactory(x, y, id)[0] as MovableEntity, 
@@ -27,10 +23,9 @@ const bossFactoryFactory = (hue: number, entityFactory?: EntityFactory, asspull?
             hue, 
             handJointId: PLAYER_GRAPHIC_JOINT_ID_RIGHT_HAND,
             insertionJointId: PLAYER_GRAPHIC_JOINT_ID_TAPE_DECK,
-            instructionsHeard: [], 
             capabilities: INSTRUCTIONS.map((instruction, i) => i),
             nextScriptIndex: 0, 
-            asspull, 
+            asspull: asspullFactory && asspullFactory(), 
         };    
         return [boss];    
     }

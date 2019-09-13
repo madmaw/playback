@@ -13,19 +13,12 @@ const playerFactory = (x: number, y: number, id: IdFactory) => {
         id: id(),
         mass: 1, 
         velocity: [0, 0], 
-        lastCollisions: [0, 0, 0, 0, 0],
         baseVelocity: BASE_VELOCITY, 
-        boundsWithVelocity: [0, 0, 0, 0], 
         airTurn: 1, 
-        activeInputs: {
-            reads: {}, 
-            states: {}, 
-        }, 
+        activeInputs: {}, 
         holding: {},  
         handJointId: PLAYER_GRAPHIC_JOINT_ID_RIGHT_HAND,
         insertionJointId: PLAYER_GRAPHIC_JOINT_ID_TAPE_DECK,
-        instructionsHeard: [], 
-        toSpeak: [],             
         capabilities: INSTRUCTIONS.map((instruction, i) => i).filter(i => INSTRUCTIONS[i].keyCodes),
     };    
     return [player];

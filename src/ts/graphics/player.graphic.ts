@@ -137,7 +137,7 @@ const playerGraphic: Graphic = {
                     imageIndex: PLAYER_GRAPHIC_IMAGE_INDEX_HANDLE, // handle
                 }], 
                 renderAfter: [{
-                    id: PLAYER_GRAPHIC_JOINT_ID_LEFT_EYE, // left eye
+                    //id: PLAYER_GRAPHIC_JOINT_ID_LEFT_EYE, // left eye
                     imageIndex: PLAYER_GRAPHIC_IMAGE_INDEX_EYE, // eye
                     transformations: [{
                         transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -145,7 +145,7 @@ const playerGraphic: Graphic = {
                         dy: 10, 
                     }], 
                 }, {
-                    id: PLAYER_GRAPHIC_JOINT_ID_RIGHT_EYE, // right eye
+                    //id: PLAYER_GRAPHIC_JOINT_ID_RIGHT_EYE, // right eye
                     imageIndex: PLAYER_GRAPHIC_IMAGE_INDEX_EYE, // eye
                     transformations: [{
                         transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -214,11 +214,11 @@ const playerGraphic: Graphic = {
             }], 
             [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{ // right arm
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: -LOW_P_MATH_PI/3, 
+                rAngle: -LOW_P_MATH_PI_ON_3, 
             }], 
             [PLAYER_GRAPHIC_JOINT_ID_LEFT_ARM]: [{ // left arm
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: LOW_P_MATH_PI/3, 
+                rAngle: LOW_P_MATH_PI_ON_3, 
             }], 
             [PLAYER_GRAPHIC_JOINT_ID_HANDLE]: [{ // handle
                 transformType: TRANSFORM_TYPE_SCALE, 
@@ -265,11 +265,11 @@ const playerGraphic: Graphic = {
             }], 
             [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{ // right arm
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: LOW_P_MATH_PI/3, 
+                rAngle: LOW_P_MATH_PI_ON_3, 
             }], 
             [PLAYER_GRAPHIC_JOINT_ID_LEFT_ARM]: [{ // left arm
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: -LOW_P_MATH_PI/3, 
+                rAngle: -LOW_P_MATH_PI_ON_3, 
             }],
             [PLAYER_GRAPHIC_JOINT_ID_HANDLE]: [{ // handle
                 transformType: TRANSFORM_TYPE_SCALE, 
@@ -289,11 +289,11 @@ const playerGraphic: Graphic = {
             }], 
             [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{ // right arm
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: LOW_P_MATH_PI*2/3, 
+                rAngle: LOW_P_MATH_PI_ON_3*2, 
             }], 
             [PLAYER_GRAPHIC_JOINT_ID_LEFT_ARM]: [{ // left arm
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: -LOW_P_MATH_PI*2/3, 
+                rAngle: -LOW_P_MATH_PI_ON_3*2, 
             }], 
         }, 
         // rest up (3)
@@ -328,7 +328,7 @@ const playerGraphic: Graphic = {
             }],
             [PLAYER_GRAPHIC_JOINT_ID_LEFT_ARM]: [{ // left arm
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: -LOW_P_MATH_PI/3
+                rAngle: -LOW_P_MATH_PI_ON_3
             }]
         },
         // insert
@@ -355,14 +355,14 @@ const playerGraphic: Graphic = {
             }], 
             [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: -LOW_P_MATH_PI/4, 
+                rAngle: -LOW_P_MATH_PI_ON_4, 
             }],
         }, 
         // throw wind up
         {
             [PLAYER_GRAPHIC_JOINT_ID_BODY]: [{
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: -LOW_P_MATH_PI/4, 
+                rAngle: -LOW_P_MATH_PI_ON_4, 
                 aroundX: 3, 
                 aroundY: 26, 
             }], 
@@ -377,18 +377,18 @@ const playerGraphic: Graphic = {
             }],            
             [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: LOW_P_MATH_PI*3/4, 
+                rAngle: LOW_P_MATH_PI_ON_4*3, 
             }],
             [PLAYER_GRAPHIC_JOINT_ID_RIGHT_LEG]: [{
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: LOW_P_MATH_PI/4, 
+                rAngle: LOW_P_MATH_PI_ON_4, 
             }],
         }, 
         // throw pitch
         {
             [PLAYER_GRAPHIC_JOINT_ID_BODY]: [{
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: LOW_P_MATH_PI/4, 
+                rAngle: LOW_P_MATH_PI_ON_4, 
                 aroundX: 10, 
                 aroundY: 26, 
             }], 
@@ -407,21 +407,21 @@ const playerGraphic: Graphic = {
             }],
             [PLAYER_GRAPHIC_JOINT_ID_RIGHT_LEG]: [{
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: -LOW_P_MATH_PI/4, 
+                rAngle: -LOW_P_MATH_PI_ON_4, 
             }],
         }, 
         // drop 
         {            
             [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: -LOW_P_MATH_PI/3, 
+                rAngle: -LOW_P_MATH_PI_ON_3, 
             }],    
         }, 
         // push a button 
         {
             [PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM]: [{
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: -LOW_P_MATH_PI*3/4, 
+                rAngle: -LOW_P_MATH_PI_ON_4*3, 
             }, {
                 transformType: TRANSFORM_TYPE_TRANSLATE, 
                 dx: 0, 

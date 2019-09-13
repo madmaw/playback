@@ -26,7 +26,7 @@ const crateGraphic: Graphic = {
         ], 
     ], 
     joints: [{
-        id: CRATE_GRAPHIC_JOINT_ID_BODY, 
+        //id: CRATE_GRAPHIC_JOINT_ID_BODY, 
         transformations: [{
             transformType: TRANSFORM_TYPE_TRANSLATE, 
             dx: 0, 
@@ -58,7 +58,7 @@ const crateGraphic: Graphic = {
                 scaleY:-1, 
             }, {
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: -MATH_PI_ON_2, 
+                rAngle: -MED_P_MATH_PI_ON_2, 
             }], 
         }, {
             imageIndex: CRATE_GRAPHIC_IMAGE_INDEX_BOARD, 
@@ -72,7 +72,7 @@ const crateGraphic: Graphic = {
                 scaleY:-1, 
             }, {
                 transformType: TRANSFORM_TYPE_ROTATE, 
-                rAngle: -MATH_PI_ON_2, 
+                rAngle: -MED_P_MATH_PI_ON_2, 
             }], 
         }, {
             imageIndex: CRATE_GRAPHIC_IMAGE_INDEX_BOARD, 

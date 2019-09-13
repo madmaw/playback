@@ -1,10 +1,8 @@
 const mainframeFactoryFactory = (hue: number) => {
     const palette: HSL[] = [
-        [hue, 30, 60], 
-        [hue, 20, 50],
-        [hue, 30, 40],
+        [hue, 40, 60],
         [0, 0, 30], 
-        [0, 0, 10], 
+        [0, 0, 9], 
     ];
     return (x: number, y: number, id: IdFactory) => {
         const mainframe: Robot = {
@@ -18,23 +16,16 @@ const mainframeFactoryFactory = (hue: number) => {
             collisionGroup: COLLISION_GROUP_BACKGROUNDED, 
             gravityMultiplier: 0, 
             id: id(), 
-            lastCollisions: [0, 0, 0, 0, 0],
-            mass: 0, 
             nextInstructionTime: 0, 
             nextScriptIndex: 0, 
             velocity: [0, 0], 
             baseVelocity: BASE_VELOCITY/3, 
-            boundsWithVelocity: [0, 0, 0, 0], 
             entityOrientation: 1, 
             orientationStartTime: 0, 
             activeInputs: {
-                reads: {}, 
-                states: {}, 
             }, 
             hue, 
             holding: {},  
-            handJointId: 0, 
-            instructionsHeard: [],             
             capabilities: [
                 INSTRUCTION_ID_DO_NOTHING, 
                 INSTRUCTION_ID_SAVE,

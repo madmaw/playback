@@ -47,7 +47,7 @@ const robotGraphic: Graphic = {
         ], 
     ], 
     joints: [{
-        id: ROBOT_GRAPHIC_JOINT_ID_EVERYTHING, 
+        //id: ROBOT_GRAPHIC_JOINT_ID_EVERYTHING, 
         transformations: [{
             transformType: TRANSFORM_TYPE_TRANSLATE, 
             dx: -10, 
@@ -86,21 +86,21 @@ const robotGraphic: Graphic = {
                     dy: -10, 
                 }]
             }, {
-                id: ROBOT_GRAPHIC_JOINT_ID_RIGHT_ARM, 
+                //id: ROBOT_GRAPHIC_JOINT_ID_RIGHT_ARM, 
                 imageIndex: ROBOT_GRAPHIC_IMAGE_INDEX_HAND,
                 transformations: [{
                     transformType: TRANSFORM_TYPE_TRANSLATE, 
                     dx: 8, 
                     dy: -10, 
                 }], 
-                renderAfter: [{
+                /*renderAfter: [{
                     id: ROBOT_GRAPHIC_JOINT_ID_RIGHT_HAND, 
                     transformations: [{
                         transformType: TRANSFORM_TYPE_TRANSLATE, 
                         dx: 0, 
                         dy: 5, 
                     }]  
-                }]
+                }]*/
             }, {
                 id: ROBOT_GRAPHIC_JOINT_ID_HEAD, 
                 imageIndex: ROBOT_GRAPHIC_IMAGE_INDEX_HEAD, 
@@ -123,14 +123,14 @@ const robotGraphic: Graphic = {
                         dx: -3, 
                         dy: -4, 
                     }], 
-                }, {
+                }/*, { unused
                     id: ROBOT_GRAPHIC_JOINT_ID_TAPE_DECK, 
                     transformations: [{
                         transformType: TRANSFORM_TYPE_TRANSLATE, 
                         dx: 0, 
                         dy: -9, 
                     }]
-                }], 
+                }*/], 
             }], 
         }], 
     }], 

@@ -115,6 +115,9 @@ module.exports = function (grunt) {
                     from: "const ", 
                     to: "var "
                 }/*, {
+                    from: "var ", 
+                    to: "let "
+                }*//*, {
                     from: /\[(\d+)\]\:/,
                     to: "${1}:"
                 }*/]

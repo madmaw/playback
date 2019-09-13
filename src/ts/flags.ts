@@ -17,3 +17,4 @@ const FLAG_RANDOMIZE_BLOCK_COLORS = true;
 // don't do this
 const FLAG_RANDOMIZE_PHENOMES = false;
 const FLAG_SHAKE = false;
+const FLAG_DEBUG_SKIPPED_FRAMES = false;

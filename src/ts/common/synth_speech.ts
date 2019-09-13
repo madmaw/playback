@@ -16,7 +16,7 @@ const Sawtooth = ( x: number ) => {
 
 type Phenome = [number, number, number, number, number?, number?, number?, number?, number?, number?];
 
-/*var g_phonemes = {
+/*let g_phonemes = {
 	'o': { f:[12,  15,  0], w:[ 10,  10,  0], len:3, amp: 6, osc:0, plosive:0 },
 	'i': { f:[ 5,  56,  0], w:[ 10,  10,  0], len:3, amp: 3, osc:0, plosive:0 },
 	'j': { f:[ 5,  56,  0], w:[ 10,  10,  0], len:1, amp: 3, osc:0, plosive:0 },
@@ -45,7 +45,7 @@ type Phenome = [number, number, number, number, number?, number?, number?, numbe
 	'k': { f:[20,  80,  0], w:[ 10,  10,  0], len:1, amp: 3, osc:1, plosive:1 }
 };
 */
-var g_phonemes: Phenome[];
+let g_phonemes: Phenome[];
 if (FLAG_RANDOMIZE_PHENOMES) {
 	g_phonemes = [];
 	for (let i=0; i<26; i++) {
@@ -60,7 +60,7 @@ if (FLAG_RANDOMIZE_PHENOMES) {
 } else {
 	g_phonemes = [
 		[10,  10,  0, 18,  30], // 'a': 
-		[10,   0,  0, 4], // 'b': 
+		,//[10,   0,  0, 4], // 'b': 
 		, // c
 		[10,  10, 10, 4,  40, 80], // 'd': 
 		[10,  10,  0, 14,  50], // 'e': 
@@ -69,13 +69,13 @@ if (FLAG_RANDOMIZE_PHENOMES) {
 		[30,  10, 30, 22,  26, 32], // 'h': 
 		[10,  10,  0,  5,  56], // 'i': 
 		[10,  10,  0,  5,  56], // 'j': 
-		[10,  10,  0, 20,  80], //'k': 
+		,//[10,  10,  0, 20,  80], //'k': 
 		[10,  10,  0,  8,  20], // 'l': 
-		[10,  10,  0,  4,  20], // 'm': 
+		,//[10,  10,  0,  4,  20], // 'm': 
 		[10,  10,  0,  4,  40], //'n': 
 		[10,  10,  0, 12,  15], // 'o': 
 		[ 5,  10, 10,  4,  10, 20], // 'p': 
-		// q
+		,// q
 		[30,   8,  1,  3,  10, 20], // 'r': 
 		[80,  40,  0, 80, 110], // 's': 
 		[10,  20,  5,  4,  20, 40], // 't': 
@@ -101,34 +101,34 @@ const SynthSpeech = ( buf: Float32Array, text: string, sampleFrequency: number )
 	let bufPos = 0;
 	// Loop through all phonemes
 	text.split('').forEach((c, textPos) => {
-		var l = text.charCodeAt(textPos) - 97; // (a is 97)
+		let l = text.charCodeAt(textPos) - 97; // (a is 97)
 		// Find phoneme description
-		var p = g_phonemes[l];
+		let p = g_phonemes[l];
 		if (!p) {
 			// space
 			if (l == 32) {
 				bufPos += (sampleFrequency * .2) | 0;
 			}
 		} else {
-		//var v = p[INDEX_AMP];
-		var v = 3;
+		//let v = p[INDEX_AMP];
+		let v = 3;
 		// Generate sound
-		//var sl = p[INDEX_LEN] * (sampleFrequency / 15);
-		var sl = (2+l/9) * (sampleFrequency / 15);
-		for ( var f = 0; f < 3; f++ ) {
-			var ff = p[f + OFFSET_F];
+		//let sl = p[INDEX_LEN] * (sampleFrequency / 15);
+		let sl = (2+l/9) * (sampleFrequency / 15);
+		for ( let f = 0; f < 3; f++ ) {
+			let ff = p[f + OFFSET_F];
 			if ( ff ) {
-				var freq = ff*(30/sampleFrequency);
-				var buf1Res = 0, buf2Res = 0;
-				var q = 1 - p[f] * (MATH_PI_2 * 5 / sampleFrequency);
-				//var b = buf; <-- store current bufPos?
-				var thisBufPos = bufPos;
-				var xp = 0;
-				for ( var s = 0; s < sl; s++ ) { 
-					// var n = Math.random()-.5;
-					// var x = n;
+				let freq = ff*(30/sampleFrequency);
+				let buf1Res = 0, buf2Res = 0;
+				let q = 1 - p[f] * (MATH_PI_2 * 5 / sampleFrequency);
+				//let b = buf; <-- store current bufPos?
+				let thisBufPos = bufPos;
+				let xp = 0;
+				for ( let s = 0; s < sl; s++ ) { 
+					// let n = Math.random()-.5;
+					// let x = n;
 					// if ( !p[INDEX_OSC] ) {
-						var x = Sawtooth ( s * (60 * MATH_PI_2 / sampleFrequency) );
+						let x = Sawtooth ( s * (60 * MATH_PI_2 / sampleFrequency) );
 						// xp = 0;
 					// }
 					// Apply formant filter

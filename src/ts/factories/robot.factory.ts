@@ -1,8 +1,8 @@
 const robotFactoryFactory = (orientation: Orientation, hue: number) => {
     const palette: HSL[] = [
-        [hue, 40, 50], 
-        [hue, 40, 40], 
-        [hue, 40, 20], 
+        [hue, 50, 50], 
+        [hue, 50, 40], 
+        [hue, 50, 20], 
         [hue, 0, 99], 
     ]; 
     return (x: number, y: number, id: IdFactory) => {
@@ -17,22 +17,17 @@ const robotFactoryFactory = (orientation: Orientation, hue: number) => {
             collisionGroup: COLLISION_GROUP_ENEMIES, 
             gravityMultiplier: 1, 
             id: id(), 
-            lastCollisions: [0, 0, 0, 0, 0],
             mass: 2, 
             velocity: [0, 0], 
             baseVelocity: BASE_VELOCITY/3, 
-            boundsWithVelocity: [0, 0, 0, 0], 
             entityOrientation: orientation,
             orientationStartTime: 0, 
             activeInputs: {
-                reads: {}, 
-                states: {}, 
             }, 
             holding: {},  
             hue, 
             handJointId: ROBOT_GRAPHIC_JOINT_ID_LEFT_ARM, 
             insertionJointId: ROBOT_GRAPHIC_JOINT_ID_TAPE_DECK, 
-            instructionsHeard: [],       
             nextScriptIndex: 0,       
             capabilities: [
                 INSTRUCTION_ID_UP,

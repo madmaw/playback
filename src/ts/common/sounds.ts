@@ -64,11 +64,12 @@ let vibratoSoundFactory = (
         oscillator.type = oscillatorType;
 
         let gain = audioContext.createGain();
-        var decay = durationSeconds * .2;
+        let decay = durationSeconds * .2;
         linearRampGain(gain, now, attackVolume, sustainVolume, attackSeconds, decay, null, durationSeconds);
 
         let vibrato: OscillatorNode;
         let vibratoGain: GainNode;
+        let filter: BiquadFilterNode;
         if( vibratoType ) {
             vibrato = audioContext.createOscillator();
             vibrato.frequency.value = vibratoFrequency;
@@ -85,7 +86,7 @@ let vibratoSoundFactory = (
         }
 
         if( filterFrequency ) {
-            var filter = audioContext.createBiquadFilter();
+            filter = audioContext.createBiquadFilter();
             filter.type = filterFrequency < oscillatorStartFrequency
                 ? 'highpass'
                 : 'lowpass';
@@ -140,9 +141,9 @@ const boomSoundFactory =(
     sustainVolume: number
 ): Sound => {
 	let sampleRate = audioContext.sampleRate;
-    var frameCount = durationSeconds * sampleRate | 0;
-    var buffer = audioContext.createBuffer(1, frameCount, sampleRate);
-	var data = buffer.getChannelData(0);
+    let frameCount = durationSeconds * sampleRate | 0;
+    let buffer = audioContext.createBuffer(1, frameCount, sampleRate);
+	let data = buffer.getChannelData(0);
 	
     while (frameCount--) {
         data[frameCount] = Math.random() * 2 - 1;
@@ -150,18 +151,18 @@ const boomSoundFactory =(
 
     return () => {
 
-		var staticNode = audioContext.createBufferSource();
+		let staticNode = audioContext.createBufferSource();
 		staticNode.buffer = buffer;
 		staticNode.loop = true;
 
-		var filter = audioContext.createBiquadFilter();
+		let filter = audioContext.createBiquadFilter();
 		filter.type = 'lowpass';
 		filter.Q.value = 0;
 		filter.frequency.value = filterFrequency;
 
 		//decay
-		var gain = audioContext.createGain();
-		var decay = durationSeconds * .2;
+		let gain = audioContext.createGain();
+		let decay = durationSeconds * .2;
 		linearRampGain(gain, audioContext.currentTime, attackVolume, sustainVolume, attackSeconds, decay, null, durationSeconds);
 
 		staticNode.connect(filter);
@@ -189,17 +190,17 @@ const synthesizeSpeech = (
     // create the buffer
     let durationSeconds = word.length * SECONDS_PER_LETTER;
 	let sampleRate = audioContext.sampleRate;
-    var frameCount = durationSeconds * sampleRate | 0;
-    var buffer = audioContext.createBuffer(1, frameCount, sampleRate * 2);
-    var data = buffer.getChannelData(0);
+    let frameCount = durationSeconds * sampleRate | 0;
+    let buffer = audioContext.createBuffer(1, frameCount, sampleRate * 2);
+    let data = buffer.getChannelData(0);
     
     SynthSpeech(data, word, sampleRate);
 
     return () => {
-		var staticNode = audioContext.createBufferSource();
+		let staticNode = audioContext.createBufferSource();
         staticNode.buffer = buffer;
         
-        var gain = audioContext.createGain();
+        let gain = audioContext.createGain();
         gain.gain.value = baseVolume;
 
         staticNode.connect(gain);

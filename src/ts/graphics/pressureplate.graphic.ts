@@ -21,7 +21,7 @@ const PRESSURE_PLATE_STRUT_WIDTH = 4;
 const PRESSURE_PLATE_POSE_ID_TRIGGER = 0;
 
 const pressurePlateGraphicFactory = (width: number, height: number, edge: Edge) => {
-    const rAngle = (edge - 1) * MATH_PI_ON_2;
+    const rAngle = (edge - 1) * MED_P_MATH_PI_ON_2;
     const imageryWidth = width;
     const imageryHeight = height;
     if (!(edge % 2)) {

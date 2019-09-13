@@ -233,8 +233,8 @@ const instructionToKey = (i: Instruction) => i.keyChar ||  i.keyCodes && String.
 
 
 type Inputs = {
-    states: {[_:number]: number}, 
-    reads: {[_:number]: number}, 
+    states?: {[_:number]: number}, 
+    reads?: {[_:number]: number}, 
 };
 
 let setInput = (entity: Entity, input: number, now: number) => {

@@ -23,7 +23,7 @@ const tapeGraphic: Graphic = {
         ]
     ], 
     joints: [{
-        id: TAPE_GRAPHIC_JOINT_ID_BODY, 
+        //id: TAPE_GRAPHIC_JOINT_ID_BODY, 
         imageIndex: TAPE_GRAPHIC_IMAGE_INDEX_BODY, 
         transformations: [{
             transformType: TRANSFORM_TYPE_TRANSLATE, 

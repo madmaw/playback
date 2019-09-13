@@ -58,7 +58,7 @@ const createWorld = (audioContext: AudioContext, w: number, h: number, roomFacto
         [INSTRUCTION_ID_PICK_UP]: vibratoSoundFactory(audioContext, .2, 0, .2, .05, 'triangle', 699, 2e3, 599),  
         [INSTRUCTION_ID_SHOOT]: boomSoundFactory(audioContext, .3, .01, 399, 1, .5), 
         [INSTRUCTION_ID_STOP]: boomSoundFactory(audioContext, .1, 0, 1e3, .5, .4), 
-        [INSTRUCTION_ID_RECORD]: vibratoSoundFactory(audioContext, .2, 0, .2, .05, 'triangle', 799, 1e3, 499), 
+        [INSTRUCTION_ID_RECORD]: vibratoSoundFactory(audioContext, .3, 0, .2, .05, 'triangle', 799, 1e3, 499, 'sawtooth', 99), 
         [INSTRUCTION_ID_ASSPULL]: vibratoSoundFactory(audioContext, .2, 0, .2, .05, 'triangle', 299, 2e3, 599),   
     };
     // for (let instruction = 0; instruction < 10; instruction++) {
@@ -92,17 +92,3 @@ const createWorld = (audioContext: AudioContext, w: number, h: number, roomFacto
     };
     return world;
 }
-
-const worldGetActiveRoomBounds = (world: World): Rectangle => {    
-    const [cx, cy] = world.currentRoom;
-    const [w, h] = world.size;
-    const minX = cx - ACTIVE_ROOM_SPREAD_HORIZONTAL;
-    const minY = cy - ACTIVE_ROOM_SPREAD_VERTICAL; 
-    return [
-        Math.max(minX, 0), 
-        Math.max(minY, 0), 
-        Math.min(cx + ACTIVE_ROOM_SPREAD_HORIZONTAL, w - 1) - minX, 
-        Math.min(cy + ACTIVE_ROOM_SPREAD_VERTICAL, h - 1) - minY, 
-    ];
-}
-
