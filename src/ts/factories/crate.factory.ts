@@ -1,6 +1,6 @@
 const crateFactory = (x: number, y: number, id: IdFactory) => {
     const crate: Crate = {
-        id: id(), 
+        eid: id(), 
         entityType: ENTITY_TYPE_CRATE, 
         collisionGroup: COLLISION_GROUP_PUSHABLES, 
         collisionMask: COLLISION_MASK_PUSHABLES, 

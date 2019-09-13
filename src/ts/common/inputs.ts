@@ -48,7 +48,7 @@ type Instruction = {
 const INSTRUCTIONS: Instruction[] = [{ 
     // count 0
     keyCodes: [48], // 0 
-    phoneticName: 'oo',
+    phoneticName: 'o',
 }, {    
     // count 1
     keyCodes: [49], // 1
@@ -64,27 +64,27 @@ const INSTRUCTIONS: Instruction[] = [{
 }, {
     // count 4
     keyCodes: [52], // 4
-    phoneticName: 'for', 
+    phoneticName: 'or', 
 }, {
     // count 5
     keyCodes: [53], // 5
-    phoneticName: 'fiv', 
+    phoneticName: 'fi', 
 }, {
     // count 6
     keyCodes: [54], // 6
-    phoneticName: 'six', 
+    phoneticName: 'si', 
 }, {
     // count 7
     keyCodes: [55], // 7
-    phoneticName: 'svn', 
+    phoneticName: 'sen', 
 }, {
     // count 8
     keyCodes: [56], // 8
-    phoneticName: 'ate', 
+    phoneticName: 'at', 
 }, {
     // count 9
     keyCodes: [57], // 9
-    phoneticName: 'nie', 
+    phoneticName: 'ni', 
 }, {
     // noop / do nothing
 }, {
@@ -176,7 +176,7 @@ const INSTRUCTIONS: Instruction[] = [{
     animationId: ANIMATION_ID_SAVING, 
 }, {
     // shoot
-    readableName: FLAG_EMOJIS ? '🔫' : 'shoot', 
+    readableName: FLAG_EMOJIS ? '🔫' : 'fire', 
     keyCodes: [13], // enter
     hold: 1, 
     automatedDuration: BULLET_INTERVAL, 

@@ -440,7 +440,7 @@ const drawEntity = (c: CanvasRenderingContext2D, entity: Entity, worldAge: numbe
             graphicalEntity.currentPoseId = currentPoseId;
         }
         const callback: PostJointRenderCallback = (c, j) => {
-            const held = movableEntity.holding && movableEntity.holding[j.id];
+            const held = movableEntity.holding && movableEntity.holding[j.gid];
             if (held) {
                 drawEntity(c, held as Entity, worldAge, newXScale, newYScale);
             }
@@ -586,7 +586,7 @@ const updateEntity = (
                         const tileBounds = [tx, ty, 1, 1] as Rectangle;
                         const blocked = room.tiles[tx][ty].find(e => rectangleOverlap((e as MovableEntity).bounds, tileBounds) > .8 && (e.collisionGroup == COLLISION_GROUP_TERRAIN || e.collisionGroup == COLLISION_GROUP_PUSHABLES));
                         if (blocked) {
-                            tileReachability[ty][tx] = blocked.id;
+                            tileReachability[ty][tx] = blocked.eid;
                         } else {
                             tileReachability[ty][tx] = cost;
                             EDGE_OFFSETS.forEach(([dx, dy]: Vector) => {
@@ -601,7 +601,7 @@ const updateEntity = (
             room.updatableEntities.forEach(e => {
                 const everyEntity = e as EveryEntity;
                 let heard: boolean;
-                rectangleIterateBounds(everyEntity.bounds, room.bounds, (x, y) => heard = heard || tileReachability[y][x] < 0 || tileReachability[y][x] == e.id);
+                rectangleIterateBounds(everyEntity.bounds, room.bounds, (x, y) => heard = heard || tileReachability[y][x] < 0 || tileReachability[y][x] == e.eid);
                 if (heard) {
                     playerHeard = playerHeard || e.entityType == ENTITY_TYPE_PLAYER;
                     if (everyEntity.instructionsHeard && e != entity && (!everyEntity.hue || everyEntity.hue == (tape && tape.hue))) {
@@ -617,7 +617,7 @@ const updateEntity = (
                     collisionMask: 0, 
                     entityType: ENTITY_TYPE_SPEECH_BUBBLE, 
                     hue, 
-                    id: world.idFactory(),
+                    eid: world.idFactory(),
                     bounds: [...everyEntity.bounds] as Rectangle,  
                     spokenAge: worldAge, 
                     instruction, 
@@ -1024,7 +1024,7 @@ const updateEntity = (
                         collisionGroup: COLLISION_GROUP_BULLETS, 
                         collisionMask: COLLISION_MASK_BULLETS, 
                         gravityMultiplier: 0, 
-                        id: world.idFactory(), 
+                        eid: world.idFactory(), 
                         lastCollisions: [0, 0, 0, 0, 0], 
                         mass: .1, 
                         boundsWithVelocity: [0, 0, 0, 0], 

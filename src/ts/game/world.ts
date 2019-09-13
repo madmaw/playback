@@ -14,7 +14,7 @@ type World = {
 
 const createWorld = (audioContext: AudioContext, w: number, h: number, roomFactory: RoomFactory) => {
     // leave some space for persistent ids, start at 99
-    let nextId = 99;
+    let nextId = MAX_PERSISTENT_ID_PLUS_1;
     const idFactory = () => nextId++;
     let player: Player;
     let startX: number;
@@ -87,8 +87,8 @@ const createWorld = (audioContext: AudioContext, w: number, h: number, roomFacto
         age, 
         player, 
         instructionSounds, 
-        lastShaken: 0, 
-        shakeSound, 
+        //lastShaken: 0, 
+        //shakeSound, 
     };
     return world;
 }

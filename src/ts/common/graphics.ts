@@ -21,7 +21,7 @@ type TriangleWithPaletteIndex = [number, number, number, number, number, number,
 type Image = (RectangleWithPaletteIndex | TriangleWithPaletteIndex)[];
 
 type Joint = {
-    id?: number, 
+    gid?: number, 
     imageIndex?: number;
     transformations?: Transform[];
     renderBefore?: Joint[];
@@ -91,7 +91,7 @@ let drawGraphicJoints = (c: CanvasRenderingContext2D, g: Graphic, palette: HSL[]
         joints.forEach(j => {
             c.save();
             applyGraphicTransformations(c, j.transformations, 1);
-            poses.forEach(p => applyGraphicTransformations(c, g.poses[p.poseId][j.id], p.animationProgress));
+            poses.forEach(p => applyGraphicTransformations(c, g.poses[p.poseId][j.gid], p.animationProgress));
             drawGraphicJoints(c, g, palette, j.renderBefore, callback, poses);
             if (j.imageIndex != null) {
                 g.imagery[j.imageIndex].forEach(image => {      

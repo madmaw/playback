@@ -39,7 +39,7 @@ type PassiveAnimation = {
 };
 
 type CommonEntity = {
-    id: number;
+    eid: number;
     entityType: number;
     persistentId?: number;
 }
@@ -96,7 +96,7 @@ type PlaybackEntity = {
     playbackStartTime?: number;
     nextScriptIndex?: number;
     autoRewind?: number | boolean;
-    capabilities: number[];
+    capabilities?: number[];
 } & MovableEntity;
 
 type InstructableEntity = {
@@ -160,7 +160,7 @@ const ENTITY_TYPE_PLAYER = 0;
 type Player = {
     entityType: 0,
     commandsVisible?: boolean | number,
-} & CommonEntity & GrabbingEntity & ActiveGraphicalEntity & PlaybackEntity & ListeningEntity & MortalEntity;
+} & CommonEntity & GrabbingEntity & ActiveGraphicalEntity & PlaybackEntity & ListeningEntity & SpeakingEntity & MortalEntity;
 
 const ENTITY_TYPE_ROBOT = 1; 
 type Robot = {

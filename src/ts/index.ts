@@ -84,20 +84,17 @@ onload = () => {
             };
             delta -= d;
             const render = delta < MAX_DELTA;
+            context.save();
             if (render) {
                 //context.clearRect(0, 0, clientWidth, clientHeight);
-                context.save();
                 if (FLAG_SHAKE) {
                     const shake = Math.sqrt(Math.max(0, world.lastShaken - world.age));
                     context.translate(shake * (Math.random() - .5), shake * (Math.random() - .5));    
                 }
-
-                context.scale(scale, scale); 
             }
+            context.scale(scale, scale); 
             updateAndRenderWorld(context, world, d, render);
-            if (render) {
-                context.restore();
-            }
+            context.restore();
         }
         remainder = delta;
         if (world.player.deathAge && readInput(world.player, INSTRUCTION_ID_JUMP, world.age)) {
@@ -116,7 +113,7 @@ const renderPlayer = (player: Player, world: World) => {
     if (player.deathAge) {
         message = 'Space to Retry';
     } else if (world.lastSaved > world.age - MESSAGE_DISPLAY_TIME){
-        message = 'Game Saved';
+        message = 'Saved';
     }
     if (message) {
         o.innerText = message;

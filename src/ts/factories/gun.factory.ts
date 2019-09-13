@@ -8,7 +8,7 @@ const gunFactoryFactory = (holderFactory?: EntityFactory) => {
             collisionGroup: COLLISION_GROUP_ITEMS, 
             collisionMask: COLLISION_MASK_ITEMS, 
             gravityMultiplier: 1, 
-            id: id(), 
+            eid: id(), 
             mass: .1, 
             velocity: [0, 0], 
             restitution: .4, 

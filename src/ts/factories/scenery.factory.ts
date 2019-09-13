@@ -1,7 +1,7 @@
 let sceneryFactoryFactory = (text: string, scale: number) => {
     return (x: number, y: number, id: IdFactory) => {
         const scenery: Scenery = {
-            id: id(), 
+            eid: id(), 
             collisionGroup: COLLISION_GROUP_BACKGROUNDED, 
             collisionMask: 0, 
             text, 

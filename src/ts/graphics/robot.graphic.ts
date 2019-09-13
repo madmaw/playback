@@ -54,7 +54,7 @@ const robotGraphic: Graphic = {
             dy: 0, 
         }],
         renderAfter: [{
-            id: ROBOT_GRAPHIC_JOINT_ID_LEFT_LEG, 
+            gid: ROBOT_GRAPHIC_JOINT_ID_LEFT_LEG, 
             imageIndex: ROBOT_GRAPHIC_IMAGE_INDEX_LEG, 
             transformations: [{
                 transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -62,7 +62,7 @@ const robotGraphic: Graphic = {
                 dy: 26, 
             }]
         }, {
-            id: ROBOT_GRAPHIC_JOINT_ID_RIGHT_LEG, 
+            gid: ROBOT_GRAPHIC_JOINT_ID_RIGHT_LEG, 
             imageIndex: ROBOT_GRAPHIC_IMAGE_INDEX_LEG, 
             transformations: [{
                 transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -70,7 +70,7 @@ const robotGraphic: Graphic = {
                 dy: 26, 
             }]
         }, {
-            id: ROBOT_GRAPHIC_JOINT_ID_BODY, 
+            gid: ROBOT_GRAPHIC_JOINT_ID_BODY, 
             imageIndex: ROBOT_GRAPHIC_IMAGE_INDEX_BODY, 
             transformations: [{
                 transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -78,7 +78,7 @@ const robotGraphic: Graphic = {
                 dy: 28, 
             }], 
             renderAfter: [{
-                id: ROBOT_GRAPHIC_JOINT_ID_LEFT_ARM, 
+                gid: ROBOT_GRAPHIC_JOINT_ID_LEFT_ARM, 
                 imageIndex: ROBOT_GRAPHIC_IMAGE_INDEX_HAND,
                 transformations: [{
                     transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -102,7 +102,7 @@ const robotGraphic: Graphic = {
                     }]  
                 }]*/
             }, {
-                id: ROBOT_GRAPHIC_JOINT_ID_HEAD, 
+                gid: ROBOT_GRAPHIC_JOINT_ID_HEAD, 
                 imageIndex: ROBOT_GRAPHIC_IMAGE_INDEX_HEAD, 
                 transformations: [{
                     transformType: TRANSFORM_TYPE_TRANSLATE, 

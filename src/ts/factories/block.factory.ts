@@ -13,7 +13,7 @@ const blockFactoryFactory = ([hue, baseSaturation, baseLighting]: HSL, rounding 
             [hue, saturation, lighting - 9],    
         ];    
         const block: Block = {
-            id: id(),
+            eid: id(),
             graphic: blockGraphic, 
             palette, 
             entityType: ENTITY_TYPE_BLOCK, 

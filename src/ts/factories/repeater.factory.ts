@@ -16,7 +16,7 @@ const repeaterFactoryFactory = (hue: number) => {
             collisionMask: COLLISION_MASK_BACKGROUNDED, 
             gravityMultiplier: 0, 
             holding: {},
-            id: id(), 
+            eid: id(), 
             activeInputs: {
             }, 
             entityType: ENTITY_TYPE_REPEATER, 

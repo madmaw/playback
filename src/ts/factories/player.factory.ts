@@ -10,16 +10,17 @@ const playerFactory = (x: number, y: number, id: IdFactory) => {
         gravityMultiplier: 1, 
         entityOrientation: ORIENTATION_RIGHT, 
         orientationStartTime: 0, 
-        id: id(),
+        eid: id(),
         mass: 1, 
         velocity: [0, 0], 
         baseVelocity: BASE_VELOCITY, 
         airTurn: 1, 
         activeInputs: {}, 
         holding: {},  
+        toSpeak: [], 
         handJointId: PLAYER_GRAPHIC_JOINT_ID_RIGHT_HAND,
         insertionJointId: PLAYER_GRAPHIC_JOINT_ID_TAPE_DECK,
-        capabilities: INSTRUCTIONS.map((instruction, i) => i).filter(i => INSTRUCTIONS[i].keyCodes),
+        //capabilities: INSTRUCTIONS.map((instruction, i) => i).filter(i => INSTRUCTIONS[i].keyCodes),
     };    
     return [player];
 }

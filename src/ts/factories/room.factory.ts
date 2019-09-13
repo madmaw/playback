@@ -66,7 +66,8 @@ const roomFactoryFactory = () => {
         'v': spikeFactory, 
         'T': sceneryFactoryFactory('🌳', 3), // 🌳
         //'A': sceneryFactoryFactory('🌲', 3), // 🌲
-        'O': sceneryFactoryFactory('☁️', 2), // ☁️        
+        'O': sceneryFactoryFactory('☁️', 2), // ☁️  
+        'U': sceneryFactoryFactory('☁️', 3), 
         //'F': sceneryFactoryFactory('🌻', 1), // 🌻
         //'M': sceneryFactoryFactory('🍄', .5), // 🍄
         //'I': sceneryFactoryFactory('🕯️', .5), // 🕯️
@@ -133,8 +134,7 @@ const roomFactoryFactory = () => {
             // 3, 0
             legendRoomFactory(
                 {...baseLegend,
-                    'C': sceneryFactoryFactory('🏰', 4), 
-                    'U': sceneryFactoryFactory('☁️', 3), 
+                    'C': sceneryFactoryFactory('🏰', 3), 
                     'T': sceneryFactoryFactory('Fin', 2), 
                     'B': tapeFactoryFactory([
                         INSTRUCTION_ID_WAIT, INSTRUCTION_ID_COUNT_4, INSTRUCTION_ID_LEFT, INSTRUCTION_ID_WAIT, INSTRUCTION_ID_COUNT_2, INSTRUCTION_ID_RIGHT,                         
@@ -241,9 +241,9 @@ const roomFactoryFactory = () => {
                     ), 
                 }, 
                 '                  ' + 
-                '             O    ' +
-                ' B                ' + 
-                'yyy   O           ' + 
+                '  O               ' +
+                ' B         O      ' + 
+                'yyy   U           ' + 
                 'ooo         aT  T ' +
                 'ooo         oooooo' +
                 'ooo         oooooo' +
@@ -294,8 +294,8 @@ const roomFactoryFactory = () => {
                     '3': tapeFactoryFactory([INSTRUCTION_ID_COUNT_7, INSTRUCTION_ID_LEFT], HUE_TAPE_SET_3, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS, EDGE_BOTTOM)), 
                 }, 
                 '               yyy' + 
-                '         O     yyy' +
-                '    O          3yy' + 
+                '    O          yyy' +
+                '         U     3yy' + 
                 '                  ' + 
                 'T                 ' + 
                 'oo           yyyyy' + 
@@ -400,7 +400,7 @@ const roomFactoryFactory = () => {
                     'R': gunFactoryFactory(robotFactoryFactory(ORIENTATION_RIGHT, HUE_TAPE_SET_1)), 
                     'd': platformFactoryFactory(1, 2, EDGE_TOP, HUE_TAPE_SET_1), 
                     'D': tapeFactoryFactory([INSTRUCTION_ID_UP, INSTRUCTION_ID_COUNT_6, INSTRUCTION_ID_SHOOT, INSTRUCTION_ID_DOWN], HUE_TAPE_SET_1, pressurePlateFactoryFactory(2, 1, HSL_AREA_1_BLOCKS)), 
-                    'c': tapeFactoryFactory([INSTRUCTION_ID_COUNT_2], HUE_TAPE_SET_1, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS, EDGE_RIGHT)), 
+                    'c': tapeFactoryFactory([INSTRUCTION_ID_COUNT_1], HUE_TAPE_SET_1, pressurePlateFactoryFactory(1, 1, HSL_AREA_1_BLOCKS, EDGE_RIGHT)), 
                 }, 
                 'yy  yyyyyyyyyyyyyy' + 
                 'yy                ' +

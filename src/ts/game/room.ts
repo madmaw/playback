@@ -22,9 +22,9 @@ type RoomFactory = (x: number, y: number, id: IdFactory) => Room;
 let roomIterateEntities = (room: Room, bounds: Rectangle | undefined, i: (entity: Entity) => void, useBoundsWithVelocity?: number | boolean) => {
     const handled = new Set<number>();
     roomIterateBounds(room, bounds, tile => tile.forEach(e => {
-        if (!handled.has(e.id) && rectangleOverlap(useBoundsWithVelocity && (e as MovableEntity).boundsWithVelocity || (e as MovableEntity).bounds, bounds)) {
+        if (!handled.has(e.eid) && rectangleOverlap(useBoundsWithVelocity && (e as MovableEntity).boundsWithVelocity || (e as MovableEntity).bounds, bounds)) {
             i(e);
-            handled.add(e.id);
+            handled.add(e.eid);
         }
     }));
 }

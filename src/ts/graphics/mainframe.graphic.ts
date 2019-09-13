@@ -46,10 +46,10 @@ const mainframeGraphic: Graphic = {
         ],         
     ], 
     joints: [{
-        id: MAINFRAME_GRAPHIC_JOINT_ID_BODY, 
+        gid: MAINFRAME_GRAPHIC_JOINT_ID_BODY, 
         imageIndex: BLOCK_GRAPHIC_IMAGE_INDEX_BODY, 
         renderAfter: [{
-            id: MAINFRAME_GRAPHIC_JOINT_ID_LEFT_SPINNER, 
+            gid: MAINFRAME_GRAPHIC_JOINT_ID_LEFT_SPINNER, 
             imageIndex: MAINFRAME_GRAPHIC_IMAGE_INDEX_TAPE_SPINNER, 
             transformations: [{
                 transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -75,7 +75,7 @@ const mainframeGraphic: Graphic = {
                 }]
             }]
         },{
-            id: MAINFRAME_GRAPHIC_JOINT_ID_RIGHT_SPINNER, 
+            gid: MAINFRAME_GRAPHIC_JOINT_ID_RIGHT_SPINNER, 
             imageIndex: MAINFRAME_GRAPHIC_IMAGE_INDEX_TAPE_SPINNER, 
             transformations: [{
                 transformType: TRANSFORM_TYPE_TRANSLATE, 

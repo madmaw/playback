@@ -113,7 +113,7 @@ module.exports = function (grunt) {
                     to: "null"
                 }, {
                     from: "const ", 
-                    to: "var "
+                    to: "let "
                 }/*, {
                     from: "var ", 
                     to: "let "

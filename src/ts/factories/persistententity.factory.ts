@@ -3,7 +3,7 @@ const persistentEntityFactoryFactory = (entityFactory: EntityFactory, persistent
         let entities = entityFactory(x, y, id, persistentId);
         if (!localStorage.getItem(persistentId as any)) {
             entities[0].persistentId = persistentId;
-            entities[0].id = persistentId;
+            entities[0].eid = persistentId;
         } else {
             entities = [];
         }

@@ -44,7 +44,7 @@ const repeaterGraphic: Graphic = {
             dy: 12, 
         }], 
     }, {
-        id: REPEATER_GRAPHIC_JOINT_ID_TAPE_DECK, 
+        gid: REPEATER_GRAPHIC_JOINT_ID_TAPE_DECK, 
         transformations: [{
             transformType: TRANSFORM_TYPE_TRANSLATE, 
             dx: -7.5, 

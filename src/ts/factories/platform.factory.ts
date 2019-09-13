@@ -21,7 +21,7 @@ const platformFactoryFactory = (w: number, h: number, direction: Edge, hue: numb
             collisionMask: COLLISION_MASK_TERRAIN, 
             collisionGroup: COLLISION_GROUP_TERRAIN, 
             gravityMultiplier: 0, 
-            id: id(), 
+            eid: id(), 
             velocity: [0, 0], 
             // can't be too fast or we outpace gravity and downward room transitions don't work while riding platforms
             baseVelocity: .0028, 

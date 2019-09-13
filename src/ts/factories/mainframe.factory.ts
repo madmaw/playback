@@ -15,7 +15,7 @@ const mainframeFactoryFactory = (hue: number) => {
             collisionMask: COLLISION_MASK_BACKGROUNDED, 
             collisionGroup: COLLISION_GROUP_BACKGROUNDED, 
             gravityMultiplier: 0, 
-            id: id(), 
+            eid: id(), 
             nextInstructionTime: 0, 
             nextScriptIndex: 0, 
             velocity: [0, 0], 

@@ -14,7 +14,7 @@ const pressurePlateFactoryFactory = (
     const graphic = pressurePlateGraphicFactory(width * 32, height * 32, edge);
     return (x: number, y: number, id: IdFactory) => {
         const pressurePlate: PressurePlate = {
-            id: id(),
+            eid: id(),
             graphic, 
             palette, 
             entityType: ENTITY_TYPE_PRESSURE_PLATE, 
@@ -31,7 +31,7 @@ const pressurePlateFactoryFactory = (
             toSpeak: [], 
             velocity: [0, 0], 
             autoRewind: 1, 
-            capabilities: [INSTRUCTION_ID_PLAY, INSTRUCTION_ID_REWIND, INSTRUCTION_ID_FAST_FORWARD, INSTRUCTION_ID_EJECT], 
+            //capabilities: [INSTRUCTION_ID_PLAY, INSTRUCTION_ID_REWIND, INSTRUCTION_ID_FAST_FORWARD, INSTRUCTION_ID_EJECT], 
             pressureEdge: edge, 
         }
         return [pressurePlate];

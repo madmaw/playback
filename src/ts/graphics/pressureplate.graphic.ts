@@ -89,7 +89,7 @@ const pressurePlateGraphicFactory = (width: number, height: number, edge: Edge) 
             ]
         ], 
         joints: [{
-            id: PRESSURE_PLATE_GRAPHIC_JOINT_ID_BODY, 
+            gid: PRESSURE_PLATE_GRAPHIC_JOINT_ID_BODY, 
             imageIndex: PRESSURE_PLATE_GRAPHIC_IMAGE_INDEX_BODY, 
             transformations: [{
                 transformType: TRANSFORM_TYPE_ROTATE, 
@@ -102,7 +102,7 @@ const pressurePlateGraphicFactory = (width: number, height: number, edge: Edge) 
                 dy: PRESSURE_PLATE_PLATE_HEIGHT, 
             }], 
         }, {
-            id: PRESSURE_PLATE_GRAPHIC_JOINT_ID_PLATE, 
+            gid: PRESSURE_PLATE_GRAPHIC_JOINT_ID_PLATE, 
             imageIndex: PRESSURE_PLATE_GRAPHIC_IMAGE_INDEX_PLATE, 
             transformations: [{
                 transformType: TRANSFORM_TYPE_ROTATE, 
@@ -115,7 +115,7 @@ const pressurePlateGraphicFactory = (width: number, height: number, edge: Edge) 
                 dy: -PRESSURE_PLATE_PLATE_GAP, 
             }], 
         }, {
-            id: PRESSURE_PLATE_GRAPHIC_JOINT_ID_TAPE, 
+            gid: PRESSURE_PLATE_GRAPHIC_JOINT_ID_TAPE, 
             imageIndex: PRESSURE_PLATE_GRAPHIC_IMAGE_INDEX_TAPE_DECK, 
             transformations: [{
                 transformType: TRANSFORM_TYPE_TRANSLATE, 

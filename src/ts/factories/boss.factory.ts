@@ -10,13 +10,12 @@ const bossFactoryFactory = (hue: number, entityFactory?: EntityFactory, asspullF
             gravityMultiplier: 1, 
             entityOrientation: ORIENTATION_RIGHT, 
             orientationStartTime: 0, 
-            id: id(),
+            eid: id(),
             mass: 49, 
             velocity: [0, 0], 
             baseVelocity: BASE_VELOCITY, 
             airTurn: 1, 
-            activeInputs: {
-            }, 
+            activeInputs: {}, 
             holding: {
                 [PLAYER_GRAPHIC_JOINT_ID_RIGHT_HAND]: entityFactory && entityFactory(x, y, id)[0] as MovableEntity, 
             },  

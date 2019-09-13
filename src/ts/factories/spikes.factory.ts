@@ -1,7 +1,7 @@
 const spikeFactoryFactory = () => {
     return (x: number, y: number, id: IdFactory) => {
         const spike: Lethal = {
-            id: id(),
+            eid: id(),
             graphic: randomSpikeGraphic(), 
             palette: spikesPalette, 
             entityType: ENTITY_TYPE_LETHAL, 

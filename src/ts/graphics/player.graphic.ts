@@ -97,14 +97,14 @@ const playerGraphic: Graphic = {
         ],
     ], 
     joints: [{
-        id: PLAYER_GRAPHIC_JOINT_ID_BODY, // body
+        gid: PLAYER_GRAPHIC_JOINT_ID_BODY, // body
         transformations: [{
             transformType: TRANSFORM_TYPE_TRANSLATE, 
             dx: -6, 
             dy: 0, 
         }], 
         renderAfter: [{
-            id: PLAYER_GRAPHIC_JOINT_ID_LEFT_LEG, // left leg
+            gid: PLAYER_GRAPHIC_JOINT_ID_LEFT_LEG, // left leg
             imageIndex: PLAYER_GRAPHIC_IMAGE_INDEX_LEG, // leg 
             transformations: [{
                 transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -112,7 +112,7 @@ const playerGraphic: Graphic = {
                 dy: 26, 
             }], 
         }, {
-            id: PLAYER_GRAPHIC_JOINT_ID_RIGHT_LEG, // right leg
+            gid: PLAYER_GRAPHIC_JOINT_ID_RIGHT_LEG, // right leg
             imageIndex: PLAYER_GRAPHIC_IMAGE_INDEX_LEG, // leg 
             transformations: [{
                 transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -120,12 +120,12 @@ const playerGraphic: Graphic = {
                 dy: 26, 
             }], 
         }, {
-            id: PLAYER_GRAPHIC_JOINT_ID_TORSO, // torso
+            gid: PLAYER_GRAPHIC_JOINT_ID_TORSO, // torso
             renderAfter: [{
-                id: PLAYER_GRAPHIC_JOINT_ID_FRONT_PANEL, // front panel
+                gid: PLAYER_GRAPHIC_JOINT_ID_FRONT_PANEL, // front panel
                 imageIndex: PLAYER_GRAPHIC_IMAGE_INDEX_FRONT_PANEL, // font panel
                 renderBefore: [{
-                    id: PLAYER_GRAPHIC_JOINT_ID_LEFT_ARM, // left arm
+                    gid: PLAYER_GRAPHIC_JOINT_ID_LEFT_ARM, // left arm
                     imageIndex: PLAYER_GRAPHIC_IMAGE_INDEX_ARM, // arm
                     transformations: [{
                         transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -133,7 +133,7 @@ const playerGraphic: Graphic = {
                         dy: 8, 
                     }], 
                 }, { // handle
-                    id: PLAYER_GRAPHIC_JOINT_ID_HANDLE, // handle
+                    gid: PLAYER_GRAPHIC_JOINT_ID_HANDLE, // handle
                     imageIndex: PLAYER_GRAPHIC_IMAGE_INDEX_HANDLE, // handle
                 }], 
                 renderAfter: [{
@@ -153,7 +153,7 @@ const playerGraphic: Graphic = {
                         dy: 10, 
                     }],
                 }, {
-                    id: PLAYER_GRAPHIC_JOINT_ID_TAPE_DECK, 
+                    gid: PLAYER_GRAPHIC_JOINT_ID_TAPE_DECK, 
                     transformations: [{
                         transformType: TRANSFORM_TYPE_TRANSLATE, 
                         dx: 10, 
@@ -161,10 +161,10 @@ const playerGraphic: Graphic = {
                     }]
                 }], 
             }, {
-                id: PLAYER_GRAPHIC_JOINT_ID_SIDE_PANEL, // side panel
+                gid: PLAYER_GRAPHIC_JOINT_ID_SIDE_PANEL, // side panel
                 imageIndex: PLAYER_GRAPHIC_IMAGE_INDEX_SIDE_PANEL, // side panel
                 renderAfter: [{
-                    id: PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM, // right arm
+                    gid: PLAYER_GRAPHIC_JOINT_ID_RIGHT_ARM, // right arm
                     imageIndex: PLAYER_GRAPHIC_IMAGE_INDEX_ARM, // arm
                     transformations: [{
                         transformType: TRANSFORM_TYPE_TRANSLATE, 
@@ -172,7 +172,7 @@ const playerGraphic: Graphic = {
                         dy: 8, 
                     }],
                     renderAfter: [{
-                        id: PLAYER_GRAPHIC_JOINT_ID_RIGHT_HAND, 
+                        gid: PLAYER_GRAPHIC_JOINT_ID_RIGHT_HAND, 
                         transformations: [{
                             transformType: TRANSFORM_TYPE_TRANSLATE, 
                             dx: 0, 
