@@ -1,21 +1,20 @@
-Template project for making a JS13K entry using TypeScript, Grunt, and minified using the Closure Compiler (which now supports fully-compressed ES6 output!)
+Oh no, you've been kicked out of the castle! Solve puzzles and make your way back to your rightful home. 
 
-It uses old-school `AMD` style, which means everything is global. No imports, use `\\\<reference path="lib.ts">` in the order you want them imported (ideally just do this once in `index.ts`) instead. Or change the module type, whatever suits you, but I believe `AMD` produces the smallest code.
+Puzzle-platformer game with an audio mechanic. Robots and platforms will only respond to sounds from tapes of the same color. Platforms with dark arrows on them will remember their position after saving, so you don't need to worry about losing too much progress if you die. 
 
-To set up 
-1. install NPM https://www.npmjs.com/get-npm
-2. install Grunt CLI `npm install -g grunt-cli`
-3. in the project folder type `npm install`
+Controls (when it says "hold" make sure you hold down the key)
 
-To run up the devekopment environment
-1. type `grunt`
-2. go to http://localhost:8000/ (and open the developer tools/console)
-3. Any changes to the code/html/css should be automatically reloaded
-
-To do a build to submit
-1. type `grunt dist`
-2. go to http://localhost:8000/dist to check it still works
-3. compress (just) `dist/index.html` manually using advzip https://www.advancemame.it/comp-readme.html
-4. submit!
-
-NOTE: You might want to check that the substitutions in the `Gruntfile.js` `replace` task match what you want to have trimmed out of your HTML
+Hold Left/Right Arrows or A/D = Move Left/Right
+Space or J = Jump
+Hold Down Arrow or S = Stop Grabbing
+Up Arrow or W = Climb up (while grabbing)
+G = Get/Pick up
+B = Drop (Brop?)
+I = Insert tape
+K = Eje(k)t tape
+Hold P = Play
+Hold R = Record
+Hold [ = Rewind
+Hold ] = Fast Forward
+T = Throw
+Enter = Shoot gun (should you find one)
